@@ -260,9 +260,10 @@ h3,.h3{font:700 1.2rem/1.2 var(--display);letter-spacing:.03em;text-transform:up
 .rig .rphoto{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-bottom:1px solid var(--rule)}
 
 /* ---------- bold home: full-bleed hero, angled bands ---------- */
-.hero-x{position:relative;isolation:isolate;min-height:78vh;display:flex;align-items:flex-end;color:#fff;background:var(--char) url(/photos/structure-fire.jpg) center 40%/cover no-repeat;padding:clamp(4rem,10vw,7rem) 0 clamp(4rem,9vw,7rem)}
-.hero-x::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(22,22,24,.94) 0%,rgba(22,22,24,.86) 40%,rgba(22,22,24,.55) 70%,rgba(22,22,24,.3) 100%),linear-gradient(0deg,rgba(22,22,24,.96) 0%,rgba(22,22,24,.55) 45%,rgba(22,22,24,.2) 100%)}
-.hero-x .hx{max-width:40rem}
+.hero-x{position:relative;isolation:isolate;min-height:min(88vh,60rem);display:flex;align-items:flex-end;color:#fff;background:var(--char) url(/photos/structure-fire.jpg) center 40%/cover no-repeat;padding:clamp(4rem,10vw,7rem) 0 clamp(4rem,8vw,6rem)}
+.hero-x .wrap{max-width:none;width:100%;padding:0 clamp(1rem,4.5vw,6rem)}
+.hero-x::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(22,22,24,.92) 0%,rgba(22,22,24,.82) 28%,rgba(22,22,24,.45) 52%,rgba(22,22,24,.12) 75%,rgba(22,22,24,.05) 100%),linear-gradient(0deg,rgba(22,22,24,.95) 0%,rgba(22,22,24,.45) 40%,rgba(22,22,24,.1) 100%)}
+.hero-x .hx{max-width:44rem}
 .hero-x .hpatch{display:block;width:140px;height:auto;margin-bottom:1.5rem;filter:drop-shadow(0 6px 18px rgba(0,0,0,.55))}
 @media (max-width:48rem){.hero-x .hpatch{width:96px;margin-bottom:1.1rem}}
 .hero-x .kicker{color:var(--brass)}
