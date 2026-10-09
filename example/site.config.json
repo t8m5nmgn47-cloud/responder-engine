@@ -3,5 +3,6 @@
   "domain": "https://pawpaw-fire.vercel.app",
   "template": "department",
   "formRecipient": "",
-  "patch": "/patch.svg"
+  "patch": "/patch.svg",
+  "analytics": ""
 }

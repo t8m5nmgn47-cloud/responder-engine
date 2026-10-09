@@ -198,3 +198,6 @@ Department repos pin a caret range (`^0.1.0`) and pick up patch and minor releas
 ## License
 
 MIT. See `LICENSE`.
+
+## Analytics
+Set `"analytics": "vercel"` in `site.config.json` to emit the Vercel Web Analytics snippet (`/_vercel/insights/script.js`) in `<head>`; the project must also have Web Analytics enabled on Vercel (`vercel project web-analytics <name>`). Leave it empty for no analytics (or when hosting elsewhere).

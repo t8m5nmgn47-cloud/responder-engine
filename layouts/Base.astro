@@ -2,6 +2,8 @@
 import '../styles/global.css';
 import d from '@content/dept.json';
 import status from '@content/status.json';
+import siteConfig from '@siteconfig';
+const analytics = siteConfig.analytics || '';
 interface Props { title: string; description: string; }
 const { title, description } = Astro.props;
 const path = Astro.url.pathname;
@@ -54,6 +56,7 @@ const jsonld = {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=EB+Garamond:wght@500&display=swap" />
     <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />
+    {analytics === 'vercel' && <Fragment set:html={`<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script><script defer src="/_vercel/insights/script.js"></script>`} />}
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
