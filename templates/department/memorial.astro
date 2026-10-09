@@ -2,35 +2,108 @@
 import Base from '../../layouts/Base.astro';
 import d from '@content/dept.json';
 const fmt = (s: string) => new Date(s + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+const yr = (s: string) => s.slice(0, 4);
 const q = d.lodd[0];
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
+const roll = d.memorial.slice().sort((a, b) => a.died.localeCompare(b.died));
+const first = yr(roll[0].died), last = yr(roll[roll.length - 1].died);
 ---
-<Base title="Memorial" description="In memory of the members of the Paw Paw Fire Department who have died, and of Lieutenant Ethan Quillen, who died in the line of duty on February 22, 2023.">
-  <section class="mem-hero">
-    <div class="wrap">
-      <p class="kicker">Line of duty</p>
-      <p class="mem-name" style="margin-top:1rem">{q.name}</p>
-      <p class="mem-dates">Last alarm · {fmt(q.died)} · Member since {fmt(q.joined)}</p>
-      <p class="mem-account">{q.account}</p>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="wrap">
-      <div class="head"><p class="kicker">In memorial</p><h2>Members of the department who have died</h2><p class="small" style="max-width:62ch">{d.memorial_note}</p></div>
-      <ul class="roll">
-        {d.memorial.map((m) => <li>{m.name}<span>{fmt(m.died)}</span></li>)}
-      </ul>
-    </div>
-  </section>
-
-  <section class="section charband">
-    <div class="wrap">
-      <div class="head"><p class="kicker">For every department</p><h2>If a Michigan firefighter dies in the line of duty</h2></div>
-      <div class="prose" style="max-width:62ch">
-        <p>Paw Paw knows this day. No department should face it alone. The National Fallen Firefighters Foundation answers <a href={tel(d.michigan_last.nfff)}>{d.michigan_last.nfff}</a> twenty-four hours a day and notifies Michigan's Local Assistance State Team, trained volunteers who help the department and the family with the first hours, the funeral and honors, and the federal and state benefit claims, at no cost and only when asked.</p>
-        <p class="small" style="margin-top:1rem">Michigan's fallen are honored at the {d.michigan_last.memorial}, and nationally each spring at the National Fallen Firefighters Memorial in Emmitsburg, Maryland.</p>
+<Base title="Memorial" description={`In memory of the members of the ${d.name} who have died, and of ${q.name}, who died in the line of duty on ${fmt(q.died)}.`}>
+  <div class="mstone">
+    <section class="ms-lodd">
+      <div class="wrap">
+        <p class="ms-kicker">Line of duty</p>
+        <p class="ms-name">{q.name}</p>
+        <p class="ms-dates"><span>Last alarm</span> {fmt(q.died)}<span class="ms-sep" aria-hidden="true">·</span><span>Member since</span> {fmt(q.joined)}</p>
+        <div class="ms-rule" aria-hidden="true"></div>
+        <p class="ms-account">{q.account}</p>
       </div>
-    </div>
-  </section>
+    </section>
+
+    <section class="ms-wall-sec">
+      <p class="ms-epigraph">They answered when the tones dropped. We say their names so the department remembers.</p>
+      <div class="wrap">
+        <ol class="ms-wall" aria-label={`The ${roll.length} members of the department who have died, from ${first} to ${last}, oldest first`}>
+          {roll.map((m) => <li><span class="ms-n"><span class="ms-nm">{m.name}</span><span class="ms-dp">{fmt(m.died)}</span></span></li>)}
+        </ol>
+        <p class="ms-end">{roll.length} names &nbsp;·&nbsp; {first}–{last}</p>
+        <p class="ms-note">{d.memorial_note}</p>
+      </div>
+    </section>
+
+    <section class="ms-last">
+      <div class="wrap">
+        <p class="ms-kicker">For every department</p>
+        <h2>If a Michigan firefighter dies in the line of duty</h2>
+        <p>Paw Paw knows this day. No department should face it alone. The National Fallen Firefighters Foundation answers <a href={tel(d.michigan_last.nfff)}>{d.michigan_last.nfff}</a> twenty-four hours a day and notifies Michigan's Local Assistance State Team, trained volunteers who help the department and the family with the first hours, the funeral and honors, and the federal and state benefit claims, at no cost and only when asked.</p>
+        <p class="ms-small">Michigan's fallen are honored at the {d.michigan_last.memorial}, and nationally each spring at the National Fallen Firefighters Memorial in Emmitsburg, Maryland.</p>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Names rise into place once, oldest to newest. Respects reduced motion; without JS they are simply shown.
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const ns = Array.from(document.querySelectorAll<HTMLElement>('.ms-wall .ms-n'));
+      document.documentElement.classList.add('ms-reveal');
+      ns.forEach((el, i) => { el.style.animationDelay = `${Math.min(i * 40, 1400)}ms`; el.classList.add('now'); });
+    }
+  </script>
+
+  <style is:global>
+    .mstone{
+      --ms-bg:#15130f; --ms-ink:#c9c0b1; --ms-ink-hi:#f1e8d6; --ms-ink-lo:#a49c8f;
+      --ms-stone:#aea697; --ms-stone-lo:#8f887d; --ms-bronze:#b08a55; --ms-bronze-hi:#c9a06a;
+      --ms-rule:rgba(241,232,214,.12); --ms-rule-2:rgba(241,232,214,.07);
+      --ms-serif:"EB Garamond",Garamond,"Times New Roman",serif;
+      --ms-grain:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .95  0 0 0 0 .9  0 0 0 0 .84  0 0 0 1.1 -.52'/></filter><filter id='r'><feTurbulence type='fractalNoise' baseFrequency='.22' numOctaves='3' seed='7' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .78  0 0 0 0 .52  0 0 0 0 .46  0 0 0 2.6 -1.5'/></filter><rect width='100%' height='100%' filter='url(%23g)' opacity='.24'/><rect width='100%' height='100%' filter='url(%23r)' opacity='.15'/></svg>");
+      color:var(--ms-ink);
+      background:
+        var(--ms-grain),
+        radial-gradient(120% 70% at 50% -10%,rgba(160,120,105,.10),transparent 60%),
+        radial-gradient(80% 60% at 100% 100%,rgba(90,70,60,.14),transparent 70%),
+        linear-gradient(180deg,#17140f,#131110);
+      background-size:320px 320px,100% 100vh,100% 100%,100% 100%;background-repeat:repeat,no-repeat,no-repeat,no-repeat;background-color:var(--ms-bg);
+      -webkit-font-smoothing:antialiased;
+    }
+    .mstone .wrap{max-width:72rem}
+    .mstone a{color:var(--ms-ink-hi);text-decoration:underline;text-decoration-color:var(--ms-bronze);text-underline-offset:.2em}
+    .mstone a:focus-visible{outline:2px solid var(--ms-bronze-hi);outline-offset:3px}
+    .ms-kicker{font:600 .75rem/1.4 var(--display);letter-spacing:.22em;text-transform:uppercase;color:var(--ms-bronze-hi)}
+    /* Line of duty */
+    .ms-lodd{padding:clamp(4rem,10vh,8rem) 0 clamp(3rem,7vh,5rem);text-align:center}
+    .ms-name{margin-top:1.25rem;font:500 clamp(2.4rem,1.6rem + 4vw,5.5rem)/1.05 var(--ms-serif);letter-spacing:.14em;margin-right:-.14em;text-transform:uppercase;color:var(--ms-ink-hi);
+      text-shadow:0 1px 0 rgba(255,245,230,.06),0 -1px 0 rgba(0,0,0,.6);text-wrap:balance}
+    .ms-dates{margin-top:1.4rem;font:400 .95rem/1.6 var(--sans);letter-spacing:.06em;color:var(--ms-ink)}
+    .ms-dates span{font:600 .7rem/1 var(--display);letter-spacing:.2em;text-transform:uppercase;color:var(--ms-stone-lo);margin-right:.5rem}
+    .ms-dates .ms-sep{color:var(--ms-bronze);margin:0 .9rem}
+    .ms-rule{width:3rem;height:1px;background:var(--ms-bronze);margin:2rem auto}
+    .ms-account{max-width:58ch;margin:0 auto;font:400 clamp(1.1rem,1rem + .4vw,1.3rem)/1.65 var(--ms-serif);color:var(--ms-ink);text-align:left}
+    /* The wall */
+    .ms-wall-sec{padding:clamp(2rem,5vh,4rem) 0 clamp(4rem,8vh,6rem)}
+    .ms-epigraph{max-width:38ch;margin:0 auto clamp(2.5rem,6vh,4.5rem);padding:0 var(--gutter,1rem);text-align:center;font:italic 400 clamp(1.25rem,1rem + 1vw,1.85rem)/1.35 var(--ms-serif);color:var(--ms-ink);text-wrap:balance}
+    .ms-wall{list-style:none;margin:0;padding:2.25rem 0 1.75rem;columns:1;column-gap:0;column-rule:1px solid var(--ms-rule-2);border-top:1px solid var(--ms-rule);border-bottom:1px solid var(--ms-rule)}
+    .ms-wall li{break-inside:avoid;text-align:center;padding:0 1rem}
+    .ms-n{position:relative;display:inline-block;padding:.8rem .25rem .9rem}
+    .ms-nm{display:block;font:500 1.125rem/1.2 var(--ms-serif);letter-spacing:.13em;margin-right:-.13em;color:var(--ms-stone);text-shadow:0 1px 0 rgba(255,245,230,.05),0 -1px 0 rgba(0,0,0,.55);font-feature-settings:"kern","liga","lnum"}
+    .ms-dp{display:block;margin-top:.4rem;font:400 .8rem/1.4 var(--sans);letter-spacing:.02em;color:var(--ms-stone-lo);font-variant-numeric:lining-nums}
+    .ms-n::after{content:"";position:absolute;left:50%;bottom:.3rem;width:2.5rem;height:1px;margin-left:-1.25rem;background:var(--ms-bronze);transform:scaleX(0);transition:transform .3s ease}
+    .ms-n:hover .ms-nm{color:var(--ms-ink-hi)}.ms-n:hover::after{transform:scaleX(1)}
+    @media (min-width:38rem){.ms-wall{columns:2}}
+    @media (min-width:60rem){.ms-wall{columns:3}}
+    @media (min-width:80rem){.ms-wall{columns:4}}
+    @media (max-width:37.99rem){.ms-wall{max-width:24rem;margin:0 auto;border-left:1px solid var(--ms-rule-2);border-right:1px solid var(--ms-rule-2)}}
+    .ms-end{text-align:center;margin:2.25rem auto 0;font:600 .7rem/1.6 var(--display);letter-spacing:.2em;text-transform:uppercase;color:var(--ms-ink-lo);font-variant-numeric:tabular-nums}
+    .ms-note{text-align:center;max-width:56ch;margin:1.25rem auto 0;font-size:.85rem;line-height:1.55;color:var(--ms-ink-lo)}
+    /* reveal */
+    .ms-reveal .ms-wall .ms-n{opacity:0}
+    .ms-reveal .ms-wall .ms-n.now{animation:ms-rise .5s cubic-bezier(.2,.6,.2,1) both}
+    @keyframes ms-rise{from{opacity:0;transform:translateY(.4rem)}to{opacity:1;transform:none}}
+    /* LAST */
+    .ms-last{padding:clamp(3rem,7vh,5rem) 0 clamp(4rem,9vh,6rem);border-top:1px solid var(--ms-rule)}
+    .ms-last .wrap{max-width:62ch}
+    .ms-last h2{margin-top:.75rem;color:var(--ms-ink-hi);text-transform:none;letter-spacing:0;font:500 clamp(1.6rem,1.3rem + 1.2vw,2.3rem)/1.2 var(--ms-serif)}
+    .ms-last p{margin-top:1rem;font-size:1.05rem;line-height:1.65}
+    .ms-last .ms-small{font-size:.9rem;color:var(--ms-ink-lo)}
+  </style>
 </Base>
