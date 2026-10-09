@@ -1,0 +1,520 @@
+{
+  "name": "Paw Paw Fire Department",
+  "short": "Paw Paw Fire",
+  "company": "Paw Paw Fire Company No. 1, organized September 1868",
+  "founded": 1868,
+  "tagline": "100% volunteer. 100% of the time.",
+  "radio": "1200",
+  "url": "https://pawpaw-fire.vercel.app",
+  "address": {
+    "street": "832 S. Gremps St.",
+    "city": "Paw Paw",
+    "state": "MI",
+    "zip": "49079"
+  },
+  "phones": {
+    "emergency": "911",
+    "station": "269-657-4770",
+    "fax": "269-657-4302",
+    "tours": "269-870-6236"
+  },
+  "email": "",
+  "facebook": "https://www.facebook.com/pawpawfd",
+  "district": {
+    "area_sq_mi": 88,
+    "members": [
+      "Village of Paw Paw",
+      "Paw Paw Township",
+      "Antwerp Township",
+      "Waverly Township"
+    ],
+    "contract": [
+      "Almena Township"
+    ],
+    "board": [
+      {
+        "name": "Doug Craddock",
+        "for": "Village of Paw Paw"
+      },
+      {
+        "name": "Matt Miller",
+        "for": "Paw Paw Township"
+      },
+      {
+        "name": "Dan Ruziunk",
+        "for": "Antwerp Township"
+      },
+      {
+        "name": "Tony Millek",
+        "for": "Waverly Township"
+      }
+    ],
+    "board_note": "The Fire Board has one member appointed from each participating municipality's own board. It meets monthly at the station and oversees the department's working budget. Almena Township contracts for coverage.",
+    "mutual_aid": [
+      "Lawton Fire Department (1700)",
+      "Decatur Fire Department (1400)",
+      "Van Buren County EMS",
+      "Van Buren County Central Dispatch"
+    ]
+  },
+  "stats": {
+    "members": 41,
+    "officers": 19,
+    "firefighters": 20,
+    "juniors": 2,
+    "calls_2024": 306,
+    "apparatus": 8
+  },
+  "chiefs": [
+    {
+      "name": "Nate Jackson",
+      "title": "Fire Chief",
+      "phone": "269-720-7235",
+      "since": "October 2026",
+      "note": "Took over as chief at the department's awards banquet on October 1, 2026, after serving as Assistant Chief."
+    },
+    {
+      "name": "Kyle Richardson",
+      "title": "Past Chief · 2026 Firefighter of the Year",
+      "phone": "269-720-3052",
+      "note": "Chief from October 2024 to October 2026. Joined 2010; third generation of his family in the fire service.",
+      "photo": "/photos/awards-2026-richardson-firefighter-of-the-year-800.jpg"
+    },
+    {
+      "name": "Brandon Hall",
+      "title": "Assistant Chief",
+      "phone": "269-720-7283"
+    }
+  ],
+  "chiefs_note": "Officer titles and phone numbers carried over from the department's previous contact page and updated from the October 2026 banquet announcement; the department to confirm who now serves as assistant chiefs.",
+  "captains": [
+    {
+      "unit": "Engine 1201",
+      "name": "Brandon Hall"
+    },
+    {
+      "unit": "Engine 1202",
+      "name": "Pat Burmester",
+      "note": "Member since 1981"
+    },
+    {
+      "unit": "Ladder 1203",
+      "name": "Kirk Richardson"
+    },
+    {
+      "unit": "Grass 1204",
+      "name": "Chris Slater"
+    },
+    {
+      "unit": "Tanker 1205",
+      "name": "Bryan Stump"
+    },
+    {
+      "unit": "Squad 1206",
+      "name": "Matt Redmond"
+    },
+    {
+      "unit": "Grass 1207",
+      "name": "Tyler Richardson"
+    },
+    {
+      "unit": "Safety Officer",
+      "name": "Greg Straka"
+    },
+    {
+      "unit": "Ole 3",
+      "name": "Jim DeGroff III",
+      "note": "Lieutenant; member since 1972"
+    }
+  ],
+  "apparatus": [
+    {
+      "id": "1201",
+      "kind": "Engine",
+      "year": 2010,
+      "make": "Spartan / Smeal",
+      "spec": "Side-mount pumper. 1,250 gpm pump, 1,000-gallon tank. Carries Champion rescue tools.",
+      "role": "First-out engine on structure fires."
+    },
+    {
+      "id": "1202",
+      "kind": "Engine",
+      "year": 2000,
+      "make": "Pierce Dash",
+      "spec": "1,250 gpm pump, 1,000-gallon tank.",
+      "role": "Second engine; water supply and backup lines."
+    },
+    {
+      "id": "1203",
+      "kind": "Ladder",
+      "year": 2005,
+      "make": "Spartan / Smeal",
+      "spec": "105-foot aerial. 1,500 gpm pump, 400-gallon tank.",
+      "role": "Aerial operations, ventilation, rescue from height."
+    },
+    {
+      "id": "1204",
+      "kind": "Grass rig",
+      "year": 2002,
+      "make": "Chevrolet 2500 HD",
+      "spec": "650 gpm pump, 300-gallon tank.",
+      "role": "Grass, brush and field fires off the pavement."
+    },
+    {
+      "id": "1205",
+      "kind": "Tanker",
+      "year": 1996,
+      "make": "International, 2010 US Tank body",
+      "spec": "3,000-gallon tank.",
+      "role": "Water supply where there are no hydrants, which is most of the district."
+    },
+    {
+      "id": "1206",
+      "kind": "Squad",
+      "year": 2018,
+      "make": "Freightliner",
+      "spec": "Carries two complete sets of Jaws of Life.",
+      "role": "Vehicle extrication and rescue.",
+      "photo": "/photos/squad-1206-prevention.jpg",
+      "alt": "Squad 6 with its compartments open and a flag wrap on its side, with Paw Paw Fire Department drawstring bags reading 100% Volunteer 100% of the Time and a stack of red junior firefighter helmets in front."
+    },
+    {
+      "id": "1207",
+      "kind": "Grass rig",
+      "year": 2012,
+      "make": "Ford F-350",
+      "spec": "200-gallon tank.",
+      "role": "Quick attack on grass and brush fires."
+    },
+    {
+      "id": "Ole 3",
+      "kind": "Antique pumper",
+      "year": 1948,
+      "make": "Chevrolet / American front-mount",
+      "spec": "500 gpm pump, 500-gallon tank.",
+      "role": "Parades, ceremonies, and the department's history on wheels. Still in the station."
+    }
+  ],
+  "station": {
+    "name": "Station 1200",
+    "opened": 2023,
+    "cost": "$5.9 million",
+    "size": "21,000 square feet",
+    "approved": "Approved by the district's voters in 2020",
+    "history": "The department's first home was on West Main Street beside the Strand Theatre. Around 1974 it moved to 115 East Harry Bush Boulevard, and in 2023 to the new station on South Gremps Street. \"1200\" is the department's radio designation in the Van Buren County system; Lawton is 1700 and Decatur 1400."
+  },
+  "honor_guard": "The Paw Paw Fire Department Honor Guard was formed in September 2017 by several members of the department. They trained on their own time, in parking lots and gymnasiums donated by local businesses, and now present the colors at memorials, funerals, ceremonies, parades and community events across the area.",
+  "lodd": [
+    {
+      "name": "Lieutenant Ethan Quillen",
+      "age": 28,
+      "died": "2023-02-22",
+      "joined": "2019-09-19",
+      "account": "On the evening of February 22, 2023, during an ice storm, Lieutenant Quillen was responding to burning trees and downed wires in Almena Township when a tree broke and brought a power line down on him. He was taken to the hospital and did not survive. He was 28, a Marine Corps veteran, a husband, and the father of a young child. He had joined the department in September 2019. In May 2024 his name was added to the National Fallen Firefighters Memorial in Emmitsburg, Maryland, and he is honored on the Michigan Fire Fighters Memorial in Roscommon.",
+      "sources": [
+        "https://wxyz.com/news/paw-paw-firefighter-dies-after-incident-with-downed-power-line",
+        "https://www.firehero.org/wp-content/uploads/2024/04/2024mw-release-MI.pdf"
+      ]
+    }
+  ],
+  "memorial": [
+    {
+      "name": "Norm Pfeifle",
+      "died": "2022-12-26"
+    },
+    {
+      "name": "Robert Jackson",
+      "died": "2021-12-20"
+    },
+    {
+      "name": "Jim Beebe",
+      "died": "2020-02-13"
+    },
+    {
+      "name": "Dan Young",
+      "died": "2017-07-24"
+    },
+    {
+      "name": "Ben Ritsema",
+      "died": "2017-02-14"
+    },
+    {
+      "name": "Ron Wright",
+      "died": "2016-12-12"
+    },
+    {
+      "name": "Arnold Harvey",
+      "died": "2016-07-23"
+    },
+    {
+      "name": "Stan Mroczek",
+      "died": "2015-10-24"
+    },
+    {
+      "name": "Rick Dingman",
+      "died": "2014-03-04"
+    },
+    {
+      "name": "George Jacher",
+      "died": "2013-01-05"
+    },
+    {
+      "name": "Mel Kalmbach",
+      "died": "2012-07-08"
+    },
+    {
+      "name": "Bill Cutting",
+      "died": "2012-06-19"
+    },
+    {
+      "name": "Bill Hamilton",
+      "died": "2009-09-06"
+    },
+    {
+      "name": "Jerry Atwater",
+      "died": "2009-07-29"
+    },
+    {
+      "name": "John Ruiter",
+      "died": "2009-02-06"
+    },
+    {
+      "name": "Bill Jordan",
+      "died": "2008-02-11"
+    },
+    {
+      "name": "George Ricketson",
+      "died": "2007-05-14"
+    },
+    {
+      "name": "Lynn Munson",
+      "died": "2007-03-21"
+    },
+    {
+      "name": "Fritz Fooy",
+      "died": "2006-12-15"
+    },
+    {
+      "name": "Tom Berner",
+      "died": "2004-02-02"
+    },
+    {
+      "name": "Robert Wilkinson",
+      "died": "2003-07-03"
+    },
+    {
+      "name": "John T. Thomas, Jr.",
+      "died": "1998-11-01"
+    },
+    {
+      "name": "Harry L. Bush",
+      "died": "1994-05-03"
+    },
+    {
+      "name": "Robert Reits, Sr.",
+      "died": "1992-01-15"
+    },
+    {
+      "name": "Tom Foster",
+      "died": "1974-03-09"
+    },
+    {
+      "name": "Clyde Silas",
+      "died": "1972-03-27"
+    },
+    {
+      "name": "Grant Root",
+      "died": "1968-12-16"
+    }
+  ],
+  "memorial_note": "Names and dates are carried over from the department's previous website and must be confirmed by the department before this page is published.",
+  "history": [
+    "Paw Paw learned about fire the hard way. A sawmill fire in 1839 began thirty years of losses; the business district burned three times. In 1859 the Exchange Hotel fire was fought by a bucket brigade made up mostly of women and children. Main Street burned in 1866 and again in 1868.",
+    "On September 6, 1868, a special meeting of the village appointed a board to draft a fire ordinance. On September 28 twenty-two men were appointed, and the next night they organized Paw Paw Fire Company No. 1. Its first officers were W.L. Eggleston, Chief Engineer; T.W. Melchor, 1st Assistant; James M. Servoss, Foreman; John Rousseau and S.S. Hatt, assistant foremen; B.K. Tuttle and William Hodemaker, pipesmen; and O.D. Martin, Secretary.",
+    "A month later, on October 28, 1868, the village trustees bought a hand-drawn engine for $1,050, a hose cart for $200, and 306 feet of hose for $369. That was the department.",
+    "It has been all-volunteer ever since. Today it protects the Village of Paw Paw, Paw Paw Township, and parts of Antwerp, Almena and Waverly Townships, about 88 square miles of town, farms, vineyards and lake country in the heart of Van Buren County, from a station that opened in 2023."
+  ],
+  "past_chiefs_note": "The complete list of chiefs since A.W. Showerman in 1882 is on the department's records and will be carried onto this page once confirmed.",
+  "news": [
+    {
+      "date": "2026-10-01",
+      "title": "Awards banquet: Kyle Richardson hands the department to Chief Nate Jackson, and is named Firefighter of the Year",
+      "tag": "Awards",
+      "text": "At the department's annual awards banquet at Station 1200, Kyle Richardson, who joined in 2010 and led the department as chief from October 2024, handed over the title to new Chief Nate Jackson, and was then recognized as the 2026 Paw Paw Firefighter of the Year: a white chief's helmet on a walnut base, inscribed for dedicated service above and beyond the normal call of duty, to the Department and the community, and a State of Michigan Special Tribute.",
+      "source": "https://wilcoxnewspapers.com/paw-paw-fire-chief-named-firefighter-of-the-year/",
+      "photo": "/photos/awards-2026-richardson-firefighter-of-the-year.jpg",
+      "alt": "Kyle Richardson in dress uniform holding a white chief's helmet on a wooden trophy base in front of a Paw Paw engine, with a framed State of Michigan tribute beside him.",
+      "gallery": [
+        {
+          "src": "/photos/awards-2026-trophy.jpg",
+          "alt": "The 2026 Firefighter of the Year plaque for Kyle Richardson, for dedicated service above and beyond the normal call of duty, to the Department and the community."
+        },
+        {
+          "src": "/photos/awards-2026-richardson-guests.jpg",
+          "alt": "Kyle Richardson in dress uniform between two guests in front of a Paw Paw ladder truck lettered Paw Paw Fire Dept."
+        },
+        {
+          "src": "/photos/awards-2026-dinner.jpg",
+          "alt": "The awards dinner in the meeting room at Station 1200: members and families at long tables, an officer at the podium, an engine visible through the doors to the bay."
+        }
+      ]
+    },
+    {
+      "date": "2026-10-01",
+      "title": "Sixty years: Jim Douglas, 1966 to 2026",
+      "tag": "Awards",
+      "text": "The same evening the department honored Jim Douglas for sixty years of service to the Paw Paw Fire Department and the citizens of the community, with a presentation axe and a State of Michigan tribute. He joined in 1966.",
+      "photo": "/photos/awards-2026-douglas-60-years.jpg",
+      "alt": "Jim Douglas in dress uniform holding a walnut plaque with a gold-headed presentation axe, in front of a Paw Paw engine."
+    },
+    {
+      "date": "2026-10-01",
+      "title": "Forty years: Jim Jackson",
+      "tag": "Awards",
+      "text": "Jim Jackson was recognized for forty years of service with a State of Michigan Special Tribute, presented in the bay in front of the engine.",
+      "photo": "/photos/awards-2026-jackson-tribute.jpg",
+      "alt": "Two members in dress uniform in front of a Paw Paw engine, one holding a framed State of Michigan tribute for Jim Jackson's forty years of service."
+    },
+    {
+      "date": "2026-03-09",
+      "title": "Township approves tools for the new truck",
+      "tag": "Department",
+      "text": "The Paw Paw Township Board approved up to $12,600 for tools, thermal imaging and nozzles to outfit the department's new truck, and will ask the district's other municipalities to share the cost.",
+      "source": "https://wilcoxnewspapers.com/paw-paw-township-board-approves-tools-for-new-fire-truck"
+    },
+    {
+      "date": "2026-01-23",
+      "title": "House and garage fire on 38th Street",
+      "tag": "Department",
+      "text": "Twenty Paw Paw firefighters, with Lawton and Decatur, Van Buren EMS and Central Dispatch, fought a fully involved garage and house fire in single-digit temperatures from about 2:30 a.m. until the scene was cleared around 6:30 a.m.",
+      "source": "https://wilcoxnewspapers.com/paw-paw-fire-department-battles-harsh-weather-while-fighting-structure-fire/"
+    },
+    {
+      "date": "2024-10-09",
+      "title": "Kyle Richardson named Fire Chief",
+      "tag": "Department",
+      "text": "Richardson succeeded Jim DeGroff IV as chief, with Nathan Jackson and Brandon Hall as assistant chiefs. DeGroff received a Special Tribute from state officials at the annual dinner.",
+      "source": "https://wilcoxnewspapers.com/richardson-named-paw-paw-fire-chief"
+    }
+  ],
+  "faq": [
+    {
+      "q": "What kind of fire extinguisher should I have at home?",
+      "a": "A multi-purpose ABC extinguisher, at least 5 pounds, mounted near the kitchen and the garage. Check the gauge monthly. If a fire is bigger than a wastebasket, get out and call 911."
+    },
+    {
+      "q": "Do you charge for fire calls?",
+      "a": "The department to confirm its policy here."
+    },
+    {
+      "q": "Can I burn in my township?",
+      "a": "Burning rules are set by each township and by the Michigan DNR for open burning. Check with your township office before you burn, and never burn on a windy day."
+    },
+    {
+      "q": "What should I do when an emergency vehicle approaches?",
+      "a": "Pull to the right and stop. At an intersection, stay put until it passes. Michigan law requires it, and it gets us there faster."
+    },
+    {
+      "q": "Will you fill my pool?",
+      "a": "The department to confirm its policy here."
+    },
+    {
+      "q": "Will you rescue my cat?",
+      "a": "The department to confirm its policy here."
+    },
+    {
+      "q": "How do I get a copy of an incident report?",
+      "a": "Reports cost $10 to process and are not available online or same-day. Download the request form, and fax it to 269-657-4302 or mail it to the 2nd Assistant Chief at the station. Businesses and insurers must submit a written FOIA request. The department does not hold medical run records; contact the ambulance service."
+    }
+  ],
+  "michigan_last": {
+    "nfff": "866-736-5868",
+    "memorial": "Michigan Fire Fighters Memorial, 1337 Robinson Lake Road, Roscommon"
+  },
+  "draft_note": "Draft for the Paw Paw Fire Department's review. Built from public records; names, dates, titles and policies to be confirmed by the department before this site is shared.",
+  "seasonal": {
+    "start": "2026-10-01",
+    "end": "2026-10-31",
+    "kicker": "Fire Prevention Week, October 4 to 10",
+    "title": "Charge safely. Lithium-ion batteries start fires.",
+    "text": "Phones, e-bikes, scooters, tools. Charge them on a hard surface, never under a pillow or on a couch, and unplug when full. If a battery swells, smells, or gets hot, get it outside.",
+    "link": "https://www.nfpa.org/events/fire-prevention-week",
+    "link_label": "NFPA Fire Prevention Week"
+  },
+  "support": {
+    "intro": "The department is funded by the five municipalities through the Fire Board, and that pays for the station, the rigs and the gear. The things that make a volunteer department a place people want to be, the awards dinner, the honor guard's uniforms, the junior program, the open house, Ole 3's upkeep, come from the community.",
+    "ways": [
+      {
+        "t": "Give",
+        "d": "The department will add its preferred way to give here (a hosted donation link or a mailing address for checks). Nothing on this site takes card numbers."
+      },
+      {
+        "t": "Sponsor",
+        "d": "Local businesses have supported the honor guard, training and the annual dinner for years. If yours would like to, call the station."
+      },
+      {
+        "t": "Show up",
+        "d": "Come to the open house. Bring the kids to a station tour. Wave at the parade. Tell a neighbor we're hiring."
+      }
+    ],
+    "what_it_buys": [
+      [
+        "$50",
+        "A smoke alarm with a 10-year battery, installed free in a resident's home"
+      ],
+      [
+        "$250",
+        "A set of structural firefighting gloves"
+      ],
+      [
+        "$1,200",
+        "A new set of turnout gear for a probationary member"
+      ]
+    ],
+    "what_it_buys_note": "Typical costs, for illustration; the department will replace these with its own."
+  },
+  "hero_photo": {
+    "src": "/photos/department-group.jpg",
+    "alt": "The members of the Paw Paw Fire Department in dress uniform, seated and standing in two rows in front of the ladder truck and an engine outside the station bays.",
+    "caption": "The Paw Paw Fire Department, 2021",
+    "year": 2021
+  },
+  "photos": {
+    "chief_engine": {
+      "src": "/photos/awards-2026-richardson-engine.jpg",
+      "alt": "Kyle Richardson in dress uniform holding the 2026 Firefighter of the Year trophy in front of a Paw Paw engine."
+    },
+    "structure": {
+      "src": "/photos/structure-fire.jpg",
+      "alt": "A single-story house fully involved in fire at night, flames through the roof and across a screened porch."
+    },
+    "extrication": {
+      "src": "/photos/extrication.jpg",
+      "alt": "Paw Paw firefighters in turnout gear working on a crushed vehicle at night, a hydraulic cutter on a tarp in the foreground."
+    },
+    "glow": {
+      "src": "/photos/fire-glow.jpg",
+      "alt": "A bare tree silhouetted against the orange glow of a structure fire at night."
+    },
+    "community": {
+      "src": "/photos/community-seniors.jpg",
+      "alt": "Kyle Richardson talking with residents at tables in the station's community room during a winter event."
+    },
+    "members_dog": {
+      "src": "/photos/members-dalmatian.jpg",
+      "alt": "Five members in Paw Paw Fire Department shirts standing in front of an engine with a Dalmatian sitting at their feet."
+    },
+    "dog_cab": {
+      "src": "/photos/dalmatian-cab.jpg",
+      "alt": "A Dalmatian standing in the open cab of an engine among the air packs and tools."
+    },
+    "dog_window": {
+      "src": "/photos/dalmatian-window.jpg",
+      "alt": "A Dalmatian looking out the open window of an engine's crew cab."
+    },
+    "squad": {
+      "src": "/photos/squad-1206-prevention.jpg",
+      "alt": "Squad 6 with its compartments open and a flag wrap on its side, with Paw Paw Fire Department drawstring bags reading 100% Volunteer 100% of the Time and a stack of red junior firefighter helmets in front."
+    }
+  }
+}

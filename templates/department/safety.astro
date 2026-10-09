@@ -1,0 +1,104 @@
+---
+import Base from '../../layouts/Base.astro';
+import d from '@content/dept.json';
+const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
+const s = d.seasonal;
+---
+<Base title="Safety" description="Fire safety for Paw Paw homes: request a free smoke alarm check, make a home escape plan you can print, learn what happens when you call 911, and this season's message from the department.">
+  <section class="phero two">
+    <div class="wrap">
+      <div>
+        <p class="kicker">Safety</p>
+        <h1 style="margin-top:.75rem">The best call is the one we never get.</h1>
+        <p class="lede">A working smoke alarm, two ways out, and a plan everyone in the house knows. That's most of it. Here's the rest.</p>
+      </div>
+      <div class="season">
+        <p class="kicker">{s.kicker}</p>
+        <h2 style="margin-top:.5rem;font-size:1.8rem">{s.title}</h2>
+        <p style="margin-top:.6rem">{s.text}</p>
+        <p class="small" style="margin-top:.6rem"><a href={s.link} rel="noopener">{s.link_label}</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section band" id="alarm">
+    <div class="wrap">
+      <div class="head"><p class="kicker">Free</p><h2>Request a smoke alarm check</h2><p class="small" style="max-width:62ch">A member will come to your home, test every alarm, replace dead batteries, and install an alarm where one is missing, at no charge. We make a point of it for older residents and anyone who can't get up a ladder.</p></div>
+      <form class="jf" id="sf" novalidate>
+        <div class="f"><label for="s-name">Your name *</label><input id="s-name" name="name" required></div>
+        <div class="f"><label for="s-phone">Phone *</label><input id="s-phone" name="phone" type="tel" required></div>
+        <div class="f wide"><label for="s-addr">Address *</label><input id="s-addr" name="address" required></div>
+        <div class="f"><label for="s-when">Best days and times</label><input id="s-when" name="when" placeholder="Weekday evenings; Saturday mornings"></div>
+        <div class="f"><label for="s-note">Anything we should know</label><input id="s-note" name="note" placeholder="No alarms upstairs; I use a walker; dog in the yard"></div>
+        <div class="bar2"><button class="btn red" type="submit">Request a visit</button><p class="small" id="s-status" aria-live="polite"></p></div>
+        <details class="fb" id="s-fb" hidden><summary>If your email program didn't open, copy this and send it, or call the station.</summary><textarea readonly rows="8"></textarea></details>
+      </form>
+    </div>
+  </section>
+
+  <section class="section" id="911">
+    <div class="wrap">
+      <div class="head"><p class="kicker">How it works</p><h2>What happens when you call 911</h2></div>
+      <ol class="steps2">
+        <li><h3>You call. Stay on the line.</h3><p>Van Buren County Central Dispatch answers. The dispatcher asks where, what, and whether anyone is hurt. Answer the questions; the page is going out while you talk.</p></li>
+        <li><h3>Forty-one pagers go off.</h3><p>Paw Paw has no one sitting in the station. Our firefighters are at work, at dinner, asleep. The tones reach every member at once, and the ones who can go, go.</p></li>
+        <li><h3>They drive to the station.</h3><p>Members respond from wherever they are to Station 1200, pull on gear, and roll the first rig as soon as a crew is aboard. This is the part that takes the minutes: it is the difference between a volunteer department and a paid one, and it is why we need members who live close.</p></li>
+        <li><h3>The first rig is out.</h3><p>Usually an engine with the first three or four members, then the ladder, the tanker and the squad as more arrive. Lawton, Decatur and other county departments are paged for working fires.</p></li>
+        <li><h3>We stay until it's done.</h3><p>Fire out, patients handed to Van Buren EMS, scene safe, and then back to the station to wash hoses and fill air bottles so the next call starts clean.</p></li>
+      </ol>
+      <p class="small" style="margin-top:1.5rem;max-width:62ch">The honest version of "how long will it take": longer than in a city, and shorter the more volunteers we have within a few minutes of the station. If that bothers you, <a href="/join/">join</a>.</p>
+    </div>
+  </section>
+
+  <section class="section band" id="escape">
+    <div class="wrap">
+      <div class="head"><p class="kicker">Make a plan</p><h2>Your home escape plan</h2><p class="small" style="max-width:62ch">Draw your home, mark two ways out of every room, pick a meeting place outside, and practice it twice a year. Print the sheet and put it on the refrigerator.</p></div>
+      <div class="doors">
+        <a class="door" href="/escape-plan/"><h3>Print the escape plan sheet</h3><p>A one-page grid for your floor plan with the checklist on the side. Nothing is stored; it just prints.</p><span class="go">Open the sheet</span></a>
+        <div class="door"><h3>The three rules</h3><p>Smoke alarms on every level and in every bedroom, tested monthly. Two ways out of every room, and windows that open. One meeting place outside, and once you're out, stay out.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="head"><p class="kicker">Around the house</p><h2>The short list</h2></div>
+      <div class="facts three">
+        <div class="fact"><h3>Kitchen</h3><p>Stay with what you're cooking. Keep a lid nearby; sliding it over a pan fire puts it out. Never water on grease.</p></div>
+        <div class="fact"><h3>Heating</h3><p>Three feet between a space heater and anything that burns. Chimneys cleaned yearly. Ashes in a metal can, outside, away from the house.</p></div>
+        <div class="fact"><h3>Charging</h3><p>Lithium batteries on a hard surface, never under a pillow or on bedding, and unplugged when full. A swollen or hot battery goes outside.</p></div>
+        <div class="fact"><h3>Burning</h3><p>Check the banner at the top of this site and your township office. Michigan DNR permits for open burning. Never on a windy day. A hose or bucket within reach.</p></div>
+        <div class="fact"><h3>Carbon monoxide</h3><p>A CO alarm near the bedrooms, especially with gas heat, a wood stove or an attached garage. Never run a generator in a garage.</p></div>
+        <div class="fact"><h3>Your address</h3><p>Reflective numbers at the road, visible from both directions at night. We can't help a house we can't find.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const f = document.getElementById('sf') as HTMLFormElement; const st = document.getElementById('s-status')!; const fb = document.getElementById('s-fb') as HTMLDetailsElement; const to = '';
+    f.addEventListener('submit', (e) => { e.preventDefault(); if (!f.reportValidity()) return;
+      const lines: string[] = []; f.querySelectorAll<HTMLElement>('.f').forEach((w) => { const l = w.querySelector('label')!.textContent!.replace(/\s*\*$/, '').trim(); const el = w.querySelector('input,textarea') as HTMLInputElement; if (el.value.trim()) lines.push(`${l}: ${el.value.trim()}`); });
+      const body = lines.join('\n') + '\n\nSmoke alarm check request from the Paw Paw Fire Department website.';
+      (fb.querySelector('textarea') as HTMLTextAreaElement).value = `Subject: Smoke alarm check request\n\n${body}`; fb.hidden = false; fb.open = true;
+      if (to) { st.textContent = 'Opening your email program…'; location.href = `mailto:${to}?subject=${encodeURIComponent('Smoke alarm check request')}&body=${encodeURIComponent(body)}`; } else st.textContent = 'The department has not yet set an email address for this form. Copy the text below and send it, or call the station.'; });
+  </script>
+  <style is:global>
+    .season{background:var(--char);color:var(--char-ink);padding:1.5rem 1.6rem;border-left:5px solid var(--brass)}
+    .season h2{color:#fff}.season .kicker{color:var(--brass)}.season a{color:#fff}
+    .steps2{counter-reset:s;display:grid;gap:0;border-top:1px solid var(--rule);max-width:56rem}
+    .steps2 li{display:grid;grid-template-columns:3.5rem 1fr;gap:1rem;padding:1.3rem 0;border-bottom:1px solid var(--rule)}
+    .steps2 li::before{counter-increment:s;content:counter(s);font:700 2.6rem/1 var(--display);color:var(--red)}
+    .steps2 h3{font-size:1.35rem;margin-bottom:.3rem}
+    .steps2 p{max-width:60ch;grid-column:2}
+    .steps2 li::before{grid-row:1/3}
+    .steps2 h3{grid-column:2}
+    .jf{display:grid;gap:1rem;grid-template-columns:1fr;max-width:46rem}
+    @media (min-width:44rem){.jf{grid-template-columns:1fr 1fr}.jf .wide,.jf .bar2,.jf .fb{grid-column:1/-1}}
+    .jf .f{display:grid;gap:.3rem;min-width:0}
+    .jf label{font:700 .8rem/1.3 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-lo)}
+    .jf input,.jf textarea{background:var(--card);border:1px solid var(--rule);border-radius:2px;padding:.7rem .8rem;font:inherit;color:inherit;width:100%;min-width:0}
+    .jf .bar2{display:flex;gap:1rem;align-items:center;flex-wrap:wrap}
+    .jf .fb{font-size:.9rem;color:var(--ink-lo)}.jf .fb summary{cursor:pointer;padding:.25rem 0}
+    .jf .fb textarea{margin-top:.5rem;width:100%;font:.875rem/1.5 ui-monospace,Menlo,monospace;background:var(--card);border:1px solid var(--rule);padding:.75rem}
+  </style>
+</Base>

@@ -1,0 +1,49 @@
+---
+import Base from '../../layouts/Base.astro';
+import d from '@content/dept.json';
+const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
+---
+<Base title="Community" description="For Paw Paw residents and businesses: Knox Box, fire hydrant rules, station tours, Fire Prevention Week, what to do after a fire, incident reports, and answers to common questions.">
+  <section class="phero two" style={`--pbg:url(${d.photos.community.src})`}>
+    <div class="wrap">
+      <div>
+        <p class="kicker">Community</p>
+        <h1 style="margin-top:.75rem">Before, during, and after.</h1>
+        <p class="lede">The practical things: how to keep a fire from starting, how to help us when one does, and what to do the morning after.</p>
+      </div>
+      <figure class="hphoto side"><img src={d.photos.community.src.replace(".jpg","-800.jpg")} alt={d.photos.community.alt} width="800" height="1067" fetchpriority="high" /><figcaption>Kyle Richardson with residents in the station's community room.</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="facts three">
+        <div class="fact"><h3>Knox Box</h3><p>A Knox Box lets us get into your business or building without breaking a door. The department doesn't sell them; you order through Knox and work with the Fire Chief to register the box in the department's system. Ask the station for the order form.</p></div>
+        <div class="fact"><h3>Fire hydrants</h3><p>Keep three feet clear on every side. Don't park in front of one, don't paint it, don't open it. If a hydrant is damaged or buried, call the station.</p></div>
+        <div class="fact"><h3>Station tours</h3><p>By request, twenty to thirty minutes, booked two weeks ahead. Groups under thirty, one adult for every five children. No parties, but plenty of rigs to climb on. Call <a href={tel(d.phones.tours)}>{d.phones.tours}</a> or the station.</p></div>
+        <div class="fact"><h3>Fire Prevention Week</h3><p>Every October the department visits the schools in the district with the message that has saved more lives than any truck: working smoke alarms, two ways out, a meeting place.</p></div>
+        <div class="fact"><h3>Burning</h3><p>Each township sets its own burning rules, and the Michigan DNR governs open burning. Check with your township office before you burn, and never on a windy day.</p></div>
+        <div class="fact"><h3>Incident reports</h3><p>Reports cost $10 and aren't available online or same-day. Fax the request form to <span class="tn">{d.phones.fax}</span> or mail it to the 2nd Assistant Chief at the station. Businesses and insurers must file a written FOIA request. We don't hold medical run records.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section band">
+    <div class="wrap">
+      <div class="head"><p class="kicker">After the fire</p><h2>The morning after</h2></div>
+      <div class="prose">
+        <p>Call your insurance company first; they will tell you what to do and will often arrange cleanup and a place to stay. Don't go back into the building until we have told you it's safe, and don't reconnect gas, electric or water until the utility or an electrician has checked them. The Red Cross can help with immediate needs. Gather what documents you can: insurance, identification, bank, medical.</p>
+        <p>You may notice we opened windows, cut holes in the roof, or opened walls. Ventilation lets heat and smoke out so firefighters can get in, and fire hides in walls and ceilings; we open them to make sure it's out. It looks like damage. It's how the rest of the house survived.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="head"><p class="kicker">Common questions</p><h2>Things people ask us</h2></div>
+      <div class="faq" style="max-width:62ch">
+        {d.faq.map((f) => <details><summary>{f.q}</summary><p>{f.a}</p></details>)}
+      </div>
+    </div>
+  </section>
+</Base>

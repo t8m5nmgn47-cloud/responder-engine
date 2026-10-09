@@ -1,0 +1,8 @@
+{
+  "_how": "Edit `level` to one of: normal | caution | ban. Edit `text` to say what residents should know today. Save, push, done. `updated` is shown on the banner.",
+  "level": "caution",
+  "text": "Fall burning season. Open burning requires a permit from the Michigan DNR and your township's OK; no burning on windy days.",
+  "updated": "2026-10-08",
+  "link": "https://www.michigan.gov/dnr/managing-resources/forestry/fire/burn-permits",
+  "link_label": "Michigan DNR burn permits"
+}

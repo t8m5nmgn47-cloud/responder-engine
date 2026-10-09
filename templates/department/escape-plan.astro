@@ -1,0 +1,40 @@
+---
+import d from '@content/dept.json';
+---
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="robots" content="noindex" /><title>Home escape plan · Paw Paw Fire Department</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700&family=Source+Sans+3:wght@400;600&display=swap" />
+<style>
+@page{size:letter;margin:0} *{box-sizing:border-box} html,body{margin:0;background:#ddd} body{font:10.5pt/1.4 "Source Sans 3",system-ui,sans-serif;color:#111;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:8.5in;height:11in;margin:0 auto;background:#fff;padding:.5in .6in;display:grid;grid-template-columns:1fr 2.3in;grid-template-rows:auto 1fr auto;gap:.2in .3in}
+@media screen{.page{margin:1rem auto;box-shadow:0 2px 20px rgba(0,0,0,.2)} .print{position:fixed;top:1rem;right:1rem;background:#b3261e;color:#fff;border:0;padding:.6rem 1rem;font:700 14px "Barlow Condensed",sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}}
+@media print{html,body{background:#fff}.page{margin:0;box-shadow:none}.print{display:none}}
+h1{grid-column:1/-1;font:700 28pt/1 "Barlow Condensed",sans-serif;text-transform:uppercase;margin:0;border-bottom:2pt solid #b3261e;padding-bottom:.12in}
+h1 small{display:block;font:600 9pt/1.3 "Source Sans 3",sans-serif;letter-spacing:.14em;color:#555;margin-top:5pt;text-transform:uppercase}
+.grid{background-image:linear-gradient(#cfcfcf 1px,transparent 1px),linear-gradient(90deg,#cfcfcf 1px,transparent 1px);background-size:.25in .25in;border:1pt solid #999;position:relative}
+.grid span{position:absolute;left:.1in;top:.08in;font-size:8.5pt;color:#777;letter-spacing:.1em;text-transform:uppercase}
+.side{display:grid;gap:.16in;align-content:start}
+.side h2{font:700 11pt/1.2 "Barlow Condensed",sans-serif;text-transform:uppercase;letter-spacing:.1em;color:#b3261e;margin:0 0 4pt}
+.side ul{margin:0;padding-left:1.1em}.side li+li{margin-top:3pt}
+.side .box{border:1pt solid #999;padding:.1in;min-height:.7in}
+.side .box b{display:block;font-size:8.5pt;letter-spacing:.1em;text-transform:uppercase;color:#555;margin-bottom:4pt}
+.foot{grid-column:1/-1;border-top:1pt solid #999;padding-top:.1in;font-size:8.5pt;color:#444;display:flex;justify-content:space-between;gap:.3in}
+.legend{display:flex;gap:.25in;font-size:9pt}
+.legend i{display:inline-block;width:.22in;height:.14in;vertical-align:middle;margin-right:4pt}
+</style></head>
+<body>
+<button class="print" type="button" onclick="window.print()">Print</button>
+<div class="page">
+  <h1>Our home escape plan<small>{d.name} · Draw every room. Mark two ways out of each. Practice twice a year.</small></h1>
+  <div class="grid"><span>Draw your floor plan here (one square = about 2 feet)</span></div>
+  <div class="side">
+    <div><h2>Legend</h2><div class="legend" style="flex-direction:column;gap:5pt"><span><i style="background:#b3261e"></i>Smoke alarm (every level, every bedroom)</span><span><i style="border:1.5pt solid #111"></i>Door or window that is a way out</span><span><i style="border:1.5pt dashed #111"></i>Second way out</span><span><i style="background:#2d6a3f"></i>Meeting place outside</span></div></div>
+    <div class="box"><b>Our meeting place</b></div>
+    <div class="box"><b>Who helps whom (children, older adults, pets)</b></div>
+    <div><h2>Before</h2><ul><li>Test every alarm monthly; replace at 10 years.</li><li>Keep halls and stairs clear.</li><li>Windows open easily; security bars release from inside.</li><li>Reflective house number at the road.</li></ul></div>
+    <div><h2>During</h2><ul><li>Get low under smoke. Feel doors with the back of your hand.</li><li>Close doors behind you.</li><li>Once out, stay out. Call 911 from outside.</li><li>Never go back in for anything.</li></ul></div>
+    <div class="box"><b>Practiced on</b></div>
+  </div>
+  <div class="foot"><span>{d.name} · {d.address.street}, {d.address.city} · Non-emergency {d.phones.station} · Emergency 911</span><span>Free smoke alarm checks: {d.url.replace('https://','')}/safety/</span></div>
+</div>
+</body></html>

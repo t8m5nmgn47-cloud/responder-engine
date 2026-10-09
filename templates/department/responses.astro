@@ -1,0 +1,82 @@
+---
+import Base from '../../layouts/Base.astro';
+import d from '@content/dept.json';
+import inc from '@content/incidents.json';
+const fmt = (s: string) => new Date(s + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+const years = inc.year_counts.slice().sort((a, b) => a.year - b.year);
+const max = Math.max(...years.map((y) => y.calls));
+---
+<Base title="Responses" description="Recent responses by the Paw Paw Fire Department: what we were called to, when, where in general, which rigs went, and how many volunteers turned out. Plus calls by year.">
+  <section class="phero two" style={`--pbg:url(${d.photos.glow.src})`}>
+    <div class="wrap">
+      <div>
+        <p class="kicker">Responses</p>
+        <h1 style="margin-top:.75rem">What the pager said.</h1>
+        <p class="lede">Every call, in general terms: the kind of incident, the road, which rigs went, how many of your neighbors dropped what they were doing. No names, no house numbers, no medical details.</p>
+      </div>
+      <div>
+        <figure class="hphoto side"><img src={d.photos.glow.src.replace(".jpg","-800.jpg")} alt={d.photos.glow.alt} width="800" height="1067" fetchpriority="high" /><figcaption>A structure fire at night in the district.</figcaption></figure>
+        <div class="stats" style="grid-template-columns:repeat(2,1fr);margin-top:1.25rem">
+          <div class="stat"><div class="v">{d.stats.calls_2024}</div><div class="k">Calls in 2024</div></div>
+          <div class="stat"><div class="v">{Math.round(d.stats.calls_2024 / 365 * 7)}</div><div class="k">Calls in a typical week</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="head"><p class="kicker">Recent</p><h2>Latest responses</h2></div>
+      <ol class="runs">
+        {inc.incidents.map((r) => (
+          <li class="run">
+            <div class="run-n"><span class="num">{r.n}</span><time datetime={r.date}>{fmt(r.date)}{r.time && ` · ${r.time}`}</time></div>
+            <div class="run-b">
+              <h3>{r.type}</h3>
+              <p class="loc">{r.location}</p>
+              {r.notes && <p class="nt">{r.notes}</p>}
+              <p class="meta">Units {r.units.join(', ')} · {r.members} members{r.mutual_aid && r.mutual_aid.length ? ` · with ${r.mutual_aid.join(', ')}` : ''}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <p class="small" style="margin-top:1.5rem;max-width:62ch">This log is kept by the department from its run reports. It is built to be updated from a phone after each call: one line per response in a plain data file.</p>
+    </div>
+  </section>
+
+  <section class="section band">
+    <div class="wrap">
+      <div class="head"><p class="kicker">By the numbers</p><h2>Calls by year</h2></div>
+      <div class="bars" role="img" aria-label={`Calls by year: ${years.map((y) => `${y.year}, ${y.calls}`).join('; ')}`}>
+        {years.map((y) => <div class="bar-row"><span class="bar-y">{y.year}</span><span class="bar-t"><span class="bar-f" style={`width:${(y.calls / max * 100).toFixed(0)}%`}></span></span><span class="bar-v">{y.calls}</span></div>)}
+      </div>
+      <p class="small" style="margin-top:1rem;max-width:62ch">The department's year-end counts go here, one line per year, and the chart draws itself. 2024 was the department's second-busiest year on record.</p>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="head"><p class="kicker">Why it takes a few minutes</p><h2>What happens when you call 911</h2></div>
+      <div class="prose"><p>Read <a href="/safety/#911">how a volunteer response works</a>, from the dispatcher's questions to the first rig out of the station, and why the time between your call and our arrival is what it is.</p></div>
+    </div>
+  </section>
+
+  <style is:global>
+    .runs{display:grid;gap:0;border-top:1px solid var(--rule)}
+    .run{display:grid;grid-template-columns:1fr;gap:.4rem 2rem;padding:1.2rem 0;border-bottom:1px solid var(--rule)}
+    @media (min-width:44rem){.run{grid-template-columns:11rem 1fr}}
+    .run-n{display:grid;gap:.2rem;align-content:start}
+    .run-n .num{font:700 1.3rem/1 var(--display);color:var(--red);letter-spacing:.03em}
+    .run-n time{font-size:.85rem;color:var(--ink-lo);font-variant-numeric:tabular-nums}
+    .run-b h3{font-size:1.35rem}
+    .run-b .loc{font-weight:600;color:var(--ink-hi)}
+    .run-b .nt{margin-top:.3rem;max-width:62ch}
+    .run-b .meta{margin-top:.4rem;font-size:.85rem;color:var(--ink-lo);letter-spacing:.04em;text-transform:uppercase}
+    .bars{display:grid;gap:.5rem;max-width:40rem}
+    .bar-row{display:grid;grid-template-columns:4rem 1fr 3.5rem;align-items:center;gap:.75rem}
+    .bar-y{font:700 1rem var(--display);color:var(--ink-hi)}
+    .bar-t{height:1.4rem;background:var(--card);border:1px solid var(--rule);min-width:0}
+    .bar-f{display:block;height:100%;background:var(--red)}
+    .bar-v{font-variant-numeric:tabular-nums;text-align:right;font-weight:600}
+  </style>
+</Base>

@@ -1,0 +1,8 @@
+{
+  "name": "responder-engine-example",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": { "dev": "astro dev", "build": "astro build", "preview": "astro preview" },
+  "dependencies": { "astro": "^7.3.5", "@sightline/responder-engine": "file:.." }
+}

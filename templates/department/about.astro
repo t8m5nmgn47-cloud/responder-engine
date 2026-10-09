@@ -1,0 +1,68 @@
+---
+import Base from '../../layouts/Base.astro';
+import d from '@content/dept.json';
+import DistrictMap from '../../components/DistrictMap.astro';
+const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
+---
+<Base title="About" description="The Paw Paw Fire Department: organized as Paw Paw Fire Company No. 1 in 1868, all-volunteer ever since, serving five communities in Van Buren County from Station 1200. History, leadership, the Fire Board, and the station.">
+  <section class="phero two">
+    <div class="wrap">
+      <div>
+        <p class="kicker">About the department</p>
+        <h1 style="margin-top:.75rem">Organized the night after the second fire.</h1>
+        <p class="lede">Paw Paw's business district burned three times before twenty-two men formed Fire Company No. 1 in September 1868. The department has been volunteer, and busy, ever since.</p>
+      </div>
+      <figure class="hphoto"><img src={d.hero_photo.src} alt={d.hero_photo.alt} width="1100" height="400" loading="eager" style="aspect-ratio:auto" /><figcaption>{d.hero_photo.caption}</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="head"><p class="kicker">History</p><h2>1868 to now</h2></div>
+      <div class="prose">{d.history.map((p) => <p>{p}</p>)}</div>
+    </div>
+  </section>
+
+  <section class="section band">
+    <div class="wrap">
+      <div class="head"><p class="kicker">Leadership</p><h2>Chief's officers</h2></div>
+      <div class="people">
+        {d.chiefs.map((c) => <div class="person">{c.photo && <img class="pimg" src={c.photo} alt={`${c.name}`} loading="lazy" />}<div class="nm">{c.name}</div><div class="tt">{c.title}</div>{c.since && <div class="nt">Chief since {c.since}</div>}{c.note && <div class="nt">{c.note}</div>}<div class="nt"><a href={tel(c.phone)}>{c.phone}</a></div></div>)}
+      </div>
+      <p class="small" style="margin-top:1rem;max-width:62ch">{d.chiefs_note}</p>
+      <p class="small" style="margin-top:.5rem;max-width:62ch">{d.past_chiefs_note}</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="head"><p class="kicker">Governance</p><h2>The Paw Paw Fire Board</h2></div>
+      <div class="prose"><p>{d.district.board_note}</p></div>
+      <dl class="rows" style="margin-top:1.5rem;max-width:48rem">
+        {d.district.board.map((b) => <div class="row"><dt>{b.for}</dt><dd>{b.name}</dd></div>)}
+        <div class="row"><dt>By contract</dt><dd>{d.district.contract.join(', ')}</dd></div>
+      </dl>
+      <p class="small" style="margin-top:1rem">Board membership as listed on the department's previous website; to be confirmed.</p>
+      <div style="margin-top:2rem;max-width:48rem"><DistrictMap /></div>
+      <p class="small" style="margin-top:.5rem">The district in red; Almena Township, by contract, in lighter red; the Village of Paw Paw outlined. Boundaries from the U.S. Census Bureau.</p>
+    </div>
+  </section>
+
+  <section class="section charband">
+    <div class="wrap">
+      <div class="head"><p class="kicker">{d.station.name}</p><h2>A new house for an old company</h2></div>
+      <div class="prose" style="max-width:62ch">
+        <p>The station at {d.address.street} opened in {d.station.opened}: {d.station.size}, {d.station.cost}, {d.station.approved.toLowerCase()}.</p>
+        <p>{d.station.history}</p>
+      </div>
+      <figure class="hphoto" style="margin-top:2rem"><img src={d.hero_photo.src} alt="The members of the department in front of the apparatus bays of Station 1200." width="1100" height="400" loading="lazy" style="aspect-ratio:auto" /><figcaption style="color:rgba(243,239,230,.7)">Station 1200, South Gremps Street, with the department in front of the bays, 2021.</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="head"><p class="kicker">Mission</p><h2>Why we exist</h2></div>
+      <div class="prose"><p>To protect lives and property from fire and other emergencies, inside the Paw Paw Fire District or wherever we are dispatched on alarm.</p></div>
+    </div>
+  </section>
+</Base>

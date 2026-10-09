@@ -1,0 +1,42 @@
+---
+import Base from '../../layouts/Base.astro';
+import d from '@content/dept.json';
+---
+<Base title="Members" description="The people of the Paw Paw Fire Department: 41 volunteers, the chief's officers, the captains of each rig, the honor guard, and the honorary members who served before them.">
+  <section class="phero two">
+    <div class="wrap">
+      <div>
+        <p class="kicker">Members</p>
+        <h1 style="margin-top:.75rem">Forty-one neighbors with pagers.</h1>
+        <p class="lede">{d.stats.officers} officers, {d.stats.firefighters} firefighters and {d.stats.juniors} junior members, every one of them a volunteer. Some have been on the department for more than fifty years.</p>
+      </div>
+      <figure class="hphoto"><img src={d.hero_photo.src} alt={d.hero_photo.alt} width="1100" height="400" fetchpriority="high" style="aspect-ratio:auto" /><figcaption>{d.hero_photo.caption}</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="section band">
+    <div class="wrap">
+      <div class="head"><p class="kicker">Captains</p><h2>Who runs each rig</h2></div>
+      <dl class="rows" style="max-width:48rem">
+        {d.captains.map((c) => <div class="row"><dt>{c.unit}</dt><dd>{c.name}{c.note && <span class="small"> · {c.note}</span>}</dd></div>)}
+      </dl>
+      <p class="small" style="margin-top:1rem;max-width:62ch">The full roster of lieutenants, firefighters and junior members will be listed here with the department's approval. Names come from the department's previous website and must be confirmed.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="head"><p class="kicker">Honor guard</p><h2>Formed in 2017, on donated time</h2></div>
+      <div class="prose"><p>{d.honor_guard}</p></div>
+    </div>
+  </section>
+
+  <section class="section tight band">
+    <div class="wrap">
+      <div class="head"><p class="kicker">Honorary members and awards</p><h2>Those who served before</h2></div>
+      <div class="prose">
+        <p>The department keeps honorary membership for those who have given their years and stepped back, two honorary officers and more than thirty honorary members, and it presents the Van Buren County Judges Award each year, a tradition going back to 1961. Both lists will be carried onto this page once the department has confirmed them.</p>
+      </div>
+    </div>
+  </section>
+</Base>

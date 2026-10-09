@@ -1,0 +1,25 @@
+---
+import Base from '../../layouts/Base.astro';
+import d from '@content/dept.json';
+---
+<Base title="Apparatus" description="The Paw Paw Fire Department's rigs: Engines 1201 and 1202, Ladder 1203, Tanker 1205, Squad 1206, two grass rigs, and Ole 3, the department's 1948 front-mount pumper.">
+  <section class="phero">
+    <div class="wrap">
+      <div>
+        <p class="kicker">Apparatus</p>
+        <h1 style="margin-top:.75rem">Eight rigs. All of them earn their keep.</h1>
+        <p class="lede">Most of the district has no hydrants, so the water rides with us: two engines, a tanker, a ladder, a rescue squad, two grass rigs, and a 1948 pumper that still runs.</p>
+      </div>
+    </div>
+  </section>
+  <section class="section tight">
+    <div class="wrap">
+      <div class="rigs">
+        {d.apparatus.map((r) => (
+          <div class="rig">{r.photo ? <img class="rphoto" src={r.photo.replace(".jpg","-800.jpg")} alt={r.alt || `${r.kind} ${r.id}`} loading="lazy" width="800" height="600" /> : <div class="photo" role="img" aria-label={`Reserved for a photograph of ${r.kind} ${r.id}`}><span>{r.kind} {r.id}</span></div>}<div class="in"><div class="id">{r.id}</div><div class="kind">{r.kind} · {r.year}</div><div class="mk">{r.make}</div><div class="sp">{r.spec}</div><div class="ro">{r.role}</div></div></div>
+        ))}
+      </div>
+      <p class="small" style="margin-top:1.5rem;max-width:62ch">Specifications carried over from the department's previous website; the department to confirm, and to add the new truck approved in 2026.</p>
+    </div>
+  </section>
+</Base>

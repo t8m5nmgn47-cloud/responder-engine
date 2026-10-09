@@ -1,0 +1,155 @@
+---
+import Base from '../../layouts/Base.astro';
+import DistrictMap from '../../components/DistrictMap.astro';
+import d from '@content/dept.json';
+import inc from '@content/incidents.json';
+import ev from '@content/events.json';
+const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
+const latest = d.news.slice(0, 3);
+const runs = inc.incidents.slice(0, 3);
+const today = new Date().toISOString().slice(0, 10);
+const upcoming = ev.events.filter((e) => (e.end || e.date) >= today).sort((a, b) => a.date.localeCompare(b.date)).slice(0, 3);
+const fmt = (s: string) => new Date(s + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+const s = d.seasonal;
+const inSeason = s && s.start <= today && today <= s.end;
+---
+<Base title="Home" description={`Paw Paw Fire Department: an all-volunteer fire department serving the Village of Paw Paw and Paw Paw, Antwerp, Waverly and Almena Townships in Van Buren County, Michigan, since 1868. Join us. Non-emergency ${d.phones.station}.`}>
+  <section class="hero-x" aria-label="Welcome">
+    <div class="wrap">
+      <div class="hx">
+        <img class="hpatch" src="/patch.svg" alt="Paw Paw Fire Department patch" width="140" height="161" loading="eager" />
+        <p class="kicker">{d.tagline} · Van Buren County · Since {d.founded}</p>
+        <h1>Paw Paw needs firefighters.</h1>
+        <p class="lede">Forty-one of your neighbors answer about three hundred calls a year, at any hour, for nothing but the work itself. We train you. We outfit you. We need you.</p>
+        <div class="acts">
+          <a class="btn red" href="/join/">Join the department</a>
+          <a class="btn light" href="/safety/#alarm">Free smoke alarm check</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="statband" aria-label="The department by the numbers">
+    <div class="wrap">
+      <div class="stats">
+        <div class="stat"><div class="v">{d.stats.members}</div><div class="k">Volunteer members</div></div>
+        <div class="stat"><div class="v">{d.stats.calls_2024}</div><div class="k">Calls in 2024</div></div>
+        <div class="stat"><div class="v">{d.district.area_sq_mi}</div><div class="k">Square miles protected</div></div>
+        <div class="stat"><div class="v">{new Date().getFullYear() - d.founded}</div><div class="k">Years of service</div></div>
+      </div>
+    </div>
+  </section>
+
+  <figure class="groupband"><img src={d.hero_photo.src} alt={d.hero_photo.alt} width="1100" height="400" loading="eager" /><figcaption><div class="wrap">{d.hero_photo.caption}</div></figcaption></figure>
+
+
+  <section class="section feat">
+    <div class="wrap">
+      <div class="featgrid">
+        <img src={d.photos.chief_engine.src.replace(".jpg","-800.jpg")} alt={d.photos.chief_engine.alt} width="800" height="1067" loading="lazy" />
+        <div>
+          <p class="kicker">2026 Firefighter of the Year</p>
+          <h2>Kyle Richardson</h2>
+          <p class="lede">Chief from October 2024 until the awards banquet on October 1, 2026, when he handed the department to new Chief Nate Jackson and was named Firefighter of the Year by his own members. A member since 2010, and the third generation of his family to serve Paw Paw.</p>
+          <p style="margin-top:1.25rem"><a class="btn" href="/news/">The awards banquet</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+  {inSeason && <section class="section tight charband"><div class="wrap"><div class="seasonal"><div><p class="kicker">{s.kicker}</p><h2 style="margin-top:.4rem">{s.title}</h2><p style="margin-top:.6rem;max-width:60ch">{s.text}</p></div><div><a class="btn light" href="/safety/">Fire safety at home</a></div></div></div></section>}
+
+  <section class="section">
+    <div class="wrap">
+      <div class="two">
+        <div>
+          <div class="head"><p class="kicker">Recent responses</p><h2>What the pager said</h2></div>
+          <ol class="mini">
+            {runs.map((r) => <li><span class="mn">{r.n}</span><span class="md">{fmt(r.date)}</span><span class="mt"><b>{r.type}</b> · {r.location}</span></li>)}
+          </ol>
+          <p style="margin-top:1.25rem"><a class="btn" href="/responses/">All responses</a></p>
+        </div>
+        <div>
+          <div class="head"><p class="kicker">Coming up</p><h2>Events</h2></div>
+          {upcoming.length ? <ol class="mini">{upcoming.map((e) => <li><span class="md">{fmt(e.date)}</span><span class="mt"><b>{e.title}</b> · {e.where}{e.time && ` · ${e.time}`}</span></li>)}</ol> : <p class="small">Nothing scheduled right now.</p>}
+          <p style="margin-top:1.25rem"><a class="btn" href="/news/">News &amp; events</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section band">
+    <div class="wrap">
+      <div class="mapgrid">
+        <div>
+          <div class="head"><p class="kicker">The district</p><h2>Five communities, one department</h2></div>
+          <div class="prose">
+            <p>The Village of Paw Paw, the county seat, and Paw Paw, Antwerp and Waverly Townships, with Almena Township under contract: about {d.district.area_sq_mi} square miles of town, farms, vineyards and lake country in the middle of Van Buren County. A Fire Board with one member from each participating municipality oversees the department.</p>
+            <p class="small" style="margin-top:1rem">Mutual aid with {d.district.mutual_aid.slice(0, 2).join(' and ')} and every department in the county. Station 1200, {d.address.street}. Boundaries from the U.S. Census Bureau.</p>
+          </div>
+        </div>
+        <DistrictMap />
+      </div>
+    </div>
+  </section>
+
+  <section class="section charband cut up">
+    <div class="wrap">
+      <div class="head"><p class="kicker">On the floor</p><h2>Eight rigs, one of them from 1948</h2></div>
+      <div class="rigs">
+        {d.apparatus.slice(0, 4).map((r) => (
+          <div class="rig">{r.photo ? <img class="rphoto" src={r.photo.replace(".jpg","-800.jpg")} alt={r.alt || `${r.kind} ${r.id}`} loading="lazy" width="800" height="600" /> : <div class="photo" role="img" aria-label={`Reserved for a photograph of ${r.kind} ${r.id}`}></div>}<div class="in"><div class="id">{r.id}</div><div class="kind">{r.kind} · {r.year}</div><div class="mk">{r.make}</div><div class="sp">{r.spec}</div></div></div>
+        ))}
+      </div>
+      <p style="margin-top:1.5rem"><a class="btn" href="/apparatus/">All eight, with the specs</a></p>
+    </div>
+  </section>
+
+  <section class="section band">
+    <div class="wrap">
+      <div class="doors three pdoors">
+        <a class="door" href="/safety/#911"><span class="tag">Safety</span><img src={d.photos.structure.src.replace(".jpg","-800.jpg")} alt={d.photos.structure.alt} loading="lazy" width="800" height="600" /><h3>What happens when you call 911</h3><p>Forty-one pagers, a drive to the station, and the first rig out. Why a volunteer response takes the minutes it takes.</p><span class="go">How it works</span></a>
+        <a class="door" href="/community/"><span class="tag">Community</span><img src={d.photos.community.src.replace(".jpg","-800.jpg")} alt={d.photos.community.alt} loading="lazy" width="800" height="1067" /><h3>For residents</h3><p>Knox Box, hydrants, station tours, burning questions, what to do after a fire, how to get an incident report.</p><span class="go">Community</span></a>
+        <a class="door" href="/memorial/"><span class="tag char">Memorial</span><img src={d.photos.glow.src.replace(".jpg","-800.jpg")} alt={d.photos.glow.alt} loading="lazy" width="800" height="1067" /><h3>In memory</h3><p>The members we have lost, and Lieutenant Ethan Quillen, who died in the line of duty on February 22, 2023.</p><span class="go">Memorial</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="head"><p class="kicker">Latest</p><h2>News from the station</h2></div>
+      <div class="ncards">{latest.map((n) => <a class={`ncard${n.photo ? '' : ' nophoto'}`} href="/news/"><span class={`tag${(n as any).tag === 'Awards' ? ' gold' : ''}`}>{(n as any).tag || 'Department'}</span>{n.photo && <img src={n.photo.replace(".jpg","-800.jpg")} alt={n.alt || ""} loading="lazy" />}<div class="in"><time datetime={n.date}>{fmt(n.date)}, {n.date.slice(0,4)}</time><h3>{n.title}</h3><p>{n.text}</p></div></a>)}</div>
+    </div>
+  </section>
+
+  <section class="section redband cut up">
+    <div class="wrap">
+      <div class="seasonal">
+        <div><p class="kicker">Support</p><h2 style="margin-top:.4rem">The rigs are paid for. <span>The rest is us.</span></h2><p style="margin-top:.6rem;max-width:56ch">The honor guard's uniforms, the junior program, the open house, the awards dinner, Ole 3's upkeep. That's the community's part.</p></div>
+        <div><a class="btn light" href="/support/">Support the department</a></div>
+      </div>
+    </div>
+  </section>
+
+  <style is:global>
+    .feat{background:var(--bg-2)}
+    .featgrid{display:grid;gap:2rem;grid-template-columns:1fr;align-items:center}
+    .featgrid img{width:100%;max-width:26rem;height:auto;aspect-ratio:3/4;object-fit:cover;border-radius:2px;border:4px solid var(--card);box-shadow:0 10px 30px rgba(0,0,0,.18)}
+    @media (min-width:60rem){.featgrid{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:3.5rem}}
+    .two{display:grid;gap:2.5rem;grid-template-columns:1fr}
+    @media (min-width:60rem){.two{grid-template-columns:1fr 1fr}}
+    .mini{display:grid;gap:0;border-top:1px solid var(--rule)}
+    .mini li{display:grid;grid-template-columns:auto 1fr;gap:.2rem 1rem;padding:.75rem 0;border-bottom:1px solid var(--rule-2)}
+    .mini .mn{font:700 1rem/1.3 var(--display);color:var(--red);letter-spacing:.04em;grid-row:1}
+    .mini .md{font-size:.85rem;color:var(--ink-lo);grid-column:1;font-variant-numeric:tabular-nums;white-space:nowrap}
+    .mini .mt{grid-column:2;grid-row:1/3}
+    .mini li:has(.mn) .md{grid-row:2}
+    .mapgrid{display:grid;gap:2rem;grid-template-columns:1fr;align-items:center}
+    @media (min-width:60rem){.mapgrid{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr)}}
+    .seasonal{display:flex;flex-wrap:wrap;gap:1.5rem 3rem;align-items:center;justify-content:space-between}
+    .seasonal h2{font-size:clamp(1.6rem,1.3rem + 1.2vw,2.4rem)}
+    .seasonal h2{font-size:clamp(2rem,1.5rem + 1.8vw,3rem)}
+    .pdoors .door{padding-top:0;overflow:hidden;border-top:0}
+    .pdoors .door img{display:block;width:calc(100% + 3.2rem);max-width:none;height:auto;margin:0 -1.6rem 1.1rem;aspect-ratio:3/2;object-fit:cover}
+    .pdoors .door h3{font-size:1.7rem}
+  </style>
+</Base>

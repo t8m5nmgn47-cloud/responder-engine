@@ -1,0 +1,17 @@
+---
+import Base from '../../layouts/Base.astro';
+import d from '@content/dept.json';
+const s = d.support;
+const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
+---
+<Base title="Support the department" description="How to support the Paw Paw Fire Department: give, sponsor, or show up. What the community's support pays for.">
+  <section class="phero"><div class="wrap"><div><p class="kicker">Support</p><h1 style="margin-top:.75rem">The rigs are paid for. The rest is us.</h1><p class="lede">{s.intro}</p></div></div></section>
+  <section class="section band"><div class="wrap">
+    <div class="doors three">{s.ways.map((w) => <div class="door"><h3>{w.t}</h3><p>{w.d}</p></div>)}</div>
+  </div></section>
+  <section class="section tight"><div class="wrap">
+    <div class="head"><p class="kicker">What it buys</p><h2>Where a gift goes</h2></div>
+    <dl class="rows" style="max-width:40rem">{s.what_it_buys.map(([a, b]) => <div class="row"><dt>{a}</dt><dd>{b}</dd></div>)}</dl>
+    <p class="small" style="margin-top:1rem">{s.what_it_buys_note} Questions: <a href={tel(d.phones.station)}>{d.phones.station}</a>.</p>
+  </div></section>
+</Base>

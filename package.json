@@ -1,0 +1,19 @@
+{
+  "name": "@sightline/responder-engine",
+  "version": "0.1.0",
+  "description": "Reusable Astro site engine for volunteer fire departments and other first-responder organizations. Content-only department repos consume it as an integration.",
+  "type": "module",
+  "license": "MIT",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./templates/*": "./templates/*",
+    "./layouts/*": "./layouts/*",
+    "./components/*": "./components/*",
+    "./styles/*": "./styles/*",
+    "./package.json": "./package.json"
+  },
+  "files": ["index.js", "templates", "layouts", "components", "styles", "README.md", "LICENSE"],
+  "peerDependencies": { "astro": "^7" },
+  "keywords": ["astro", "astro-integration", "fire-department", "static-site"]
+}

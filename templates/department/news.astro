@@ -1,0 +1,28 @@
+---
+import Base from '../../layouts/Base.astro';
+import d from '@content/dept.json';
+import ev from '@content/events.json';
+const fmt = (s: string) => new Date(s + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+const short = (s: string) => new Date(s + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+const today = new Date().toISOString().slice(0, 10);
+const upcoming = ev.events.filter((e) => (e.end || e.date) >= today).sort((a, b) => a.date.localeCompare(b.date));
+const ics = (e: any) => `data:text/calendar;charset=utf8,${encodeURIComponent(['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Paw Paw Fire//EN','BEGIN:VEVENT',`DTSTART;VALUE=DATE:${e.date.replace(/-/g,'')}`,`DTEND;VALUE=DATE:${(e.end || e.date).replace(/-/g,'')}`,`SUMMARY:${e.title}`,`LOCATION:${e.where}`,`DESCRIPTION:${(e.text||'').replace(/\n/g,' ')}`,'END:VEVENT','END:VCALENDAR'].join('\r\n'))}`;
+---
+<Base title="News & events" description="News from the Paw Paw Fire Department and upcoming public events: training nights, Fire Board meetings, Fire Prevention Week, the open house, and the annual awards dinner.">
+  <section class="phero"><div class="wrap"><div><p class="kicker">News &amp; events</p><h1 style="margin-top:.75rem">From the station.</h1><p class="lede">What's coming up, and what the department has been doing, as reported in the Courier-Leader and by the department itself.</p></div></div></section>
+
+  <section class="section tight band">
+    <div class="wrap">
+      <div class="head"><p class="kicker">Upcoming</p><h2>Events</h2></div>
+      {upcoming.length ? <div class="news">{upcoming.map((e) => <div class="item"><time datetime={e.date}>{short(e.date)}{e.end && e.end !== e.date ? ` to ${short(e.end)}` : ''}{e.time && <><br />{e.time}</>}</time><div><h3>{e.title}</h3><p><b>{e.where}</b>{e.text && <> · {e.text}</>}</p><a class="src" href={ics(e)} download={`${e.title.replace(/[^a-z0-9]+/gi,'-').toLowerCase()}.ics`}>Add to calendar</a></div></div>)}</div> : <p class="small">Nothing scheduled right now. Training nights continue weekly; call the station for the next one.</p>}
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="head"><p class="kicker">News</p><h2>Recent</h2></div>
+      <div class="news">{d.news.map((n) => <div class="item"><time datetime={n.date}>{fmt(n.date)}</time><div>{n.photo && <img class="nimg" src={n.photo} alt={n.alt || ""} loading="lazy" />}<h3>{n.title}</h3><p>{n.text}</p>{n.gallery && <div class="gal">{n.gallery.map((g) => <img src={g.src.replace(".jpg","-800.jpg")} alt={g.alt} loading="lazy" />)}</div>}{n.source && <a class="src" href={n.source} rel="noopener">Source</a>}</div></div>)}</div>
+      <p class="small" style="margin-top:1.5rem;max-width:62ch">Follow the department on <a href={d.facebook} rel="noopener">Facebook</a> for day-to-day updates. News and events are kept in two plain data files the department edits.</p>
+    </div>
+  </section>
+</Base>

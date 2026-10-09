@@ -1,0 +1,16 @@
+---
+import Base from '../../layouts/Base.astro';
+import d from '@content/dept.json';
+const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
+---
+<Base title="Accessibility" description="The Paw Paw Fire Department's website is built to WCAG 2.1 AA: keyboard navigation, screen-reader structure, high contrast, a larger-text switch, and plain language. How to tell us if something doesn't work.">
+  <section class="phero"><div class="wrap"><div><p class="kicker">Accessibility</p><h1 style="margin-top:.75rem">Everyone in the district should be able to use this.</h1><p class="lede">The site is built to the WCAG 2.1 AA standard and checked with automated tools on every page. If something doesn't work for you, tell us and we will fix it.</p></div></div></section>
+  <section class="section tight"><div class="wrap">
+    <div class="facts">
+      <div class="fact"><h3>What's built in</h3><p>Every page works with a keyboard alone and with screen readers; headings and landmarks are in order; text and background contrast meets AA; links are underlined or clearly marked; nothing flashes; and the "AA" button in the top bar makes all the text larger and remembers your choice on this device.</p></div>
+      <div class="fact"><h3>Plain language</h3><p>We write the way a firefighter would explain it at your kitchen table. Where a form or a rule has to use an official term, we say what it means.</p></div>
+      <div class="fact"><h3>What's still coming</h3><p>Photographs will carry written descriptions as they are added. A Spanish version of the safety and join pages is planned.</p></div>
+      <div class="fact"><h3>Tell us</h3><p>If any part of this site is hard to use, call the station at <a href={tel(d.phones.station)}>{d.phones.station}</a> or write to us, and say which page. We would rather hear it than not.</p></div>
+    </div>
+  </div></section>
+</Base>

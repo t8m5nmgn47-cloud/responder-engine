@@ -1,0 +1,8 @@
+{
+  "_how": "One entry per response, newest first. General location only (road or block, never a house number); no names, no medical detail. Fields: date, time (24h), type, location, units, members (count), notes, photo (optional path under /public/responses/).",
+  "year_counts": [ { "year": 2024, "calls": 306 }, { "year": 2004, "calls": 246 } ],
+  "incidents": [
+    { "n": "26-0012", "date": "2026-01-23", "time": "02:31", "type": "Structure fire", "location": "63000 block of 38th Street, Paw Paw Township", "units": ["1201", "1202", "1203", "1205", "1206"], "members": 20, "mutual_aid": ["Lawton", "Decatur", "Van Buren EMS"], "notes": "Fully involved garage and house on arrival in single-digit temperatures. Scene cleared about 6:30 a.m. Cause under investigation by the state fire marshal." },
+    { "n": "25-0000", "date": "2025-02-19", "time": "", "type": "Example entry", "location": "Replace with real responses from the department's run log", "units": ["1204"], "members": 6, "mutual_aid": [], "notes": "The department reported 13 calls in January 2025 and 7 in February 2025 to Almena Township. This page is built to list them like this: number, date, type, general location, units, how many members turned out." }
+  ]
+}

@@ -1,0 +1,36 @@
+---
+import Base from '../../layouts/Base.astro';
+import d from '@content/dept.json';
+const fmt = (s: string) => new Date(s + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+const q = d.lodd[0];
+const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
+---
+<Base title="Memorial" description="In memory of the members of the Paw Paw Fire Department who have died, and of Lieutenant Ethan Quillen, who died in the line of duty on February 22, 2023.">
+  <section class="mem-hero">
+    <div class="wrap">
+      <p class="kicker">Line of duty</p>
+      <p class="mem-name" style="margin-top:1rem">{q.name}</p>
+      <p class="mem-dates">Last alarm · {fmt(q.died)} · Member since {fmt(q.joined)}</p>
+      <p class="mem-account">{q.account}</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="head"><p class="kicker">In memorial</p><h2>Members of the department who have died</h2><p class="small" style="max-width:62ch">{d.memorial_note}</p></div>
+      <ul class="roll">
+        {d.memorial.map((m) => <li>{m.name}<span>{fmt(m.died)}</span></li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section charband">
+    <div class="wrap">
+      <div class="head"><p class="kicker">For every department</p><h2>If a Michigan firefighter dies in the line of duty</h2></div>
+      <div class="prose" style="max-width:62ch">
+        <p>Paw Paw knows this day. No department should face it alone. The National Fallen Firefighters Foundation answers <a href={tel(d.michigan_last.nfff)}>{d.michigan_last.nfff}</a> twenty-four hours a day and notifies Michigan's Local Assistance State Team, trained volunteers who help the department and the family with the first hours, the funeral and honors, and the federal and state benefit claims, at no cost and only when asked.</p>
+        <p class="small" style="margin-top:1rem">Michigan's fallen are honored at the {d.michigan_last.memorial}, and nationally each spring at the National Fallen Firefighters Memorial in Emmitsburg, Maryland.</p>
+      </div>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,133 @@
+---
+import '../styles/global.css';
+import d from '@content/dept.json';
+import status from '@content/status.json';
+interface Props { title: string; description: string; }
+const { title, description } = Astro.props;
+const path = Astro.url.pathname;
+const full = path === '/' ? `${d.name} · Paw Paw, Michigan` : `${title} · ${d.name}`;
+const nav = [
+  { href: '/about/', label: 'About' },
+  { href: '/apparatus/', label: 'Apparatus' },
+  { href: '/responses/', label: 'Responses' },
+  { href: '/safety/', label: 'Safety' },
+  { href: '/community/', label: 'Community' },
+  { href: '/news/', label: 'News & events' },
+  { href: '/join/', label: 'Join', cta: true },
+];
+const more = [
+  { href: '/members/', label: 'Members' },
+  { href: '/youth/', label: 'Junior program' },
+  { href: '/memorial/', label: 'Memorial' },
+  { href: '/support/', label: 'Support the department' },
+  { href: '/contact/', label: 'Contact' },
+  { href: '/accessibility/', label: 'Accessibility' },
+];
+const lvl = (status as any).level || 'normal';
+const lvlLabel: Record<string,string> = { normal: 'Burning: normal conditions', caution: 'Burning: use caution', ban: 'Burn ban in effect' };
+const current = (h: string) => (path.startsWith(h) ? 'page' : undefined);
+const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
+const a = d.address;
+const jsonld = {
+  '@context': 'https://schema.org', '@type': 'FireStation', name: d.name, url: d.url, telephone: `+1-${d.phones.station}`,
+  address: { '@type': 'PostalAddress', streetAddress: a.street, addressLocality: a.city, addressRegion: a.state, postalCode: a.zip },
+  areaServed: [...d.district.members, ...d.district.contract].map((n) => ({ '@type': 'AdministrativeArea', name: n })),
+  foundingDate: String(d.founded), sameAs: [d.facebook],
+};
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{full}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={new URL(path, Astro.site)} />
+    <meta property="og:title" content={full} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#b3261e" />
+    <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32" />
+    <link rel="icon" href="/patch.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=EB+Garamond:wght@500&display=swap" />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    {d.draft_note && <p class="draft">{d.draft_note}</p>}
+    <div class="bar">
+      <div class="wrap">
+        <span><b class="em">Emergency: 911</b></span>
+        <span><b>Station, non-emergency:</b> <a href={tel(d.phones.station)}>{d.phones.station}</a></span>
+        <span class="addr">{a.street}, {a.city}, {a.state} {a.zip}</span>
+        <button class="tsz" type="button" id="tsz" aria-pressed="false" title="Larger text">A<span aria-hidden="true">A</span><span class="sr"> Larger text</span></button>
+      </div>
+    </div>
+    <div class={`status ${lvl}`} role="status">
+      <div class="wrap">
+        <span class="st-dot" aria-hidden="true"></span>
+        <b>{lvlLabel[lvl] || lvlLabel.normal}.</b> <span>{status.text}</span>
+        {status.link && <a href={status.link} rel="noopener">{status.link_label || 'Details'}</a>}
+        <span class="st-upd">Updated {new Date(status.updated + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+      </div>
+    </div>
+    <header class="top" id="top">
+      <div class="wrap rail">
+        <a class="brand" href="/" aria-label={`${d.name} home`}>
+          <img class="mk" src="/patch.svg" alt="" width="44" height="50" />
+          <span><span class="bn">Paw Paw Fire</span><span class="bs">Station 1200 · Est. {d.founded}</span></span>
+        </a>
+        <button class="menu-btn" type="button" aria-expanded="false" aria-controls="nav">Menu</button>
+        <nav class="nav" id="nav" aria-label="Primary">
+          <ul>{nav.map((n) => <li><a href={n.href} class={n.cta ? 'cta' : undefined} aria-current={current(n.href)}>{n.label}</a></li>)}</ul>
+        </nav>
+      </div>
+    </header>
+    <main id="main" tabindex="-1"><slot /></main>
+    <footer class="foot" id="foot">
+      <div class="wrap">
+        <div class="cols">
+          <div class="fid">
+            <img class="fpatch" src="/patch.svg" alt="" width="64" height="74" loading="lazy" />
+            <h2>{d.name}</h2>
+            <p class="about">{d.company}. An all-volunteer department protecting the Village of Paw Paw and the townships of Paw Paw, Antwerp, Waverly and Almena, about {d.district.area_sq_mi} square miles of Van Buren County, Michigan.</p>
+          </div>
+          <div>
+            <h2>Reach us</h2>
+            <ul>
+              <li>Emergency: 911</li>
+              <li>Station: <a href={tel(d.phones.station)}>{d.phones.station}</a></li>
+              <li>Fax: <span class="tn">{d.phones.fax}</span></li>
+              <li>{a.street}, {a.city}, {a.state} {a.zip}</li>
+              <li><a href={d.facebook} rel="noopener">Facebook</a></li>
+            </ul>
+          </div>
+          <div>
+            <h2>The site</h2>
+            <ul>
+              <li><a href="/">Home</a></li>
+              {nav.map((n) => <li><a href={n.href}>{n.label}</a></li>)}
+              {more.map((n) => <li><a href={n.href}>{n.label}</a></li>)}
+            </ul>
+          </div>
+        </div>
+        <div class="base">
+          <span>&copy; {new Date().getFullYear()} {d.name}</span>
+          <span>Radio designation {d.radio} · Van Buren County</span>
+        </div>
+      </div>
+    </footer>
+    <script is:inline>
+      (function(){try{if(localStorage.getItem('ppf-big')==='1'){document.documentElement.classList.add('big');var t=document.getElementById('tsz');t&&t.setAttribute('aria-pressed','true');}}catch(e){}
+      var t=document.getElementById('tsz');if(t)t.addEventListener('click',function(){var on=document.documentElement.classList.toggle('big');t.setAttribute('aria-pressed',String(on));try{localStorage.setItem('ppf-big',on?'1':'0')}catch(e){}});})();
+      (function(){var b=document.querySelector('.menu-btn'),n=document.getElementById('nav');if(!b||!n)return;
+      function set(o){b.setAttribute('aria-expanded',String(o));n.classList.toggle('open',o);b.textContent=o?'Close':'Menu';}
+      b.addEventListener('click',function(){set(b.getAttribute('aria-expanded')!=='true');});
+      document.addEventListener('keydown',function(e){if(e.key==='Escape'&&n.classList.contains('open')){set(false);b.focus();}});
+      document.addEventListener('click',function(e){if(n.classList.contains('open')&&!n.contains(e.target)&&!b.contains(e.target))set(false);});})();
+    </script>
+  </body>
+</html>
