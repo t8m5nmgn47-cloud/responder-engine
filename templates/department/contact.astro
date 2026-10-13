@@ -17,6 +17,6 @@ const a = d.address;
       <div class="row"><dt>Station tours</dt><dd><a href={tel(d.phones.tours)}>{d.phones.tours}</a></dd></div>
       <div class="row"><dt>Facebook</dt><dd><a href={d.facebook} rel="noopener">facebook.com/pawpawfd</a></dd></div>
     </dl>
-    <div class="cmap" style="margin-top:2.5rem"><div class="head"><p class="kicker">Where we are</p><h2>Station 1200</h2><p class="small" style="max-width:62ch">{a.street}, {a.city}, {a.state} {a.zip}, on the south side of the village. The map shows the district the station covers; for directions, <a href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(`${a.street}, ${a.city}, ${a.state} ${a.zip}`)}`} rel="noopener">open it in OpenStreetMap</a>.</p></div><DistrictMap /></div>
+    <div class="cmap" style="margin-top:2.5rem"><div class="head" data-reveal><p class="kicker">Where we are</p><h2>Station 1200</h2><p class="small" style="max-width:62ch">{a.street}, {a.city}, {a.state} {a.zip}, on the south side of the village. The map shows the district the station covers; for directions, <a href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(`${a.street}, ${a.city}, ${a.state} ${a.zip}`)}`} rel="noopener">open it in OpenStreetMap</a>.</p></div><DistrictMap /></div>
   </div></section>
 </Base>

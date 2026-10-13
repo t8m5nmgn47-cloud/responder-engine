@@ -1,0 +1,50 @@
+/* Motion layer. Opt-in twice over: the browser must not ask for reduced motion, and the
+   inline script in Base.astro must have added html.m-on (so no-JS visitors get a still page).
+   Transform and opacity only; nothing here moves layout. The memorial page carries no
+   data-reveal attributes and uses none of these hooks, so it stays still. */
+@media (prefers-reduced-motion: no-preference) {
+
+  /* ---------- hero entrance (runs once on load, CSS only) ---------- */
+  @keyframes m-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  html.m-on .hero-x .hpatch,
+  html.m-on .hero-x .kicker,
+  html.m-on .hero-x h1,
+  html.m-on .hero-x .lede,
+  html.m-on .hero-x .acts,
+  html.m-on .phero .kicker,
+  html.m-on .phero h1,
+  html.m-on .phero .lede,
+  html.m-on .phero .acts { animation: m-rise .55s var(--ease) both; }
+  html.m-on .hero-x .kicker, html.m-on .phero h1    { animation-delay: .1s; }
+  html.m-on .hero-x h1,      html.m-on .phero .lede { animation-delay: .2s; }
+  html.m-on .hero-x .lede,   html.m-on .phero .acts { animation-delay: .3s; }
+  html.m-on .hero-x .acts                           { animation-delay: .4s; }
+
+  /* ---------- scroll reveal ---------- */
+  html.m-on [data-reveal]:not(.m-done),
+  html.m-on [data-reveal-group] > :not(.m-done) { transition: opacity .55s var(--ease), transform .55s var(--ease); }
+  html.m-on [data-reveal]:not(.is-in),
+  html.m-on [data-reveal-group] > :not(.is-in) { opacity: 0; transform: translateY(12px); }
+  html.m-on [data-reveal-group] > :nth-child(2):not(.m-done) { transition-delay: 80ms; }
+  html.m-on [data-reveal-group] > :nth-child(3):not(.m-done) { transition-delay: 160ms; }
+  html.m-on [data-reveal-group] > :nth-child(4):not(.m-done) { transition-delay: 240ms; }
+  html.m-on [data-reveal-group] > :nth-child(5):not(.m-done) { transition-delay: 320ms; }
+  html.m-on [data-reveal-group] > :nth-child(6):not(.m-done) { transition-delay: 400ms; }
+  html.m-on [data-reveal-group] > :nth-child(n+7):not(.m-done) { transition-delay: 480ms; }
+
+  /* ---------- hover and focus feedback (150-200ms, no JS needed) ---------- */
+  .btn { transition: background .15s, color .15s, border-color .15s, transform .15s var(--ease), box-shadow .15s var(--ease); }
+  .btn:hover, .btn:focus-visible { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(20, 20, 20, .22); }
+  .btn:active { transform: none; box-shadow: none; transition-duration: .08s; }
+  .door:focus-within, .ncard:focus-within { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(20, 20, 20, .14); }
+  .ncard:focus-within h3 { color: var(--red); }
+  .rig { transition: box-shadow .2s var(--ease); }
+  .rig:hover, .rig:focus-within { box-shadow: 0 8px 22px rgba(20, 20, 20, .12); }
+  /* Prose links keep their underline; a second, red line slides in beneath it. */
+  .prose a {
+    background: linear-gradient(var(--red), var(--red)) 0 100% / 0 2px no-repeat;
+    transition: background-size .15s var(--ease), color .15s;
+  }
+  .prose a:hover, .prose a:focus-visible { background-size: 100% 2px; }
+  .charband .prose a { background-image: linear-gradient(var(--brass), var(--brass)); }
+}

@@ -14,7 +14,7 @@ import d from '@content/dept.json';
   </section>
   <section class="section tight">
     <div class="wrap">
-      <div class="rigs">
+      <div class="rigs" data-reveal-group>
         {d.apparatus.map((r) => (
           <div class="rig">{r.photo ? <img class="rphoto" src={r.photo.replace(".jpg","-800.jpg")} alt={r.alt || `${r.kind} ${r.id}`} loading="lazy" width="800" height="600" /> : <div class="photo" role="img" aria-label={`Reserved for a photograph of ${r.kind} ${r.id}`}><span>{r.kind} {r.id}</span></div>}<div class="in"><div class="id">{r.id}</div><div class="kind">{r.kind} · {r.year}</div><div class="mk">{r.make}</div><div class="sp">{r.spec}</div><div class="ro">{r.role}</div></div></div>
         ))}

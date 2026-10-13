@@ -18,15 +18,15 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 
   <section class="section">
     <div class="wrap">
-      <div class="head"><p class="kicker">History</p><h2>1868 to now</h2></div>
+      <div class="head" data-reveal><p class="kicker">History</p><h2>1868 to now</h2></div>
       <div class="prose">{d.history.map((p) => <p>{p}</p>)}</div>
     </div>
   </section>
 
   <section class="section band">
     <div class="wrap">
-      <div class="head"><p class="kicker">Leadership</p><h2>Chief's officers</h2></div>
-      <div class="people">
+      <div class="head" data-reveal><p class="kicker">Leadership</p><h2>Chief's officers</h2></div>
+      <div class="people" data-reveal-group>
         {d.chiefs.map((c) => <div class="person">{c.photo && <img class="pimg" src={c.photo} alt={`${c.name}`} loading="lazy" />}<div class="nm">{c.name}</div><div class="tt">{c.title}</div>{c.since && <div class="nt">Chief since {c.since}</div>}{c.note && <div class="nt">{c.note}</div>}<div class="nt"><a href={tel(c.phone)}>{c.phone}</a></div></div>)}
       </div>
       <p class="small" style="margin-top:1rem;max-width:62ch">{d.chiefs_note}</p>
@@ -36,7 +36,7 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 
   <section class="section">
     <div class="wrap">
-      <div class="head"><p class="kicker">Governance</p><h2>The Paw Paw Fire Board</h2></div>
+      <div class="head" data-reveal><p class="kicker">Governance</p><h2>The Paw Paw Fire Board</h2></div>
       <div class="prose"><p>{d.district.board_note}</p></div>
       <dl class="rows" style="margin-top:1.5rem;max-width:48rem">
         {d.district.board.map((b) => <div class="row"><dt>{b.for}</dt><dd>{b.name}</dd></div>)}
@@ -50,7 +50,7 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 
   <section class="section charband">
     <div class="wrap">
-      <div class="head"><p class="kicker">{d.station.name}</p><h2>A new house for an old company</h2></div>
+      <div class="head" data-reveal><p class="kicker">{d.station.name}</p><h2>A new house for an old company</h2></div>
       <div class="prose" style="max-width:62ch">
         <p>The station at {d.address.street} opened in {d.station.opened}: {d.station.size}, {d.station.cost}, {d.station.approved.toLowerCase()}.</p>
         <p>{d.station.history}</p>
@@ -61,7 +61,7 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 
   <section class="section tight">
     <div class="wrap">
-      <div class="head"><p class="kicker">Mission</p><h2>Why we exist</h2></div>
+      <div class="head" data-reveal><p class="kicker">Mission</p><h2>Why we exist</h2></div>
       <div class="prose"><p>To protect lives and property from fire and other emergencies, inside the Paw Paw Fire District or wherever we are dispatched on alarm.</p></div>
     </div>
   </section>

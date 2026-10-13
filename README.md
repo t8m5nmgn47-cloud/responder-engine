@@ -201,3 +201,27 @@ MIT. See `LICENSE`.
 
 ## Analytics
 Set `"analytics": "vercel"` in `site.config.json` to emit the Vercel Web Analytics snippet (`/_vercel/insights/script.js`) in `<head>`; the project must also have Web Analytics enabled on Vercel (`vercel project web-analytics <name>`). Leave it empty for no analytics (or when hosting elsewhere).
+
+## Motion
+
+`styles/motion.css` (imported by `Base.astro` after `global.css`) adds a quiet motion layer: the hero's patch,
+heading, lede and buttons rise in on load with a 100 ms stagger (`.hero-x` on the home page, `.phero` on inner
+pages); elements marked `data-reveal`, and the children of a `data-reveal-group` (stat tiles, photo doors, news
+cards, rigs, officer cards, section headings), fade up 12 px as they scroll into view, staggered 80 ms; buttons,
+doors, news cards and prose links give 150–200 ms hover and focus feedback; and the stat-band numbers marked
+`data-count` count up from zero over 1.2 s the first time the band is seen. Nothing loops or autoplays once the
+page has settled, nothing moves layout (transform and opacity only), and the memorial page carries none of these
+hooks.
+
+Switches in `site.config.json`:
+
+```json
+{ "motion": false }                         // whole layer off: no class, no script
+{ "motion": { "counters": false } }         // reveals on, stat numbers static
+```
+
+Default is everything on. The rule for reduced motion: every rule in `motion.css` sits inside
+`@media (prefers-reduced-motion: no-preference)`, and the small inline script in `<head>` exits before adding
+`m-on` to `<html>` when `prefers-reduced-motion: reduce` matches, so those visitors (and anyone without
+JavaScript) get a static page with every element visible and the real numbers already in the HTML. Elements
+are hidden only by `html.m-on [data-reveal]:not(.is-in)`, so a script failure can never leave content invisible.

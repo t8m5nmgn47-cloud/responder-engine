@@ -16,7 +16,7 @@ import d from '@content/dept.json';
 
   <section class="section band">
     <div class="wrap">
-      <div class="head"><p class="kicker">Captains</p><h2>Who runs each rig</h2></div>
+      <div class="head" data-reveal><p class="kicker">Captains</p><h2>Who runs each rig</h2></div>
       <dl class="rows" style="max-width:48rem">
         {d.captains.map((c) => <div class="row"><dt>{c.unit}</dt><dd>{c.name}{c.note && <span class="small"> · {c.note}</span>}</dd></div>)}
       </dl>
@@ -26,14 +26,14 @@ import d from '@content/dept.json';
 
   <section class="section">
     <div class="wrap">
-      <div class="head"><p class="kicker">Honor guard</p><h2>Formed in 2017, on donated time</h2></div>
+      <div class="head" data-reveal><p class="kicker">Honor guard</p><h2>Formed in 2017, on donated time</h2></div>
       <div class="prose"><p>{d.honor_guard}</p></div>
     </div>
   </section>
 
   <section class="section tight band">
     <div class="wrap">
-      <div class="head"><p class="kicker">Honorary members and awards</p><h2>Those who served before</h2></div>
+      <div class="head" data-reveal><p class="kicker">Honorary members and awards</p><h2>Those who served before</h2></div>
       <div class="prose">
         <p>The department keeps honorary membership for those who have given their years and stepped back, two honorary officers and more than thirty honorary members, and it presents the Van Buren County Judges Award each year, a tradition going back to 1961. Both lists will be carried onto this page once the department has confirmed them.</p>
       </div>

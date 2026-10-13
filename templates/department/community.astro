@@ -30,7 +30,7 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 
   <section class="section band">
     <div class="wrap">
-      <div class="head"><p class="kicker">After the fire</p><h2>The morning after</h2></div>
+      <div class="head" data-reveal><p class="kicker">After the fire</p><h2>The morning after</h2></div>
       <div class="prose">
         <p>Call your insurance company first; they will tell you what to do and will often arrange cleanup and a place to stay. Don't go back into the building until we have told you it's safe, and don't reconnect gas, electric or water until the utility or an electrician has checked them. The Red Cross can help with immediate needs. Gather what documents you can: insurance, identification, bank, medical.</p>
         <p>You may notice we opened windows, cut holes in the roof, or opened walls. Ventilation lets heat and smoke out so firefighters can get in, and fire hides in walls and ceilings; we open them to make sure it's out. It looks like damage. It's how the rest of the house survived.</p>
@@ -40,7 +40,7 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 
   <section class="section">
     <div class="wrap">
-      <div class="head"><p class="kicker">Common questions</p><h2>Things people ask us</h2></div>
+      <div class="head" data-reveal><p class="kicker">Common questions</p><h2>Things people ask us</h2></div>
       <div class="faq" style="max-width:62ch">
         {d.faq.map((f) => <details><summary>{f.q}</summary><p>{f.a}</p></details>)}
       </div>

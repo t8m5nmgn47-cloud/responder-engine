@@ -31,11 +31,11 @@ const inSeason = s && s.start <= today && today <= s.end;
 
   <section class="statband" aria-label="The department by the numbers">
     <div class="wrap">
-      <div class="stats">
-        <div class="stat"><div class="v">{d.stats.members}</div><div class="k">Volunteer members</div></div>
-        <div class="stat"><div class="v">{d.stats.calls_2024}</div><div class="k">Calls in 2024</div></div>
-        <div class="stat"><div class="v">{d.district.area_sq_mi}</div><div class="k">Square miles protected</div></div>
-        <div class="stat"><div class="v">{new Date().getFullYear() - d.founded}</div><div class="k">Years of service</div></div>
+      <div class="stats" data-reveal-group>
+        <div class="stat"><div class="v" data-count>{d.stats.members}</div><div class="k">Volunteer members</div></div>
+        <div class="stat"><div class="v" data-count>{d.stats.calls_2024}</div><div class="k">Calls in 2024</div></div>
+        <div class="stat"><div class="v" data-count>{d.district.area_sq_mi}</div><div class="k">Square miles protected</div></div>
+        <div class="stat"><div class="v" data-count>{new Date().getFullYear() - d.founded}</div><div class="k">Years of service</div></div>
       </div>
     </div>
   </section>
@@ -45,7 +45,7 @@ const inSeason = s && s.start <= today && today <= s.end;
 
   <section class="section feat">
     <div class="wrap">
-      <div class="featgrid">
+      <div class="featgrid" data-reveal-group>
         <img src={d.photos.chief_engine.src.replace(".jpg","-800.jpg")} alt={d.photos.chief_engine.alt} width="800" height="1067" loading="lazy" />
         <div>
           <p class="kicker">2026 Firefighter of the Year</p>
@@ -62,14 +62,14 @@ const inSeason = s && s.start <= today && today <= s.end;
     <div class="wrap">
       <div class="two">
         <div>
-          <div class="head"><p class="kicker">Recent responses</p><h2>What the pager said</h2></div>
+          <div class="head" data-reveal><p class="kicker">Recent responses</p><h2>What the pager said</h2></div>
           <ol class="mini">
             {runs.map((r) => <li><span class="mn">{r.n}</span><span class="md">{fmt(r.date)}</span><span class="mt"><b>{r.type}</b> · {r.location}</span></li>)}
           </ol>
           <p style="margin-top:1.25rem"><a class="btn" href="/responses/">All responses</a></p>
         </div>
         <div>
-          <div class="head"><p class="kicker">Coming up</p><h2>Events</h2></div>
+          <div class="head" data-reveal><p class="kicker">Coming up</p><h2>Events</h2></div>
           {upcoming.length ? <ol class="mini">{upcoming.map((e) => <li><span class="md">{fmt(e.date)}</span><span class="mt"><b>{e.title}</b> · {e.where}{e.time && ` · ${e.time}`}</span></li>)}</ol> : <p class="small">Nothing scheduled right now.</p>}
           <p style="margin-top:1.25rem"><a class="btn" href="/news/">News &amp; events</a></p>
         </div>
@@ -81,7 +81,7 @@ const inSeason = s && s.start <= today && today <= s.end;
     <div class="wrap">
       <div class="mapgrid">
         <div>
-          <div class="head"><p class="kicker">The district</p><h2>Five communities, one department</h2></div>
+          <div class="head" data-reveal><p class="kicker">The district</p><h2>Five communities, one department</h2></div>
           <div class="prose">
             <p>The Village of Paw Paw, the county seat, and Paw Paw, Antwerp and Waverly Townships, with Almena Township under contract: about {d.district.area_sq_mi} square miles of town, farms, vineyards and lake country in the middle of Van Buren County. A Fire Board with one member from each participating municipality oversees the department.</p>
             <p class="small" style="margin-top:1rem">Mutual aid with {d.district.mutual_aid.slice(0, 2).join(' and ')} and every department in the county. Station 1200, {d.address.street}. Boundaries from the U.S. Census Bureau.</p>
@@ -94,8 +94,8 @@ const inSeason = s && s.start <= today && today <= s.end;
 
   <section class="section charband cut up">
     <div class="wrap">
-      <div class="head"><p class="kicker">On the floor</p><h2>Eight rigs, one of them from 1948</h2></div>
-      <div class="rigs">
+      <div class="head" data-reveal><p class="kicker">On the floor</p><h2>Eight rigs, one of them from 1948</h2></div>
+      <div class="rigs" data-reveal-group>
         {d.apparatus.slice(0, 4).map((r) => (
           <div class="rig">{r.photo ? <img class="rphoto" src={r.photo.replace(".jpg","-800.jpg")} alt={r.alt || `${r.kind} ${r.id}`} loading="lazy" width="800" height="600" /> : <div class="photo" role="img" aria-label={`Reserved for a photograph of ${r.kind} ${r.id}`}></div>}<div class="in"><div class="id">{r.id}</div><div class="kind">{r.kind} · {r.year}</div><div class="mk">{r.make}</div><div class="sp">{r.spec}</div></div></div>
         ))}
@@ -106,7 +106,7 @@ const inSeason = s && s.start <= today && today <= s.end;
 
   <section class="section band">
     <div class="wrap">
-      <div class="doors three pdoors">
+      <div class="doors three pdoors" data-reveal-group>
         <a class="door" href="/safety/#911"><span class="tag">Safety</span><img src={d.photos.structure.src.replace(".jpg","-800.jpg")} alt={d.photos.structure.alt} loading="lazy" width="800" height="600" /><h3>What happens when you call 911</h3><p>Forty-one pagers, a drive to the station, and the first rig out. Why a volunteer response takes the minutes it takes.</p><span class="go">How it works</span></a>
         <a class="door" href="/community/"><span class="tag">Community</span><img src={d.photos.community.src.replace(".jpg","-800.jpg")} alt={d.photos.community.alt} loading="lazy" width="800" height="1067" /><h3>For residents</h3><p>Knox Box, hydrants, station tours, burning questions, what to do after a fire, how to get an incident report.</p><span class="go">Community</span></a>
         <a class="door" href="/memorial/"><span class="tag char">Memorial</span><img src={d.photos.glow.src.replace(".jpg","-800.jpg")} alt={d.photos.glow.alt} loading="lazy" width="800" height="1067" /><h3>In memory</h3><p>The members we have lost, and Lieutenant Ethan Quillen, who died in the line of duty on February 22, 2023.</p><span class="go">Memorial</span></a>
@@ -116,8 +116,8 @@ const inSeason = s && s.start <= today && today <= s.end;
 
   <section class="section tight">
     <div class="wrap">
-      <div class="head"><p class="kicker">Latest</p><h2>News from the station</h2></div>
-      <div class="ncards">{latest.map((n) => <a class={`ncard${n.photo ? '' : ' nophoto'}`} href="/news/"><span class={`tag${(n as any).tag === 'Awards' ? ' gold' : ''}`}>{(n as any).tag || 'Department'}</span>{n.photo && <img src={n.photo.replace(".jpg","-800.jpg")} alt={n.alt || ""} loading="lazy" />}<div class="in"><time datetime={n.date}>{fmt(n.date)}, {n.date.slice(0,4)}</time><h3>{n.title}</h3><p>{n.text}</p></div></a>)}</div>
+      <div class="head" data-reveal><p class="kicker">Latest</p><h2>News from the station</h2></div>
+      <div class="ncards" data-reveal-group>{latest.map((n) => <a class={`ncard${n.photo ? '' : ' nophoto'}`} href="/news/"><span class={`tag${(n as any).tag === 'Awards' ? ' gold' : ''}`}>{(n as any).tag || 'Department'}</span>{n.photo && <img src={n.photo.replace(".jpg","-800.jpg")} alt={n.alt || ""} loading="lazy" />}<div class="in"><time datetime={n.date}>{fmt(n.date)}, {n.date.slice(0,4)}</time><h3>{n.title}</h3><p>{n.text}</p></div></a>)}</div>
     </div>
   </section>
 
