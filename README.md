@@ -59,13 +59,19 @@ While the engine is unpublished, point at a checkout instead: `"@sightline/respo
 `npm install` then symlinks it into `node_modules`, and Astro resolves the template pages through the package's
 `exports` map.
 
-`site.config.json` (available to templates as `import cfg from '@siteconfig'`; not yet read by the `department`
-template, which still takes everything from `content/dept.json`):
+`site.config.json` (available to templates as `import cfg from '@siteconfig'`; the `department` template reads
+`analytics`, `motion`, `facebook` and `patch` (0.3.1: the header, hero and footer mark and, when it ends in `.svg`, the SVG favicon; defaults to `/patch.svg`) from it and takes everything else from `content/dept.json`):
 
 ```json
 { "name": "Paw Paw Fire Department", "domain": "https://pawpaw-fire.vercel.app",
-  "template": "department", "formRecipient": "", "patch": "/patch.svg" }
+  "template": "department", "formRecipient": "", "patch": "/patch.svg",
+  "facebook": "https://facebook.com/pawpawfd" }
 ```
+
+`facebook` (0.3): when set, the home page and the community page end with a "Follow us" section holding the
+Facebook Page Plugin timeline as a lazy-loaded `<iframe>` (plugin URL form, no SDK script, `title` set) with a plain
+"Open our Facebook page" link beside it as the fallback. Falls back to `dept.json` `facebook`; hidden when neither is
+set.
 
 ### What the integration does
 
@@ -123,6 +129,13 @@ Every field the `department` template reads. Paths are relative to the JSON root
 | `seasonal.start`, `.end`, `.kicker`, `.title`, `.text`, `.link`, `.link_label` | string | home and safety seasonal message (shown between `start` and `end`) |
 | `support.intro`, `.ways[] {t, d}`, `.what_it_buys` (string[][]), `.what_it_buys_note` | | support |
 | `hero_photo.src`, `.alt`, `.caption` | string | home, join, about hero images |
+| `hero_bg` | `{src, position?}` (0.3.1, optional) | the home hero's full-bleed background photo (else `/photos/structure-fire.jpg`); a `-800.jpg` sibling is used on phones; `position` is a CSS background-position such as `center 40%` |
+| `tasks` | `{label, href, icon?}[]` (0.3) | "I want to" quicklinks: tiles under the home hero (first 6) and an "I want to…" `<details>` menu in the header listing all of them. `href` may be a page, an anchor, an external URL or a `tel:` link; `icon` is an optional short glyph/emoji, rendered `aria-hidden`. Hidden when absent. |
+| `programs` | `{title, summary, href, photo?}[]` (0.3) | teaser cards on the community page (`/community/#programs`) and, when there are 3 or more, a "What we do" row of the first 3 on the home page. Hidden when absent. |
+| `dispatch_feed.label`, `.url` | string (0.3) | "Listen live" link on the responses page and in the footer, each with a note that it is a public scanner feed and not an official source. Hidden when absent. |
+| `iso_rating.class`, `.year?`, `.note?` | string, number, string (0.3) | "ISO rating" row in the about page's Fire Board facts and a short "ISO Class …" line in the footer. Hidden when absent. Only enter a rating the department has confirmed. |
+| `photos.about_hero`, `.members_hero`, `.responses`, `.apparatus_hero`, `.support_hero`, `.station` | `{src, alt, caption?}` (0.3.1, optional) | per-page overrides: about hero (else `hero_photo`), members hero (else `hero_photo`), responses hero (else `photos.glow`), a photo beside the apparatus and support page heroes (hidden when absent), the about page's station figure (else `hero_photo`). |
+| `copy.community_caption`, `.contact_caption`, `.responses_caption`, `.apparatus_h1`, `.apparatus_link`, `.support_h1`, `.members_lede`, `.community_door`, `.footer_kind`, `.members_label` | string (0.3.1, optional) | override sentences that were hardcoded with Paw Paw wording (photo captions on community/contact/responses, the apparatus and support headlines, the home "all rigs" button, the members lede, the home community door text). |
 | `photos.<key>.src`, `.alt` | string | keys used: `chief_engine`, `structure`, `glow`, `community`, `members_dog`, `dog_window`, `squad`. Pages derive the responsive 800px variant with `src.replace('.jpg', '-800.jpg')`, so every photo needs a `-800.jpg` sibling in `public/photos/`. |
 
 Present in Paw Paw's data but not read by any template: `short`, `email`, `phones.emergency`, `stats.apparatus`,
@@ -148,7 +161,8 @@ Present in Paw Paw's data but not read by any template: `short`, `email`, `phone
 
 | field | type | used for |
 |---|---|---|
-| `events` | `{date, end?, time, title, where, text}[]` | news page and home; past events are filtered out at build time, each event gets an `.ics` download link |
+| `events` | `{date, end?, time, title, where, text, type?, agenda_url?}[]` | news page and home; past events are filtered out at build time, each event gets an `.ics` download link |
+| `events[].type` | `"meeting"` (0.3) | the next upcoming event marked `meeting` renders a "Next board meeting" card on the home page (date, time, place, agenda link, link to the schedule on News & events) and is left out of the home's short upcoming list; the news page shows the `agenda_url` as an "Agenda" link |
 
 ### `public/`
 
@@ -204,14 +218,18 @@ Set `"analytics": "vercel"` in `site.config.json` to emit the Vercel Web Analyti
 
 ## Motion
 
-`styles/motion.css` (imported by `Base.astro` after `global.css`) adds a quiet motion layer: the hero's patch,
-heading, lede and buttons rise in on load with a 100 ms stagger (`.hero-x` on the home page, `.phero` on inner
-pages); elements marked `data-reveal`, and the children of a `data-reveal-group` (stat tiles, photo doors, news
-cards, rigs, officer cards, section headings), fade up 12 px as they scroll into view, staggered 80 ms; buttons,
-doors, news cards and prose links give 150–200 ms hover and focus feedback; and the stat-band numbers marked
-`data-count` count up from zero over 1.2 s the first time the band is seen. Nothing loops or autoplays once the
-page has settled, nothing moves layout (transform and opacity only), and the memorial page carries none of these
-hooks.
+`styles/motion.css` (imported by `Base.astro` after `global.css`) adds a quiet motion layer: the hero's patch and
+kicker, then the heading, then the lede and buttons rise in on load in three steps 120 ms apart (`.hero-x` on the
+home page, `.phero` on inner pages); elements marked `data-reveal`, and the children of a `data-reveal-group` (stat
+tiles, photo doors, news cards, rigs, officer cards, program cards), fade up 10 px over 450 ms
+(`cubic-bezier(.22,1,.36,1)`) as they scroll into view. A group is observed as a whole, so its children always
+reveal together, staggered 60 ms apiece via a `--i` custom property (capped at 8); `will-change` is held only until
+the transition ends (`transitionend` adds `.m-done`, which also removes the reveal transition so hover rules take
+over), and anything scrolled past in one jump, such as an anchor load, is shown at once. Buttons, doors, news cards
+and prose links give 150–200 ms hover and focus feedback; the stat-band numbers marked `data-count` count up from
+zero over 1.2 s with tabular numerals and a fixed `ch` width so the band never reflows. Nothing loops or autoplays
+once the page has settled, nothing moves layout (transform and opacity only), the angled bands (`clip-path`) are
+never transformed themselves, and the memorial page carries none of these hooks.
 
 Switches in `site.config.json`:
 

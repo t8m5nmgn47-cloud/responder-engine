@@ -1,11 +1,14 @@
 ---
 import Base from '../../layouts/Base.astro';
 import d from '@content/dept.json';
+import { copy } from '../../components/copy.js';
+const cp = copy(d);
 const s = d.support;
+const sp = (d as any).photos?.support_hero as { src: string; alt: string; caption?: string } | undefined;
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 ---
-<Base title="Support the department" description="How to support the Paw Paw Fire Department: give, sponsor, or show up. What the community's support pays for.">
-  <section class="phero"><div class="wrap"><div><p class="kicker">Support</p><h1 style="margin-top:.75rem">The rigs are paid for. The rest is us.</h1><p class="lede">{s.intro}</p></div></div></section>
+<Base title="Support the department" description={`How to support the ${d.name}: give, sponsor, or show up. What the community's support pays for.`}>
+  <section class={sp ? "phero two" : "phero"}><div class="wrap"><div><p class="kicker">Support</p><h1 style="margin-top:.75rem">{cp.support_h1}</h1><p class="lede">{s.intro}</p></div>{sp && <figure class="hphoto"><img src={sp.src} alt={sp.alt} width="1100" height="400" fetchpriority="high" style="aspect-ratio:auto" />{sp.caption && <figcaption>{sp.caption}</figcaption>}</figure>}</div></section>
   <section class="section band"><div class="wrap">
     <div class="doors three" data-reveal-group>{s.ways.map((w) => <div class="door"><h3>{w.t}</h3><p>{w.d}</p></div>)}</div>
   </div></section>

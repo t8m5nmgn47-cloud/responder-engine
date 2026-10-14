@@ -1,10 +1,12 @@
 ---
 import Base from '../../layouts/Base.astro';
 import d from '@content/dept.json';
+import { copy } from '../../components/copy.js';
+const cp = copy(d);
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 const s = d.seasonal;
 ---
-<Base title="Safety" description="Fire safety for Paw Paw homes: request a free smoke alarm check, make a home escape plan you can print, learn what happens when you call 911, and this season's message from the department.">
+<Base title="Safety" description={`Fire safety for ${cp.place} homes: request a free smoke alarm check, make a home escape plan you can print, learn what happens when you call 911, and this season's message from the department.`}>
   <section class="phero two">
     <div class="wrap">
       <div>
@@ -24,7 +26,7 @@ const s = d.seasonal;
   <section class="section band" id="alarm">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">Free</p><h2>Request a smoke alarm check</h2><p class="small" style="max-width:62ch">A member will come to your home, test every alarm, replace dead batteries, and install an alarm where one is missing, at no charge. We make a point of it for older residents and anyone who can't get up a ladder.</p></div>
-      <form class="jf" id="sf" novalidate>
+      <form class="jf" id="sf" novalidate data-site={d.name}>
         <div class="f"><label for="s-name">Your name *</label><input id="s-name" name="name" required></div>
         <div class="f"><label for="s-phone">Phone *</label><input id="s-phone" name="phone" type="tel" required></div>
         <div class="f wide"><label for="s-addr">Address *</label><input id="s-addr" name="address" required></div>
@@ -40,11 +42,11 @@ const s = d.seasonal;
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">How it works</p><h2>What happens when you call 911</h2></div>
       <ol class="steps2">
-        <li><h3>You call. Stay on the line.</h3><p>Van Buren County Central Dispatch answers. The dispatcher asks where, what, and whether anyone is hurt. Answer the questions; the page is going out while you talk.</p></li>
-        <li><h3>Forty-one pagers go off.</h3><p>Paw Paw has no one sitting in the station. Our firefighters are at work, at dinner, asleep. The tones reach every member at once, and the ones who can go, go.</p></li>
-        <li><h3>They drive to the station.</h3><p>Members respond from wherever they are to Station 1200, pull on gear, and roll the first rig as soon as a crew is aboard. This is the part that takes the minutes: it is the difference between a volunteer department and a paid one, and it is why we need members who live close.</p></li>
-        <li><h3>The first rig is out.</h3><p>Usually an engine with the first three or four members, then the ladder, the tanker and the squad as more arrive. Lawton, Decatur and other county departments are paged for working fires.</p></li>
-        <li><h3>We stay until it's done.</h3><p>Fire out, patients handed to Van Buren EMS, scene safe, and then back to the station to wash hoses and fill air bottles so the next call starts clean.</p></li>
+        <li><h3>You call. Stay on the line.</h3><p>{cp.dispatch} answers. The dispatcher asks where, what, and whether anyone is hurt. Answer the questions; the page is going out while you talk.</p></li>
+        <li><h3>{cp.members_word} pagers go off.</h3><p>{cp.no_one_in_station}</p></li>
+        <li><h3>They drive to the station.</h3><p>Members respond from wherever they are to {cp.station_label}, pull on gear, and roll the first rig as soon as a crew is aboard. This is the part that takes the minutes: it is the difference between a volunteer department and a paid one, and it is why we need members who live close.</p></li>
+        <li><h3>The first rig is out.</h3><p>{cp.first_rig}</p></li>
+        <li><h3>We stay until it's done.</h3><p>Fire out, patients handed to {cp.ems}, scene safe, and then back to the station to wash hoses and fill air bottles so the next call starts clean.</p></li>
       </ol>
       <p class="small" style="margin-top:1.5rem;max-width:62ch">The honest version of "how long will it take": longer than in a city, and shorter the more volunteers we have within a few minutes of the station. If that bothers you, <a href="/join/">join</a>.</p>
     </div>
@@ -67,7 +69,7 @@ const s = d.seasonal;
         <div class="fact"><h3>Kitchen</h3><p>Stay with what you're cooking. Keep a lid nearby; sliding it over a pan fire puts it out. Never water on grease.</p></div>
         <div class="fact"><h3>Heating</h3><p>Three feet between a space heater and anything that burns. Chimneys cleaned yearly. Ashes in a metal can, outside, away from the house.</p></div>
         <div class="fact"><h3>Charging</h3><p>Lithium batteries on a hard surface, never under a pillow or on bedding, and unplugged when full. A swollen or hot battery goes outside.</p></div>
-        <div class="fact"><h3>Burning</h3><p>Check the banner at the top of this site and your township office. Michigan DNR permits for open burning. Never on a windy day. A hose or bucket within reach.</p></div>
+        <div class="fact"><h3>Burning</h3><p>{cp.burn_rule_short}</p></div>
         <div class="fact"><h3>Carbon monoxide</h3><p>A CO alarm near the bedrooms, especially with gas heat, a wood stove or an attached garage. Never run a generator in a garage.</p></div>
         <div class="fact"><h3>Your address</h3><p>Reflective numbers at the road, visible from both directions at night. We can't help a house we can't find.</p></div>
       </div>
@@ -78,7 +80,7 @@ const s = d.seasonal;
     const f = document.getElementById('sf') as HTMLFormElement; const st = document.getElementById('s-status')!; const fb = document.getElementById('s-fb') as HTMLDetailsElement; const to = '';
     f.addEventListener('submit', (e) => { e.preventDefault(); if (!f.reportValidity()) return;
       const lines: string[] = []; f.querySelectorAll<HTMLElement>('.f').forEach((w) => { const l = w.querySelector('label')!.textContent!.replace(/\s*\*$/, '').trim(); const el = w.querySelector('input,textarea') as HTMLInputElement; if (el.value.trim()) lines.push(`${l}: ${el.value.trim()}`); });
-      const body = lines.join('\n') + '\n\nSmoke alarm check request from the Paw Paw Fire Department website.';
+      const body = lines.join('\n') + '\n\nSmoke alarm check request from the ' + (f.dataset.site || 'department') + ' website.';
       (fb.querySelector('textarea') as HTMLTextAreaElement).value = `Subject: Smoke alarm check request\n\n${body}`; fb.hidden = false; fb.open = true;
       if (to) { st.textContent = 'Opening your email program…'; location.href = `mailto:${to}?subject=${encodeURIComponent('Smoke alarm check request')}&body=${encodeURIComponent(body)}`; } else st.textContent = 'The department has not yet set an email address for this form. Copy the text below and send it, or call the station.'; });
   </script>

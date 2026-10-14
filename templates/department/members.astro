@@ -1,16 +1,19 @@
 ---
 import Base from '../../layouts/Base.astro';
 import d from '@content/dept.json';
+import { copy } from '../../components/copy.js';
+const cp = copy(d);
+const mh = ((d as any).photos?.members_hero ?? d.hero_photo) as { src: string; alt: string; caption: string };
 ---
-<Base title="Members" description="The people of the Paw Paw Fire Department: 41 volunteers, the chief's officers, the captains of each rig, the honor guard, and the honorary members who served before them.">
+<Base title="Members" description={cp.members_meta}>
   <section class="phero two">
     <div class="wrap">
       <div>
         <p class="kicker">Members</p>
-        <h1 style="margin-top:.75rem">Forty-one neighbors with pagers.</h1>
-        <p class="lede">{d.stats.officers} officers, {d.stats.firefighters} firefighters and {d.stats.juniors} junior members, every one of them a volunteer. Some have been on the department for more than fifty years.</p>
+        <h1 style="margin-top:.75rem">{cp.members_h1}</h1>
+        <p class="lede">{cp.members_lede}</p>
       </div>
-      <figure class="hphoto"><img src={d.hero_photo.src} alt={d.hero_photo.alt} width="1100" height="400" fetchpriority="high" style="aspect-ratio:auto" /><figcaption>{d.hero_photo.caption}</figcaption></figure>
+      <figure class="hphoto"><img src={mh.src} alt={mh.alt} width="1100" height="400" fetchpriority="high" style="aspect-ratio:auto" /><figcaption>{mh.caption}</figcaption></figure>
     </div>
   </section>
 
@@ -26,7 +29,7 @@ import d from '@content/dept.json';
 
   <section class="section">
     <div class="wrap">
-      <div class="head" data-reveal><p class="kicker">Honor guard</p><h2>Formed in 2017, on donated time</h2></div>
+      <div class="head" id="honor-guard" data-reveal><p class="kicker">Honor guard</p><h2>Formed in 2017, on donated time</h2></div>
       <div class="prose"><p>{d.honor_guard}</p></div>
     </div>
   </section>
@@ -35,7 +38,7 @@ import d from '@content/dept.json';
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">Honorary members and awards</p><h2>Those who served before</h2></div>
       <div class="prose">
-        <p>The department keeps honorary membership for those who have given their years and stepped back, two honorary officers and more than thirty honorary members, and it presents the Van Buren County Judges Award each year, a tradition going back to 1961. Both lists will be carried onto this page once the department has confirmed them.</p>
+        <p>{cp.honorary}</p>
       </div>
     </div>
   </section>

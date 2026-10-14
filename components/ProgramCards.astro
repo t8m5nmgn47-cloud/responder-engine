@@ -1,0 +1,17 @@
+---
+// Teaser cards for dept.json "programs": [{ title, summary, href, photo? }]. Renders nothing when absent.
+import d from '@content/dept.json';
+interface Props { limit?: number }
+const all: any[] = (d as any).programs || [];
+const items = Astro.props.limit ? all.slice(0, Astro.props.limit) : all;
+---
+{items.length > 0 && (
+  <div class="pcards" data-reveal-group>
+    {items.map((p) => (
+      <a class="pcard" href={p.href}>
+        {p.photo ? <img src={p.photo} alt="" width="800" height="600" loading="lazy" /> : <span class="pcard-none" aria-hidden="true"></span>}
+        <span class="in"><span class="h3">{p.title}</span><span class="sm">{p.summary}</span><span class="go">Read more<span class="sr"> about {p.title}</span></span></span>
+      </a>
+    ))}
+  </div>
+)}

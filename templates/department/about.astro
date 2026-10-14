@@ -1,18 +1,23 @@
 ---
 import Base from '../../layouts/Base.astro';
 import d from '@content/dept.json';
+import { copy } from '../../components/copy.js';
+const cp = copy(d);
+const ah = ((d as any).photos?.about_hero ?? d.hero_photo) as { src: string; alt: string; caption: string };
+const sp = ((d as any).photos?.station ?? d.hero_photo) as { src: string };
 import DistrictMap from '../../components/DistrictMap.astro';
+const iso = (d as any).iso_rating as { class: string; year?: number; note?: string } | undefined;
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 ---
-<Base title="About" description="The Paw Paw Fire Department: organized as Paw Paw Fire Company No. 1 in 1868, all-volunteer ever since, serving five communities in Van Buren County from Station 1200. History, leadership, the Fire Board, and the station.">
+<Base title="About" description={cp.about_meta}>
   <section class="phero two">
     <div class="wrap">
       <div>
         <p class="kicker">About the department</p>
         <h1 style="margin-top:.75rem">Organized the night after the second fire.</h1>
-        <p class="lede">Paw Paw's business district burned three times before twenty-two men formed Fire Company No. 1 in September 1868. The department has been volunteer, and busy, ever since.</p>
+        <p class="lede">{cp.about_lede}</p>
       </div>
-      <figure class="hphoto"><img src={d.hero_photo.src} alt={d.hero_photo.alt} width="1100" height="400" loading="eager" style="aspect-ratio:auto" /><figcaption>{d.hero_photo.caption}</figcaption></figure>
+      <figure class="hphoto"><img src={ah.src} alt={ah.alt} width="1100" height="400" loading="eager" style="aspect-ratio:auto" /><figcaption>{ah.caption}</figcaption></figure>
     </div>
   </section>
 
@@ -36,33 +41,34 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 
   <section class="section">
     <div class="wrap">
-      <div class="head" data-reveal><p class="kicker">Governance</p><h2>The Paw Paw Fire Board</h2></div>
+      <div class="head" data-reveal><p class="kicker">Governance</p><h2>{cp.board_title}</h2></div>
       <div class="prose"><p>{d.district.board_note}</p></div>
       <dl class="rows" style="margin-top:1.5rem;max-width:48rem">
         {d.district.board.map((b) => <div class="row"><dt>{b.for}</dt><dd>{b.name}</dd></div>)}
         <div class="row"><dt>By contract</dt><dd>{d.district.contract.join(', ')}</dd></div>
+        {iso && iso.class && <div class="row"><dt>ISO rating</dt><dd>Public Protection Classification {iso.class}{iso.year && `, rated ${iso.year}`}.{iso.note && ` ${iso.note}`}</dd></div>}
       </dl>
-      <p class="small" style="margin-top:1rem">Board membership as listed on the department's previous website; to be confirmed.</p>
-      <div style="margin-top:2rem;max-width:48rem"><DistrictMap /></div>
-      <p class="small" style="margin-top:.5rem">The district in red; Almena Township, by contract, in lighter red; the Village of Paw Paw outlined. Boundaries from the U.S. Census Bureau.</p>
+      <p class="small" style="margin-top:1rem">{cp.board_source_note}</p>
+      {cp.map && <div style="margin-top:2rem;max-width:48rem"><DistrictMap /></div>}
+      {cp.map && <p class="small" style="margin-top:.5rem">{cp.map_note}</p>}
     </div>
   </section>
 
   <section class="section charband">
     <div class="wrap">
-      <div class="head" data-reveal><p class="kicker">{d.station.name}</p><h2>A new house for an old company</h2></div>
+      <div class="head" data-reveal><p class="kicker">{d.station.name}</p><h2>{cp.station_title}</h2></div>
       <div class="prose" style="max-width:62ch">
-        <p>The station at {d.address.street} opened in {d.station.opened}: {d.station.size}, {d.station.cost}, {d.station.approved.toLowerCase()}.</p>
+        {d.station.opened > 0 && <p>The station at {d.address.street} opened in {d.station.opened}: {d.station.size}, {d.station.cost}, {d.station.approved.toLowerCase()}.</p>}
         <p>{d.station.history}</p>
       </div>
-      <figure class="hphoto" style="margin-top:2rem"><img src={d.hero_photo.src} alt="The members of the department in front of the apparatus bays of Station 1200." width="1100" height="400" loading="lazy" style="aspect-ratio:auto" /><figcaption style="color:rgba(243,239,230,.7)">Station 1200, South Gremps Street, with the department in front of the bays, 2021.</figcaption></figure>
+      <figure class="hphoto" style="margin-top:2rem"><img src={sp.src} alt={cp.station_photo_alt} width="1100" height="400" loading="lazy" style="aspect-ratio:auto" /><figcaption style="color:rgba(243,239,230,.7)">{cp.station_photo_caption}</figcaption></figure>
     </div>
   </section>
 
   <section class="section tight">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">Mission</p><h2>Why we exist</h2></div>
-      <div class="prose"><p>To protect lives and property from fire and other emergencies, inside the Paw Paw Fire District or wherever we are dispatched on alarm.</p></div>
+      <div class="prose"><p>{cp.mission}</p></div>
     </div>
   </section>
 </Base>

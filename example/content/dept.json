@@ -20,6 +20,79 @@
   },
   "email": "",
   "facebook": "https://www.facebook.com/pawpawfd",
+  "tasks": [
+    {
+      "label": "Join the department",
+      "href": "/join/",
+      "icon": "🚒"
+    },
+    {
+      "label": "Request a smoke alarm",
+      "href": "/safety/#alarm",
+      "icon": "🔔"
+    },
+    {
+      "label": "Request a station tour",
+      "href": "tel:+12698706236",
+      "icon": "👋"
+    },
+    {
+      "label": "Get burn-permit info",
+      "href": "https://www.michigan.gov/dnr/managing-resources/forestry/fire/burn-permits",
+      "icon": "🔥"
+    },
+    {
+      "label": "Report a non-emergency",
+      "href": "tel:+12696574770",
+      "icon": "📞"
+    },
+    {
+      "label": "Support the department",
+      "href": "/support/",
+      "icon": "❤"
+    }
+  ],
+  "programs": [
+    {
+      "title": "Smoke alarm program",
+      "summary": "A member comes to your home, tests every alarm, replaces batteries and installs one where it's missing. Free.",
+      "href": "/safety/#alarm",
+      "photo": "/photos/squad-1206-prevention-800.jpg"
+    },
+    {
+      "title": "Junior firefighter program",
+      "summary": "For 16- and 17-year-olds who want to learn the work before they can run calls.",
+      "href": "/youth/",
+      "photo": "/photos/members-dalmatian-800.jpg"
+    },
+    {
+      "title": "Station tours",
+      "summary": "Twenty to thirty minutes with the rigs, booked two weeks ahead. Schools, scouts, birthdays, anyone.",
+      "href": "/community/",
+      "photo": "/photos/community-seniors-800.jpg"
+    },
+    {
+      "title": "Home escape plan",
+      "summary": "Two ways out of every room and a meeting place outside. Print the sheet and put it on the refrigerator.",
+      "href": "/escape-plan/",
+      "photo": "/photos/dalmatian-window-800.jpg"
+    },
+    {
+      "title": "Honor guard",
+      "summary": "Formed in 2017 on donated time. Colors at memorials, funerals, parades and ceremonies across the area.",
+      "href": "/members/#honor-guard",
+      "photo": "/photos/department-group-800.jpg"
+    }
+  ],
+  "dispatch_feed": {
+    "label": "Van Buren County Fire and EMS on Broadcastify",
+    "url": "https://www.broadcastify.com/listen/feed/00000"
+  },
+  "iso_rating": {
+    "class": "5/5Y",
+    "year": 2024,
+    "note": "Class 5 within five road miles of the station and 1,000 feet of a hydrant; 5Y elsewhere in the district."
+  },
   "district": {
     "area_sq_mi": 88,
     "members": [

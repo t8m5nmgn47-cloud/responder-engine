@@ -1,0 +1,27 @@
+---
+// "Follow us": the Facebook Page Plugin as a lazy iframe (no SDK script), with a plain link fallback.
+// Renders nothing when site.config.json has no "facebook" (falls back to dept.json "facebook").
+import siteConfig from '@siteconfig';
+import d from '@content/dept.json';
+const fb: string = (siteConfig as any).facebook || (d as any).facebook || '';
+const name: string = d.name;
+const src = fb ? `https://www.facebook.com/plugins/page.php?href=${encodeURIComponent(fb)}&tabs=timeline&width=500&height=600&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false` : '';
+---
+{fb && (
+  <section class="section band fbsec" aria-labelledby="fb-h">
+    <div class="wrap">
+      <div class="fbgrid">
+        <div class="head" data-reveal>
+          <p class="kicker">Follow us</p>
+          <h2 id="fb-h">The department on Facebook</h2>
+          <p class="small" style="max-width:40ch">Day-to-day updates, photos from calls and events, and reminders about burning conditions are posted there first.</p>
+          <p><a class="btn" href={fb} rel="noopener">Open our Facebook page</a></p>
+        </div>
+        <div class="fbwrap">
+          <iframe class="fbframe" src={src} title={`${name} Facebook page timeline`} width="500" height="600" loading="lazy" style="border:none;overflow:hidden" scrolling="no" allow="encrypted-media"></iframe>
+          <p class="small fbfall">If the feed doesn't load here, <a href={fb} rel="noopener">open our Facebook page</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+)}

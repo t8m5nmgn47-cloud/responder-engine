@@ -2,9 +2,12 @@
 import '../styles/global.css';
 import '../styles/motion.css';
 import d from '@content/dept.json';
+import { copy } from '../components/copy.js';
+const cp = copy(d);
 import status from '@content/status.json';
 import siteConfig from '@siteconfig';
 const analytics = siteConfig.analytics || '';
+const patch = (siteConfig as any).patch || '/patch.svg';
 // Motion layer: `"motion": false` turns it all off; `"motion": { "counters": false }` keeps the
 // reveals but leaves the stat numbers static. Default is everything on. The browser's
 // prefers-reduced-motion setting always wins (checked in motion.css and in the script below).
@@ -14,7 +17,7 @@ const countersOn = motionOn && !(motionCfg && typeof motionCfg === 'object' && m
 interface Props { title: string; description: string; }
 const { title, description } = Astro.props;
 const path = Astro.url.pathname;
-const full = path === '/' ? `${d.name} · Paw Paw, Michigan` : `${title} · ${d.name}`;
+const full = path === '/' ? `${d.name} · ${cp.title_suffix}` : `${title} · ${d.name}`;
 const nav = [
   { href: '/about/', label: 'About' },
   { href: '/apparatus/', label: 'Apparatus' },
@@ -32,6 +35,9 @@ const more = [
   { href: '/contact/', label: 'Contact' },
   { href: '/accessibility/', label: 'Accessibility' },
 ];
+const tasks: { label: string; href: string; icon?: string }[] = (d as any).tasks || [];
+const feed = (d as any).dispatch_feed as { label: string; url: string } | undefined;
+const iso = (d as any).iso_rating as { class: string; year?: number; note?: string } | undefined;
 const lvl = (status as any).level || 'normal';
 const lvlLabel: Record<string,string> = { normal: 'Burning: normal conditions', caution: 'Burning: use caution', ban: 'Burn ban in effect' };
 const current = (h: string) => (path.startsWith(h) ? 'page' : undefined);
@@ -57,7 +63,7 @@ const jsonld = {
     <meta property="og:type" content="website" />
     <meta name="theme-color" content="#b3261e" />
     <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32" />
-    <link rel="icon" href="/patch.svg" type="image/svg+xml" />
+    {patch.endsWith(".svg") && <link rel="icon" href={patch} type="image/svg+xml" />}
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -66,12 +72,13 @@ const jsonld = {
       (function(){
         if(!window.matchMedia||matchMedia('(prefers-reduced-motion: reduce)').matches||!('IntersectionObserver' in window))return;
         var H=document.documentElement;H.classList.add('m-on');
-        var counters=H.getAttribute('data-counters')==='true';
+        var counters=H.getAttribute('data-counters')==='true',DUR=450,STAG=60,MAXI=8;
         function count(el){
           var m=/^(\D*)([\d,]+)(.*)$/.exec(el.textContent.trim());if(!m||el.getAttribute('data-count')==='done')return;
           el.setAttribute('data-count','done');
-          var end=parseInt(m[2].replace(/,/g,''),10),sep=m[2].indexOf(',')>-1,D=1200,t0=null;
-          var sr=document.createElement('span');sr.className='sr';sr.textContent=el.textContent;
+          var end=parseInt(m[2].replace(/,/g,''),10),sep=m[2].indexOf(',')>-1,D=1200,t0=null,txt=el.textContent.trim();
+          el.style.setProperty('--w',txt.length+'ch'); /* fixed width in ch so the band never reflows */
+          var sr=document.createElement('span');sr.className='sr';sr.textContent=txt;
           var live=document.createElement('span');live.setAttribute('aria-hidden','true');live.textContent=m[1]+'0'+m[3];
           el.textContent='';el.appendChild(sr);el.appendChild(live);
           function fmt(n){n=String(n);return sep?n.replace(/\B(?=(\d{3})+(?!\d))/g,','):n;}
@@ -79,13 +86,30 @@ const jsonld = {
             live.textContent=m[1]+fmt(Math.round(end*e))+m[3];if(p<1)requestAnimationFrame(step);}
           requestAnimationFrame(step);
         }
+        /* .m-done releases will-change and the reveal transition once it has really ended
+           (transitionend on opacity), with a timer as a fallback. */
+        function done(el,delay){var t=setTimeout(function(){el.classList.add('m-done');},DUR+delay+120);
+          el.addEventListener('transitionend',function h(e){if(e.target!==el||e.propertyName!=='opacity')return;clearTimeout(t);el.classList.add('m-done');el.removeEventListener('transitionend',h);});}
         function ready(){
-          var io=new IntersectionObserver(function(es){es.forEach(function(x){if(!x.isIntersecting)return;
-            var el=x.target;io.unobserve(el);el.classList.add('is-in');
-            setTimeout(function(){el.classList.add('m-done');},1000);
+          var pending=[];
+          function reveal(el,instant){
+            var i=pending.indexOf(el);if(i<0)return;pending.splice(i,1);io.unobserve(el);
+            if(el.hasAttribute('data-reveal-group')){
+              var kids=el.children,n=kids.length,j;
+              for(j=0;j<n;j++){var k=instant?0:Math.min(j,MAXI-1);kids[j].style.setProperty('--i',k);done(kids[j],k*STAG);}
+            } else done(el,0);
+            el.classList.add('is-in');
             if(counters){if(el.hasAttribute('data-count'))count(el);el.querySelectorAll('[data-count]').forEach(count);}
-          });},{threshold:.15,rootMargin:'0px 0px -8% 0px'});
-          document.querySelectorAll('[data-reveal],[data-reveal-group]>*,[data-count]').forEach(function(el){io.observe(el);});
+          }
+          var io=new IntersectionObserver(function(es){es.forEach(function(x){
+            if(x.isIntersecting)reveal(x.target,false);
+            else if(x.boundingClientRect.bottom<0)reveal(x.target,true); /* already scrolled past (anchor load) */
+          });},{threshold:0.01,rootMargin:'0px 0px -6% 0px'});
+          document.querySelectorAll('[data-reveal],[data-reveal-group]').forEach(function(el){pending.push(el);io.observe(el);});
+          if(counters)document.querySelectorAll('[data-count]').forEach(function(el){if(!el.closest('[data-reveal],[data-reveal-group]')){pending.push(el);io.observe(el);}});
+          /* After a long jump (anchor click, drag of the scrollbar), anything left above the viewport shows at once. */
+          function sweep(){if(!pending.length)return;pending.slice().forEach(function(el){if(el.getBoundingClientRect().bottom<0)reveal(el,true);});}
+          if('onscrollend' in window)addEventListener('scrollend',sweep,{passive:true});else addEventListener('scroll',function(){clearTimeout(sweep.t);sweep.t=setTimeout(sweep,150);},{passive:true});
         }
         if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ready);else ready();
       })();
@@ -115,12 +139,15 @@ const jsonld = {
     <header class="top" id="top">
       <div class="wrap rail">
         <a class="brand" href="/" aria-label={`${d.name} home`}>
-          <img class="mk" src="/patch.svg" alt="" width="44" height="50" />
-          <span><span class="bn">Paw Paw Fire</span><span class="bs">Station 1200 · Est. {d.founded}</span></span>
+          <img class="mk" src={patch} alt="" width="44" height="50" />
+          <span><span class="bn">{cp.short}</span><span class="bs">{cp.station_label} · Est. {d.founded}</span></span>
         </a>
         <button class="menu-btn" type="button" aria-expanded="false" aria-controls="nav">Menu</button>
         <nav class="nav" id="nav" aria-label="Primary">
-          <ul>{nav.map((n) => <li><a href={n.href} class={n.cta ? 'cta' : undefined} aria-current={current(n.href)}>{n.label}</a></li>)}</ul>
+          <ul>
+            {tasks.length > 0 && <li class="iwt"><details id="iwt"><summary>I want to&hellip;</summary><ul class="iwt-menu" aria-label="Common tasks">{tasks.map((t) => <li><a href={t.href}>{t.icon && <span class="ti" aria-hidden="true">{t.icon}</span>}{t.label}</a></li>)}</ul></details></li>}
+            {nav.map((n) => <li><a href={n.href} class={n.cta ? 'cta' : undefined} aria-current={current(n.href)}>{n.label}</a></li>)}
+          </ul>
         </nav>
       </div>
     </header>
@@ -129,9 +156,9 @@ const jsonld = {
       <div class="wrap">
         <div class="cols">
           <div class="fid">
-            <img class="fpatch" src="/patch.svg" alt="" width="64" height="74" loading="lazy" />
+            <img class="fpatch" src={patch} alt="" width="64" height="74" loading="lazy" />
             <h2>{d.name}</h2>
-            <p class="about">{d.company}. An all-volunteer department protecting the Village of Paw Paw and the townships of Paw Paw, Antwerp, Waverly and Almena, about {d.district.area_sq_mi} square miles of Van Buren County, Michigan.</p>
+            <p class="about">{d.company}. {cp.footer_kind} protecting {cp.territory}, {d.district.area_sq_mi > 0 ? `about ${d.district.area_sq_mi} square miles of ` : 'in '}{cp.county}, {cp.state_name}.</p>
           </div>
           <div>
             <h2>Reach us</h2>
@@ -141,6 +168,7 @@ const jsonld = {
               <li>Fax: <span class="tn">{d.phones.fax}</span></li>
               <li>{a.street}, {a.city}, {a.state} {a.zip}</li>
               <li><a href={d.facebook} rel="noopener">Facebook</a></li>
+              {feed && feed.url && <li class="feed"><a href={feed.url} rel="noopener">Listen live: {feed.label}</a><br /><span class="fnote">Public scanner feed, run by volunteers. Not an official source.</span></li>}
             </ul>
           </div>
           <div>
@@ -154,7 +182,8 @@ const jsonld = {
         </div>
         <div class="base">
           <span>&copy; {new Date().getFullYear()} {d.name}</span>
-          <span>Radio designation {d.radio} · Van Buren County</span>
+          <span>{d.radio && `Radio designation ${d.radio} · `}{cp.county}</span>
+          {iso && iso.class && <span>ISO Class {iso.class}{iso.year && ` (${iso.year})`}</span>}
         </div>
       </div>
     </footer>
@@ -166,6 +195,10 @@ const jsonld = {
       b.addEventListener('click',function(){set(b.getAttribute('aria-expanded')!=='true');});
       document.addEventListener('keydown',function(e){if(e.key==='Escape'&&n.classList.contains('open')){set(false);b.focus();}});
       document.addEventListener('click',function(e){if(n.classList.contains('open')&&!n.contains(e.target)&&!b.contains(e.target))set(false);});})();
+      (function(){var d=document.getElementById('iwt');if(!d)return;var s=d.querySelector('summary');
+      document.addEventListener('keydown',function(e){if(e.key==='Escape'&&d.open){d.open=false;s.focus();}});
+      document.addEventListener('click',function(e){if(d.open&&!d.contains(e.target))d.open=false;});
+      d.addEventListener('focusout',function(e){if(d.open&&e.relatedTarget&&!d.contains(e.relatedTarget))d.open=false;});})();
     </script>
   </body>
 </html>

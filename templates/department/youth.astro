@@ -1,9 +1,11 @@
 ---
 import Base from '../../layouts/Base.astro';
 import d from '@content/dept.json';
+import { copy } from '../../components/copy.js';
+const cp = copy(d);
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 ---
-<Base title="Junior program" description="The Paw Paw Fire Department's junior firefighter program: how younger members train alongside the department, what they do and don't do, and how to ask about joining.">
+<Base title="Junior program" description={`The ${d.name}'s junior firefighter program: how younger members train alongside the department, what they do and don't do, and how to ask about joining.`}>
   <section class="phero two" style={`--pbg:url(${d.photos.squad.src})`}>
     <div class="wrap">
       <div>
@@ -12,15 +14,15 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
         <p class="lede">Two of the department's {d.stats.members} members are juniors: young people who train with the department, learn the equipment and the discipline, and step up to full membership when they come of age.</p>
         <div class="acts"><a class="btn red" href="/join/#apply">Ask about joining</a><a class="btn" href={tel(d.phones.station)}>Call the station</a></div>
       </div>
-      <figure class="hphoto"><img src={d.photos.squad.src.replace(".jpg","-800.jpg")} alt={d.photos.squad.alt} width="800" height="600" fetchpriority="high" /><figcaption>Squad 1206 set up for a prevention event, junior helmets at the ready.</figcaption></figure>
+      <figure class="hphoto"><img src={d.photos.squad.src.replace(".jpg","-800.jpg")} alt={d.photos.squad.alt} width="800" height="600" fetchpriority="high" /><figcaption>{cp.squad_caption}</figcaption></figure>
     </div>
   </section>
   <section class="section band">
     <div class="wrap">
       <div class="facts three">
         <div class="fact"><h3>What juniors do</h3><p>Train on training nights: hose, ladders, tools, radio, first aid. Help at the station, at open houses and parades, and with Fire Prevention Week. Learn how a fire department actually works.</p></div>
-        <div class="fact"><h3>What juniors don't do</h3><p>Go inside a burning building, ride to calls without a supervising officer, or do anything the department's insurer and Michigan law reserve for certified adults. The rules exist to bring them home.</p></div>
-        <div class="fact"><h3>Who it's for</h3><p>Students in the district with a parent's permission and grades that hold up. The department sets the age and the details; ask the chief's officers. If you're in school in Paw Paw, Mattawan or Lawton and this sounds like you, call.</p></div>
+        <div class="fact"><h3>What juniors don't do</h3><p>Go inside a burning building, ride to calls without a supervising officer, or do anything the department's insurer and {cp.state_name} law reserve for certified adults. The rules exist to bring them home.</p></div>
+        <div class="fact"><h3>Who it's for</h3><p>Students in the district with a parent's permission and grades that hold up. The department sets the age and the details; ask the chief's officers. If you're in school in {cp.schools} and this sounds like you, call.</p></div>
       </div>
       <p class="small" style="margin-top:1.5rem;max-width:62ch">The department to confirm the program's age limits, requirements and permission form before this page is published.</p>
     </div>

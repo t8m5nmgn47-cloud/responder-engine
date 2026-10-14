@@ -1,13 +1,17 @@
 ---
 import Base from '../../layouts/Base.astro';
 import d from '@content/dept.json';
+import { copy } from '../../components/copy.js';
+const cp = copy(d);
 import inc from '@content/incidents.json';
+const rp = ((d as any).photos?.responses ?? d.photos.glow) as { src: string; alt: string };
+const feed = (d as any).dispatch_feed as { label: string; url: string } | undefined;
 const fmt = (s: string) => new Date(s + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
 const years = inc.year_counts.slice().sort((a, b) => a.year - b.year);
 const max = Math.max(...years.map((y) => y.calls));
 ---
-<Base title="Responses" description="Recent responses by the Paw Paw Fire Department: what we were called to, when, where in general, which rigs went, and how many volunteers turned out. Plus calls by year.">
-  <section class="phero two" style={`--pbg:url(${d.photos.glow.src})`}>
+<Base title="Responses" description={`Recent responses by the ${d.name}: what we were called to, when, where in general, which rigs went, and how many volunteers turned out. Plus calls by year.`}>
+  <section class="phero two" style={`--pbg:url(${rp.src})`}>
     <div class="wrap">
       <div>
         <p class="kicker">Responses</p>
@@ -15,11 +19,11 @@ const max = Math.max(...years.map((y) => y.calls));
         <p class="lede">Every call, in general terms: the kind of incident, the road, which rigs went, how many of your neighbors dropped what they were doing. No names, no house numbers, no medical details.</p>
       </div>
       <div>
-        <figure class="hphoto side"><img src={d.photos.glow.src.replace(".jpg","-800.jpg")} alt={d.photos.glow.alt} width="800" height="1067" fetchpriority="high" /><figcaption>A structure fire at night in the district.</figcaption></figure>
-        <div class="stats" data-reveal-group style="grid-template-columns:repeat(2,1fr);margin-top:1.25rem">
+        <figure class="hphoto side"><img src={rp.src.replace(".jpg","-800.jpg")} alt={rp.alt} width="800" height="1067" fetchpriority="high" /><figcaption>{cp.responses_caption}</figcaption></figure>
+        {d.stats.calls_2024 > 0 && <div class="stats" data-reveal-group style="grid-template-columns:repeat(2,1fr);margin-top:1.25rem">
           <div class="stat"><div class="v" data-count>{d.stats.calls_2024}</div><div class="k">Calls in 2024</div></div>
           <div class="stat"><div class="v" data-count>{Math.round(d.stats.calls_2024 / 365 * 7)}</div><div class="k">Calls in a typical week</div></div>
-        </div>
+        </div>}
       </div>
     </div>
   </section>
@@ -27,6 +31,7 @@ const max = Math.max(...years.map((y) => y.calls));
   <section class="section tight">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">Recent</p><h2>Latest responses</h2></div>
+      {feed && feed.url && <p class="listen" style="margin:0 0 1.5rem"><b>Listen live:</b> <a href={feed.url} rel="noopener">{feed.label}</a>. A public scanner feed run by volunteers, not an official source; what you hear there is unconfirmed until it appears below.</p>}
       <ol class="runs">
         {inc.incidents.map((r) => (
           <li class="run">

@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 import d from '@content/dept.json';
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 ---
-<Base title="Accessibility" description="The Paw Paw Fire Department's website is built to WCAG 2.1 AA: keyboard navigation, screen-reader structure, high contrast, a larger-text switch, and plain language. How to tell us if something doesn't work.">
+<Base title="Accessibility" description={`The ${d.name}'s website is built to WCAG 2.1 AA: keyboard navigation, screen-reader structure, high contrast, a larger-text switch, and plain language. How to tell us if something doesn't work.`}>
   <section class="phero"><div class="wrap"><div><p class="kicker">Accessibility</p><h1 style="margin-top:.75rem">Everyone in the district should be able to use this.</h1><p class="lede">The site is built to the WCAG 2.1 AA standard and checked with automated tools on every page. If something doesn't work for you, tell us and we will fix it.</p></div></div></section>
   <section class="section tight"><div class="wrap">
     <div class="facts">

@@ -2,25 +2,36 @@
 import Base from '../../layouts/Base.astro';
 import DistrictMap from '../../components/DistrictMap.astro';
 import d from '@content/dept.json';
+import { copy } from '../../components/copy.js';
+const cp = copy(d);
 import inc from '@content/incidents.json';
 import ev from '@content/events.json';
+import FacebookFeed from '../../components/FacebookFeed.astro';
+import ProgramCards from '../../components/ProgramCards.astro';
+import siteConfig from '@siteconfig';
+const patch = (siteConfig as any).patch || '/patch.svg';
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 const latest = d.news.slice(0, 3);
 const runs = inc.incidents.slice(0, 3);
 const today = new Date().toISOString().slice(0, 10);
-const upcoming = ev.events.filter((e) => (e.end || e.date) >= today).sort((a, b) => a.date.localeCompare(b.date)).slice(0, 3);
+const future = (ev.events as any[]).filter((e) => (e.end || e.date) >= today).sort((a, b) => a.date.localeCompare(b.date));
+const meeting = future.find((e) => e.type === 'meeting');
+const upcoming = future.filter((e) => e !== meeting).slice(0, 3);
+const tasks: { label: string; href: string; icon?: string }[] = ((d as any).tasks || []).slice(0, 6);
+const programs: any[] = (d as any).programs || [];
+const fmtLong = (s: string) => new Date(s + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 const fmt = (s: string) => new Date(s + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 const s = d.seasonal;
 const inSeason = s && s.start <= today && today <= s.end;
 ---
-<Base title="Home" description={`Paw Paw Fire Department: an all-volunteer fire department serving the Village of Paw Paw and Paw Paw, Antwerp, Waverly and Almena Townships in Van Buren County, Michigan, since 1868. Join us. Non-emergency ${d.phones.station}.`}>
-  <section class="hero-x" aria-label="Welcome">
+<Base title="Home" description={cp.home_meta}>
+  <section class="hero-x" aria-label="Welcome" style={d.hero_bg ? `--hero-bg:url(${d.hero_bg.src});--hero-bg-800:url(${d.hero_bg.src.replace(/\.jpg$/, "-800.jpg")});--hero-pos:${d.hero_bg.position || "center 40%"}` : undefined}>
     <div class="wrap">
       <div class="hx">
-        <img class="hpatch" src="/patch.svg" alt="Paw Paw Fire Department patch" width="140" height="161" loading="eager" />
-        <p class="kicker">{d.tagline} · Van Buren County · Since {d.founded}</p>
-        <h1>Paw Paw needs firefighters.</h1>
-        <p class="lede">Forty-one of your neighbors answer about three hundred calls a year, at any hour, for nothing but the work itself. We train you. We outfit you. We need you.</p>
+        <img class="hpatch" src={patch} alt={`${d.name} patch`} width="140" height="161" loading="eager" />
+        <p class="kicker">{d.tagline} · {cp.county} · Since {d.founded}</p>
+        <h1>{cp.hero_h1}</h1>
+        <p class="lede">{cp.hero_lede}</p>
         <div class="acts">
           <a class="btn red" href="/join/">Join the department</a>
           <a class="btn light" href="/safety/#alarm">Free smoke alarm check</a>
@@ -29,12 +40,20 @@ const inSeason = s && s.start <= today && today <= s.end;
     </div>
   </section>
 
+  {tasks.length > 0 && <nav class="tasksband cut" aria-label="I want to">
+    <div class="wrap">
+      <h2 class="sr">I want to</h2>
+      <ul class="tasks">{tasks.map((t) => <li><a class="task" href={t.href}>{t.icon && <span class="ti" aria-hidden="true">{t.icon}</span>}<span class="tl">{t.label}</span></a></li>)}</ul>
+    </div>
+  </nav>}
+
   <section class="statband" aria-label="The department by the numbers">
     <div class="wrap">
       <div class="stats" data-reveal-group>
-        <div class="stat"><div class="v" data-count>{d.stats.members}</div><div class="k">Volunteer members</div></div>
-        <div class="stat"><div class="v" data-count>{d.stats.calls_2024}</div><div class="k">Calls in 2024</div></div>
-        <div class="stat"><div class="v" data-count>{d.district.area_sq_mi}</div><div class="k">Square miles protected</div></div>
+        <div class="stat"><div class="v" data-count>{d.stats.members}</div><div class="k">{cp.members_label}</div></div>
+        {d.stats.calls_2024 > 0 && <div class="stat"><div class="v" data-count>{d.stats.calls_2024}</div><div class="k">Calls in 2024</div></div>}
+        {d.district.area_sq_mi > 0 && <div class="stat"><div class="v" data-count>{d.district.area_sq_mi}</div><div class="k">Square miles protected</div></div>}
+        {!(d.stats.calls_2024 > 0) && <div class="stat"><div class="v">24/7</div><div class="k">Volunteer response</div></div>}
         <div class="stat"><div class="v" data-count>{new Date().getFullYear() - d.founded}</div><div class="k">Years of service</div></div>
       </div>
     </div>
@@ -43,19 +62,19 @@ const inSeason = s && s.start <= today && today <= s.end;
   <figure class="groupband"><img src={d.hero_photo.src} alt={d.hero_photo.alt} width="1100" height="400" loading="eager" /><figcaption><div class="wrap">{d.hero_photo.caption}</div></figcaption></figure>
 
 
-  <section class="section feat">
+  {cp.feature && <section class="section feat">
     <div class="wrap">
       <div class="featgrid" data-reveal-group>
         <img src={d.photos.chief_engine.src.replace(".jpg","-800.jpg")} alt={d.photos.chief_engine.alt} width="800" height="1067" loading="lazy" />
         <div>
-          <p class="kicker">2026 Firefighter of the Year</p>
-          <h2>Kyle Richardson</h2>
-          <p class="lede">Chief from October 2024 until the awards banquet on October 1, 2026, when he handed the department to new Chief Nate Jackson and was named Firefighter of the Year by his own members. A member since 2010, and the third generation of his family to serve Paw Paw.</p>
-          <p style="margin-top:1.25rem"><a class="btn" href="/news/">The awards banquet</a></p>
+          <p class="kicker">{cp.feature.kicker}</p>
+          <h2>{cp.feature.title}</h2>
+          <p class="lede">{cp.feature.text}</p>
+          <p style="margin-top:1.25rem"><a class="btn" href={cp.feature.href}>{cp.feature.link_label}</a></p>
         </div>
       </div>
     </div>
-  </section>
+  </section>}
   {inSeason && <section class="section tight charband"><div class="wrap"><div class="seasonal"><div><p class="kicker">{s.kicker}</p><h2 style="margin-top:.4rem">{s.title}</h2><p style="margin-top:.6rem;max-width:60ch">{s.text}</p></div><div><a class="btn light" href="/safety/">Fire safety at home</a></div></div></div></section>}
 
   <section class="section">
@@ -70,6 +89,7 @@ const inSeason = s && s.start <= today && today <= s.end;
         </div>
         <div>
           <div class="head" data-reveal><p class="kicker">Coming up</p><h2>Events</h2></div>
+          {meeting && <div class="meet"><p class="mk2">Next board meeting</p><p class="mt2">{fmtLong(meeting.date)}{meeting.time && `, ${meeting.time}`}</p><p class="mw">{meeting.where}{meeting.text && ` · ${meeting.text}`}</p><p class="ml">{meeting.agenda_url && <a href={meeting.agenda_url} rel="noopener">Agenda</a>}<a href="/news/">Full schedule</a></p></div>}
           {upcoming.length ? <ol class="mini">{upcoming.map((e) => <li><span class="md">{fmt(e.date)}</span><span class="mt"><b>{e.title}</b> · {e.where}{e.time && ` · ${e.time}`}</span></li>)}</ol> : <p class="small">Nothing scheduled right now.</p>}
           <p style="margin-top:1.25rem"><a class="btn" href="/news/">News &amp; events</a></p>
         </div>
@@ -81,35 +101,43 @@ const inSeason = s && s.start <= today && today <= s.end;
     <div class="wrap">
       <div class="mapgrid">
         <div>
-          <div class="head" data-reveal><p class="kicker">The district</p><h2>Five communities, one department</h2></div>
+          <div class="head" data-reveal><p class="kicker">The district</p><h2>{cp.district_title}</h2></div>
           <div class="prose">
-            <p>The Village of Paw Paw, the county seat, and Paw Paw, Antwerp and Waverly Townships, with Almena Township under contract: about {d.district.area_sq_mi} square miles of town, farms, vineyards and lake country in the middle of Van Buren County. A Fire Board with one member from each participating municipality oversees the department.</p>
-            <p class="small" style="margin-top:1rem">Mutual aid with {d.district.mutual_aid.slice(0, 2).join(' and ')} and every department in the county. Station 1200, {d.address.street}. Boundaries from the U.S. Census Bureau.</p>
+            <p>{cp.territory_long}</p>
+            <p class="small" style="margin-top:1rem">Mutual aid with {d.district.mutual_aid.slice(0, 2).join(' and ')} and every department in the county. {cp.station_label}, {d.address.street}.{cp.map && ' Boundaries from the U.S. Census Bureau.'}</p>
           </div>
         </div>
-        <DistrictMap />
+        {cp.map && <DistrictMap />}
       </div>
     </div>
   </section>
 
   <section class="section charband cut up">
     <div class="wrap">
-      <div class="head" data-reveal><p class="kicker">On the floor</p><h2>Eight rigs, one of them from 1948</h2></div>
+      <div class="head" data-reveal><p class="kicker">On the floor</p><h2>{cp.rigs_title}</h2></div>
       <div class="rigs" data-reveal-group>
         {d.apparatus.slice(0, 4).map((r) => (
-          <div class="rig">{r.photo ? <img class="rphoto" src={r.photo.replace(".jpg","-800.jpg")} alt={r.alt || `${r.kind} ${r.id}`} loading="lazy" width="800" height="600" /> : <div class="photo" role="img" aria-label={`Reserved for a photograph of ${r.kind} ${r.id}`}></div>}<div class="in"><div class="id">{r.id}</div><div class="kind">{r.kind} · {r.year}</div><div class="mk">{r.make}</div><div class="sp">{r.spec}</div></div></div>
+          <div class="rig">{r.photo ? <img class="rphoto" src={r.photo.replace(".jpg","-800.jpg")} alt={r.alt || `${r.kind} ${r.id}`} loading="lazy" width="800" height="600" /> : <div class="photo" role="img" aria-label={`Reserved for a photograph of ${r.kind} ${r.id}`}></div>}<div class="in"><div class="id">{r.id}</div><div class="kind">{r.kind}{r.year ? ` · ${r.year}` : ""}</div><div class="mk">{r.make}</div><div class="sp">{r.spec}</div></div></div>
         ))}
       </div>
-      <p style="margin-top:1.5rem"><a class="btn" href="/apparatus/">All eight, with the specs</a></p>
+      <p style="margin-top:1.5rem"><a class="btn" href="/apparatus/">{cp.apparatus_link}</a></p>
     </div>
   </section>
+
+  {programs.length >= 3 && <section class="section">
+    <div class="wrap">
+      <div class="head" data-reveal><p class="kicker">What we do</p><h2>Beyond the fire calls</h2></div>
+      <ProgramCards limit={3} />
+      {programs.length > 3 && <p style="margin-top:1.5rem"><a class="btn" href="/community/#programs">All our programs</a></p>}
+    </div>
+  </section>}
 
   <section class="section band">
     <div class="wrap">
       <div class="doors three pdoors" data-reveal-group>
-        <a class="door" href="/safety/#911"><span class="tag">Safety</span><img src={d.photos.structure.src.replace(".jpg","-800.jpg")} alt={d.photos.structure.alt} loading="lazy" width="800" height="600" /><h3>What happens when you call 911</h3><p>Forty-one pagers, a drive to the station, and the first rig out. Why a volunteer response takes the minutes it takes.</p><span class="go">How it works</span></a>
-        <a class="door" href="/community/"><span class="tag">Community</span><img src={d.photos.community.src.replace(".jpg","-800.jpg")} alt={d.photos.community.alt} loading="lazy" width="800" height="1067" /><h3>For residents</h3><p>Knox Box, hydrants, station tours, burning questions, what to do after a fire, how to get an incident report.</p><span class="go">Community</span></a>
-        <a class="door" href="/memorial/"><span class="tag char">Memorial</span><img src={d.photos.glow.src.replace(".jpg","-800.jpg")} alt={d.photos.glow.alt} loading="lazy" width="800" height="1067" /><h3>In memory</h3><p>The members we have lost, and Lieutenant Ethan Quillen, who died in the line of duty on February 22, 2023.</p><span class="go">Memorial</span></a>
+        <a class="door" href="/safety/#911"><span class="tag">Safety</span><img src={d.photos.structure.src.replace(".jpg","-800.jpg")} alt={d.photos.structure.alt} loading="lazy" width="800" height="600" /><h3>What happens when you call 911</h3><p>{cp.call_door}</p><span class="go">How it works</span></a>
+        <a class="door" href="/community/"><span class="tag">Community</span><img src={d.photos.community.src.replace(".jpg","-800.jpg")} alt={d.photos.community.alt} loading="lazy" width="800" height="1067" /><h3>For residents</h3><p>{cp.community_door}</p><span class="go">Community</span></a>
+        <a class="door" href="/memorial/"><span class="tag char">Memorial</span><img src={d.photos.glow.src.replace(".jpg","-800.jpg")} alt={d.photos.glow.alt} loading="lazy" width="800" height="1067" /><h3>In memory</h3><p>{cp.memorial_door}</p><span class="go">Memorial</span></a>
       </div>
     </div>
   </section>
@@ -120,6 +148,8 @@ const inSeason = s && s.start <= today && today <= s.end;
       <div class="ncards" data-reveal-group>{latest.map((n) => <a class={`ncard${n.photo ? '' : ' nophoto'}`} href="/news/"><span class={`tag${(n as any).tag === 'Awards' ? ' gold' : ''}`}>{(n as any).tag || 'Department'}</span>{n.photo && <img src={n.photo.replace(".jpg","-800.jpg")} alt={n.alt || ""} loading="lazy" />}<div class="in"><time datetime={n.date}>{fmt(n.date)}, {n.date.slice(0,4)}</time><h3>{n.title}</h3><p>{n.text}</p></div></a>)}</div>
     </div>
   </section>
+
+  <FacebookFeed />
 
   <section class="section redband cut up">
     <div class="wrap">

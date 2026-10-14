@@ -1,12 +1,14 @@
 ---
 import Base from '../../layouts/Base.astro';
 import d from '@content/dept.json';
+import { copy } from '../../components/copy.js';
+const cp = copy(d);
 import DistrictMap from '../../components/DistrictMap.astro';
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 const a = d.address;
 ---
-<Base title="Contact" description="How to reach the Paw Paw Fire Department: 911 for emergencies; station non-emergency line, fax, address, and the chief's officers.">
-  <section class="phero two" style={`--pbg:url(${d.photos.dog_window.src})`}><div class="wrap"><div><p class="kicker">Contact</p><h1 style="margin-top:.75rem">For an emergency, call 911.</h1><p class="lede">For everything else, the station line is answered when someone is in the building, and the chief's officers are listed below.</p></div><figure class="hphoto side"><img src={d.photos.dog_window.src.replace(".jpg","-800.jpg")} alt={d.photos.dog_window.alt} width="800" height="1067" loading="eager" /><figcaption>Somebody is usually watching the door.</figcaption></figure></div></section>
+<Base title="Contact" description={`How to reach the ${d.name}: 911 for emergencies; station non-emergency line, fax, address, and the chief's officers.`}>
+  <section class="phero two" style={`--pbg:url(${d.photos.dog_window.src})`}><div class="wrap"><div><p class="kicker">Contact</p><h1 style="margin-top:.75rem">For an emergency, call 911.</h1><p class="lede">For everything else, the station line is answered when someone is in the building, and the chief's officers are listed below.</p></div><figure class="hphoto side"><img src={d.photos.dog_window.src.replace(".jpg","-800.jpg")} alt={d.photos.dog_window.alt} width="800" height="1067" loading="eager" /><figcaption>{cp.contact_caption}</figcaption></figure></div></section>
   <section class="section tight"><div class="wrap">
     <dl class="rows" style="max-width:48rem">
       <div class="row"><dt>Emergency</dt><dd><b>911</b></dd></div>
@@ -15,8 +17,8 @@ const a = d.address;
       <div class="row"><dt>Address</dt><dd>{d.name}<br />{a.street}<br />{a.city}, {a.state} {a.zip}</dd></div>
       {d.chiefs.filter((c) => !c.title.startsWith("Past")).map((c) => <div class="row"><dt>{c.title}</dt><dd>{c.name} · <a href={tel(c.phone)}>{c.phone}</a></dd></div>)}
       <div class="row"><dt>Station tours</dt><dd><a href={tel(d.phones.tours)}>{d.phones.tours}</a></dd></div>
-      <div class="row"><dt>Facebook</dt><dd><a href={d.facebook} rel="noopener">facebook.com/pawpawfd</a></dd></div>
+      <div class="row"><dt>Facebook</dt><dd><a href={d.facebook} rel="noopener">{d.facebook.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}</a></dd></div>
     </dl>
-    <div class="cmap" style="margin-top:2.5rem"><div class="head" data-reveal><p class="kicker">Where we are</p><h2>Station 1200</h2><p class="small" style="max-width:62ch">{a.street}, {a.city}, {a.state} {a.zip}, on the south side of the village. The map shows the district the station covers; for directions, <a href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(`${a.street}, ${a.city}, ${a.state} ${a.zip}`)}`} rel="noopener">open it in OpenStreetMap</a>.</p></div><DistrictMap /></div>
+    <div class="cmap" style="margin-top:2.5rem"><div class="head" data-reveal><p class="kicker">Where we are</p><h2>{cp.station_label}</h2><p class="small" style="max-width:62ch">{a.street}, {a.city}, {a.state} {a.zip}{cp.station_where}.{cp.map && " The map shows the district the station covers;"} for directions, <a href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(`${a.street}, ${a.city}, ${a.state} ${a.zip}`)}`} rel="noopener">open it in OpenStreetMap</a>.</p></div>{cp.map && <DistrictMap />}</div>
   </div></section>
 </Base>

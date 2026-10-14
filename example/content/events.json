@@ -1,8 +1,29 @@
 {
-  "_how": "Upcoming public events. Fields: date (YYYY-MM-DD), end (optional), time, title, where, text. Past events drop off automatically.",
+  "_how": "Upcoming public events. Fields: date (YYYY-MM-DD), end (optional), time, title, where, text. Past events drop off automatically. Add \"type\": \"meeting\" (and an optional \"agenda_url\") to a board meeting so the home page shows it as the next board meeting.",
   "events": [
-    { "date": "2026-10-05", "end": "2026-10-11", "time": "", "title": "Fire Prevention Week school visits", "where": "Paw Paw Public Schools", "text": "The department visits the elementary classrooms with this year's message. Working smoke alarms, two ways out, a meeting place." },
-    { "date": "2026-10-20", "time": "7:00 p.m.", "title": "Training night: come see what we do", "where": "Station 1200, 832 S. Gremps St.", "text": "Thinking about joining? Stand in the bay, climb on a rig, ask anything. No paperwork. Date to be confirmed by the department." },
-    { "date": "2026-11-10", "time": "7:00 p.m.", "title": "Fire Board meeting", "where": "Station 1200", "text": "The Paw Paw Fire Board meets monthly at the station. Open to the public. Date to be confirmed." }
+    {
+      "date": "2026-10-05",
+      "end": "2026-10-11",
+      "time": "",
+      "title": "Fire Prevention Week school visits",
+      "where": "Paw Paw Public Schools",
+      "text": "The department visits the elementary classrooms with this year's message. Working smoke alarms, two ways out, a meeting place."
+    },
+    {
+      "date": "2026-10-20",
+      "time": "7:00 p.m.",
+      "title": "Training night: come see what we do",
+      "where": "Station 1200, 832 S. Gremps St.",
+      "text": "Thinking about joining? Stand in the bay, climb on a rig, ask anything. No paperwork. Date to be confirmed by the department."
+    },
+    {
+      "date": "2026-11-10",
+      "time": "7:00 p.m.",
+      "title": "Fire Board meeting",
+      "where": "Station 1200",
+      "text": "The Paw Paw Fire Board meets monthly at the station. Open to the public. Date to be confirmed.",
+      "type": "meeting",
+      "agenda_url": "https://example.org/fire-board/agenda.pdf"
+    }
   ]
 }

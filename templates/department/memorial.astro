@@ -1,16 +1,19 @@
 ---
 import Base from '../../layouts/Base.astro';
 import d from '@content/dept.json';
+import { copy } from '../../components/copy.js';
+const cp = copy(d);
 const fmt = (s: string) => new Date(s + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 const yr = (s: string) => s.slice(0, 4);
 const q = d.lodd[0];
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 const roll = d.memorial.slice().sort((a, b) => a.died.localeCompare(b.died));
-const first = yr(roll[0].died), last = yr(roll[roll.length - 1].died);
+const first = roll.length ? yr(roll[0].died) : '', last = roll.length ? yr(roll[roll.length - 1].died) : '';
+const desc = q ? `In memory of the members of the ${d.name} who have died, and of ${q.name}, who died in the line of duty on ${fmt(q.died)}.` : `In memory of the members of the ${d.name} who have died.`;
 ---
-<Base title="Memorial" description={`In memory of the members of the ${d.name} who have died, and of ${q.name}, who died in the line of duty on ${fmt(q.died)}.`}>
+<Base title="Memorial" description={desc}>
   <div class="mstone">
-    <section class="ms-lodd">
+    {q ? <section class="ms-lodd">
       <div class="wrap">
         <p class="ms-kicker">Line of duty</p>
         <p class="ms-name">{q.name}</p>
@@ -18,15 +21,22 @@ const first = yr(roll[0].died), last = yr(roll[roll.length - 1].died);
         <div class="ms-rule" aria-hidden="true"></div>
         <p class="ms-account">{q.account}</p>
       </div>
-    </section>
+    </section> : <section class="ms-lodd">
+      <div class="wrap">
+        <p class="ms-kicker">Memorial</p>
+        <p class="ms-name">{d.name}</p>
+        <div class="ms-rule" aria-hidden="true"></div>
+        <p class="ms-account">In memory of the members who served this department and have died.</p>
+      </div>
+    </section>}
 
     <section class="ms-wall-sec">
       <p class="ms-epigraph">They answered when the tones dropped. We say their names so the department remembers.</p>
       <div class="wrap">
-        <ol class="ms-wall" aria-label={`The ${roll.length} members of the department who have died, from ${first} to ${last}, oldest first`}>
+        {roll.length > 0 && <ol class="ms-wall" aria-label={`The ${roll.length} members of the department who have died, from ${first} to ${last}, oldest first`}>
           {roll.map((m) => <li><span class="ms-n"><span class="ms-nm">{m.name}</span><span class="ms-dp">{fmt(m.died)}</span></span></li>)}
-        </ol>
-        <p class="ms-end">{roll.length} names &nbsp;·&nbsp; {first}–{last}</p>
+        </ol>}
+        {roll.length > 0 && <p class="ms-end">{roll.length} names &nbsp;·&nbsp; {first}–{last}</p>}
         <p class="ms-note">{d.memorial_note}</p>
       </div>
     </section>
@@ -34,9 +44,9 @@ const first = yr(roll[0].died), last = yr(roll[roll.length - 1].died);
     <section class="ms-last">
       <div class="wrap">
         <p class="ms-kicker">For every department</p>
-        <h2>If a Michigan firefighter dies in the line of duty</h2>
-        <p>Paw Paw knows this day. No department should face it alone. The National Fallen Firefighters Foundation answers <a href={tel(d.michigan_last.nfff)}>{d.michigan_last.nfff}</a> twenty-four hours a day and notifies Michigan's Local Assistance State Team, trained volunteers who help the department and the family with the first hours, the funeral and honors, and the federal and state benefit claims, at no cost and only when asked.</p>
-        <p class="ms-small">Michigan's fallen are honored at the {d.michigan_last.memorial}, and nationally each spring at the National Fallen Firefighters Memorial in Emmitsburg, Maryland.</p>
+        <h2>If a {cp.state_name} firefighter dies in the line of duty</h2>
+        <p>{d.lodd.length > 0 && `${cp.place} knows this day. `}No department should face it alone. The National Fallen Firefighters Foundation answers <a href={tel(d.michigan_last.nfff)}>{d.michigan_last.nfff}</a> twenty-four hours a day and notifies {cp.last_team}, trained volunteers who help the department and the family with the first hours, the funeral and honors, and the federal and state benefit claims, at no cost and only when asked.</p>
+        <p class="ms-small">{cp.state_name}'s fallen are honored at the {d.michigan_last.memorial}, and nationally each spring at the National Fallen Firefighters Memorial in Emmitsburg, Maryland.</p>
       </div>
     </section>
   </div>

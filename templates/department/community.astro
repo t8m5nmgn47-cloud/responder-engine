@@ -1,9 +1,14 @@
 ---
 import Base from '../../layouts/Base.astro';
 import d from '@content/dept.json';
+import { copy } from '../../components/copy.js';
+const cp = copy(d);
+import FacebookFeed from '../../components/FacebookFeed.astro';
+import ProgramCards from '../../components/ProgramCards.astro';
+const programs: any[] = (d as any).programs || [];
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 ---
-<Base title="Community" description="For Paw Paw residents and businesses: Knox Box, fire hydrant rules, station tours, Fire Prevention Week, what to do after a fire, incident reports, and answers to common questions.">
+<Base title="Community" description={cp.community_meta}>
   <section class="phero two" style={`--pbg:url(${d.photos.community.src})`}>
     <div class="wrap">
       <div>
@@ -11,7 +16,7 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
         <h1 style="margin-top:.75rem">Before, during, and after.</h1>
         <p class="lede">The practical things: how to keep a fire from starting, how to help us when one does, and what to do the morning after.</p>
       </div>
-      <figure class="hphoto side"><img src={d.photos.community.src.replace(".jpg","-800.jpg")} alt={d.photos.community.alt} width="800" height="1067" fetchpriority="high" /><figcaption>Kyle Richardson with residents in the station's community room.</figcaption></figure>
+      <figure class="hphoto side"><img src={d.photos.community.src.replace(".jpg","-800.jpg")} alt={d.photos.community.alt} width="800" height="1067" fetchpriority="high" /><figcaption>{cp.community_caption}</figcaption></figure>
     </div>
   </section>
 
@@ -22,13 +27,20 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
         <div class="fact"><h3>Fire hydrants</h3><p>Keep three feet clear on every side. Don't park in front of one, don't paint it, don't open it. If a hydrant is damaged or buried, call the station.</p></div>
         <div class="fact"><h3>Station tours</h3><p>By request, twenty to thirty minutes, booked two weeks ahead. Groups under thirty, one adult for every five children. No parties, but plenty of rigs to climb on. Call <a href={tel(d.phones.tours)}>{d.phones.tours}</a> or the station.</p></div>
         <div class="fact"><h3>Fire Prevention Week</h3><p>Every October the department visits the schools in the district with the message that has saved more lives than any truck: working smoke alarms, two ways out, a meeting place.</p></div>
-        <div class="fact"><h3>Burning</h3><p>Each township sets its own burning rules, and the Michigan DNR governs open burning. Check with your township office before you burn, and never on a windy day.</p></div>
+        <div class="fact"><h3>Burning</h3><p>{cp.burn_rule}</p></div>
         <div class="fact"><h3>Incident reports</h3><p>Reports cost $10 and aren't available online or same-day. Fax the request form to <span class="tn">{d.phones.fax}</span> or mail it to the 2nd Assistant Chief at the station. Businesses and insurers must file a written FOIA request. We don't hold medical run records.</p></div>
       </div>
     </div>
   </section>
 
-  <section class="section band">
+  {programs.length > 0 && <section class="section band" id="programs">
+    <div class="wrap">
+      <div class="head" data-reveal><p class="kicker">Programs</p><h2>What we do for the district</h2></div>
+      <ProgramCards />
+    </div>
+  </section>}
+
+  <section class="section">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">After the fire</p><h2>The morning after</h2></div>
       <div class="prose">
@@ -46,4 +58,6 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
       </div>
     </div>
   </section>
+
+  <FacebookFeed />
 </Base>
