@@ -239,113 +239,20 @@ npm publish --access public           # once the package is published to a regis
 
 Department repos pin a tag (`github:t8m5nmgn47-cloud/responder-engine#v0.10.2`) and move forward deliberately.
 
-### Working with more than one session or agent (0.10.2)
+### Working across sessions (0.10.2)
 
-Several Claude sessions (or people) may work on departments at once. The engine is the one shared thing, so:
+Kris uses one Claude session at a time, but not always the same one, so the risk is a session starting from stale
+state rather than two editing at once. `HANDOFF.md` at the repo root is the fix: read it first, rewrite its
+"Current state" block last. The short version:
 
-1. **One writer on the engine at a time.** Before editing this repo, `git fetch origin && git status`, then say
-   "I have the engine" in whatever notes you hand back. Everyone else builds department content against the
-   latest tag; that is the normal case, since a new department needs content, not engine edits.
-2. **Tags are the contract.** Department `package.json` pins a tag, never a branch or `main`. A session that needs
-   an engine change writes it up (what breaks, what it should do) and hands it to whoever has the engine,
-   rather than patching a private copy. Repeated local patches are how chimera code happens.
-3. **No history rewrites on main.** `git pull` before `git push`. If main diverged, merge; never rebase, amend or
-   force-push a commit someone may already have pulled.
-4. **Every release gets a `CHANGELOG.md` entry and a tag** so the next session reads what changed instead of
-   re-discovering it. Bump `package.json`, add the entry, commit, `git tag v0.x.y`, push both.
+1. `git pull`, read `HANDOFF.md` and the top of `CHANGELOG.md`; `git describe --tags` must match `package.json`.
+2. **Tags are the contract.** Department `package.json` pins a tag (`#v0.10.2`), never a branch. Need an engine
+   change? Change the engine, bump, CHANGELOG entry, tag, push, re-pin. No private patches of an old copy.
+3. **No history rewrites on main.** `git pull` before `git push`; merge if diverged, never rebase or force.
+4. **Every release gets a `CHANGELOG.md` entry and a tag.**
 5. **Pixels before "done".** Build the photo-free test department, Paw Paw and the newest live department;
-   screenshot at 1366 and 390 (and 1200 for a nine-item nav); diff the normalized `dist/` trees against the
-   previous tag's build. Structure passing says nothing about how it looks.
-
-## Feedback widget (0.5.0): guided review + markup
-
-Set `feedback` in `site.config.json` to render a "Review this site" button on every page (`components/Feedback.astro`,
-inline script and styles, no dependencies, no external hosts, about 17 KB of script). Absent, nothing is emitted.
-
-```json
-"feedback": { "site": "crains-creek-fire", "endpoint": "https://sitesforservice.org/api/site-feedback" }
-```
-
-`site` is the slug the collector files notes under; `endpoint` is optional and defaults to the URL above.
-
-### Guided review
-
-When `content/review.json` has items, the button opens a welcome card ("Chief, let's check this site together. N quick
-questions… Your answers save as you go.") with an optional name field (remembered in `sfs_feedback_who`), **Start** and
-**Just mark things**. Start walks through the items in order: the widget navigates to the item's `page` (with
-`#sfs-review` on the URL so the pass resumes on load), scrolls the `selector` element to the middle of the free
-viewport, outlines it in red with a dimmed cut-out, and shows a bottom card with a progress bar, "3 of 24"
-(`aria-live`), the `question`, "The draft shows: `current`", **✓ Looks right** / **✗ Needs a change** (reveals
-"Tell us what it should say" + **Save**), and Back / Pause / Skip links. Keys: Y, N, ← →, Escape pauses. Each answer is
-stored immediately and the pass auto-advances. Progress lives in `localStorage` (`sfs_review_<site>` =
-`{ idx, status: active|paused|done }`); while a pass is in progress every page shows a pill "Continue review (12 of 24)"
-instead of the full button. After the last item an end card offers **Mark more things** and **Send to Sites for Service**.
-Welcome and end cards are modal (page content gets `inert` + `aria-hidden`); the bottom card traps focus;
-`prefers-reduced-motion` disables the smooth scroll. On phones the cards are bottom sheets at most 45% of the viewport
-with full-width 52 px buttons.
-
-review.json items take three optional anchor fields (everything else unchanged):
-
-```json
-{ "id": "founded", "question": "Was the department organized in 1977?", "current": "…", "where": ["/", "/about/"],
-  "page": "/", "selector": "header .brand .bs", "status": "open" }
-```
-
-`page` is where the widget takes the reviewer (defaults to `/`); `selector` is any CSS selector for the element the
-question is about — prefer stable ids/classes from the template (`header .brand .bs`, `.hero-x .kicker`,
-`.stats .stat:nth-child(1)`, `.rigs .rig:nth-child(1)`, `.people .person:nth-child(1)`, `main dl.rows .row:nth-child(3)`,
-`.doors .door:nth-child(1)`, `.mini`, `.mapgrid`, `#programs`, `footer a[href*="facebook"]`). Omit `selector` for items
-with nothing to point at (patch artwork, donation method): the card shows without a highlight. The `/review/` page keeps
-the printable checklist and, when `feedback` is configured, opens by saying the easy way is the button on the site.
-
-### Markup mode
-
-"Just mark things" / "Mark more things" (or the button when there is no review.json) toggles markup mode: a slim top bar
-("Tap anything you want changed · Notes (n) · Done"), targetable elements (`main p, h1-h3, li, img, figcaption, a.btn,
-td, dt, dd, header .brand, footer p`) outlined on hover/focus. Tapping a text element shows a small bar
-**Edit this text / Leave a note / Cancel**; "Edit this text" makes the element `contenteditable` with a green outline
-and a Done/Cancel strip, and on Done stores an `edit` item with `before`/`after`. Tapping an image shows
-**Replace this photo / Remove this photo / Leave a note**; the first two store a `photo` item whose `note` is the choice.
-"Leave a note" opens the note popover (Text / Photo / Other) as before. Link and button clicks are prevented in markup
-mode. Every stored item with a selector gets a numbered red pin on its page (answers marked "Looks right"/"Skip" get
-none). Items persist in `localStorage` (`sfs_feedback_<site>`) until sent.
-
-### Sending
-
-**Send to Sites for Service** (notes panel and end card) posts with `fetch` (`mode: 'cors'`,
-`Content-Type: application/json`):
-
-```json
-{
-  "site": "crains-creek-fire",
-  "site_name": "Crains Creek Fire-Rescue",
-  "submitted_at": "2026-10-14T15:04:05.000Z",
-  "reviewer": { "name": "Chief Smith", "email": "chief@example.org" },
-  "items": [
-    { "id": "mgq1x2ab3c", "kind": "answer", "question_id": "founded", "question": "Was the department organized in 1977?",
-      "answer": "change", "note": "1976.", "page": "/", "url": "https://…/", "selector": "header .brand .bs",
-      "excerpt": "Station 23 · Est. 1977", "created_at": "…" },
-    { "id": "…", "kind": "edit", "page": "/about/", "url": "…", "selector": "main > section:nth-of-type(2) > … > p:nth-of-type(1)",
-      "excerpt": "Crains Creek Volunteer Fire Department was organized in 1977…", "before": "…was organized in 1977…",
-      "after": "…was organized in 1976…", "note": "Edited in place", "created_at": "…" },
-    { "id": "…", "kind": "photo", "page": "/members/", "selector": ".phero img", "excerpt": "Crains Creek members with the engine",
-      "note": "Replace this photo", "created_at": "…" },
-    { "id": "…", "kind": "text", "page": "/about/", "selector": "…", "excerpt": "…", "note": "Founded 1976, not 1977.", "created_at": "…" }
-  ]
-}
-```
-
-`kind` is `answer` (`answer`: `ok` | `change` | `skip`, with `question_id`, `question`, `note`), `edit` (`before`,
-`after`), `photo`, `text` or `other`. `selector` is the item's anchor, or the nearest `#id` / `nth-of-type` path from
-`<body>` for free markup; `excerpt` is the element text (or image alt) trimmed to 160 characters. The endpoint must
-answer 2xx with `{"ok": true}` (and CORS headers for the site's origin); the widget then clears the stored items, pins and
-review progress and shows "Sent. Thank you, Chief. We'll make these changes and send you the updated site." with a
-**Start over** link. On any failure it shows the error and offers "Email instead", a `mailto:hello@sitesforservice.org`
-with subject `Site changes: <site_name>` and one line per item (`- Q3 Needs a change: … (question)`,
-`- /page · "before" → "after"`, `- /page · "excerpt" → note`). When `draft_note` is set the draft banner gains the hint
-"Tap "Review this site" and we'll walk you through it." Escape closes the action bar, edit, popover, card (pauses the
-pass), panel, then markup mode; the widget is hidden in print, does not render on `plain` pages (the review checklist),
-and does not touch the motion layer or the "I want to" menu.
+   screenshot at 1366 and 390 (and 1200 for a nine-item nav); look at the images; diff the normalized `dist/`
+   trees against the previous tag's build.
 
 ## Gotchas
 
