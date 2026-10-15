@@ -17,8 +17,8 @@ const a = d.address;
       <div class="row"><dt>Address</dt><dd>{d.name}<br />{a.street}<br />{a.city}, {a.state} {a.zip}</dd></div>
       {d.chiefs.filter((c) => !c.title.startsWith("Past")).map((c) => <div class="row"><dt>{c.title}</dt><dd>{c.name} · <a href={tel(c.phone)}>{c.phone}</a></dd></div>)}
       <div class="row"><dt>Station tours</dt><dd><a href={tel(d.phones.tours)}>{d.phones.tours}</a></dd></div>
-      <div class="row"><dt>Facebook</dt><dd><a href={d.facebook} rel="noopener">{d.facebook.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}</a></dd></div>
+      <div class="row"><dt>Facebook</dt><dd><a href={d.facebook} rel="noopener">Facebook page</a></dd></div>
     </dl>
-    <div class="cmap" style="margin-top:2.5rem"><div class="head" data-reveal><p class="kicker">Where we are</p><h2>{cp.station_label}</h2><p class="small" style="max-width:62ch">{a.street}, {a.city}, {a.state} {a.zip}{cp.station_where}.{cp.map && " The map shows the district the station covers;"} for directions, <a href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(`${a.street}, ${a.city}, ${a.state} ${a.zip}`)}`} rel="noopener">open it in OpenStreetMap</a>.</p></div>{cp.map && <DistrictMap />}</div>
+    <div class="cmap" style="margin-top:2.5rem"><div class="head" data-reveal><p class="kicker">Where we are</p><h2>{cp.station_label}</h2><p class="small" style="max-width:62ch">{a.street}, {a.city}, {a.state} {a.zip}{cp.station_where}.{cp.map && " The map shows the district the station covers;"}{cp.map ? " for" : " For"} directions, <a href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(`${a.street}, ${a.city}, ${a.state} ${a.zip}`)}`} rel="noopener">open it in OpenStreetMap</a>.</p></div>{cp.map && <DistrictMap />}</div>
   </div></section>
 </Base>

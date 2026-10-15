@@ -11,7 +11,7 @@ const upcoming = ev.events.filter((e) => (e.end || e.date) >= today).sort((a, b)
 const ics = (e: any) => `data:text/calendar;charset=utf8,${encodeURIComponent(['BEGIN:VCALENDAR','VERSION:2.0',`PRODID:-//${cp.short}//EN`,'BEGIN:VEVENT',`DTSTART;VALUE=DATE:${e.date.replace(/-/g,'')}`,`DTEND;VALUE=DATE:${(e.end || e.date).replace(/-/g,'')}`,`SUMMARY:${e.title}`,`LOCATION:${e.where}`,`DESCRIPTION:${(e.text||'').replace(/\n/g,' ')}`,'END:VEVENT','END:VCALENDAR'].join('\r\n'))}`;
 ---
 <Base title="News & events" description={cp.news_meta}>
-  <section class="phero"><div class="wrap"><div><p class="kicker">News &amp; events</p><h1 style="margin-top:.75rem">From the station.</h1><p class="lede">What's coming up, and what the department has been doing, as reported in the Courier-Leader and by the department itself.</p></div></div></section>
+  <section class="phero"><div class="wrap"><div><p class="kicker">News &amp; events</p><h1 style="margin-top:.75rem">From the station.</h1><p class="lede">What's coming up, and what the department has been doing, {cp.news_source}.</p></div></div></section>
 
   <section class="section tight band">
     <div class="wrap">

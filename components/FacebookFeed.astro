@@ -5,7 +5,9 @@ import siteConfig from '@siteconfig';
 import d from '@content/dept.json';
 const fb: string = (siteConfig as any).facebook || (d as any).facebook || '';
 const name: string = d.name;
-const src = fb ? `https://www.facebook.com/plugins/page.php?href=${encodeURIComponent(fb)}&tabs=timeline&width=500&height=600&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false` : '';
+// The Page Plugin only frames a canonical facebook.com/<pagename> URL; profile.php?id= and /p/ URLs render blank, so those get the button alone.
+const canonical = /^https:\/\/(www\.)?facebook\.com\/[A-Za-z0-9.\-]+\/?$/.test(fb) && !/^https:\/\/(www\.)?facebook\.com\/(p|profile\.php|people|pages|groups)\/?$/.test(fb);
+const src = fb && canonical ? `https://www.facebook.com/plugins/page.php?href=${encodeURIComponent(fb)}&tabs=timeline&width=500&height=600&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=false` : '';
 ---
 {fb && (
   <section class="section band fbsec" aria-labelledby="fb-h">
@@ -17,10 +19,10 @@ const src = fb ? `https://www.facebook.com/plugins/page.php?href=${encodeURIComp
           <p class="small" style="max-width:40ch">Day-to-day updates, photos from calls and events, and reminders about burning conditions are posted there first.</p>
           <p><a class="btn" href={fb} rel="noopener">Open our Facebook page</a></p>
         </div>
-        <div class="fbwrap">
+        {src && <div class="fbwrap">
           <iframe class="fbframe" src={src} title={`${name} Facebook page timeline`} width="500" height="600" loading="lazy" style="border:none;overflow:hidden" scrolling="no" allow="encrypted-media"></iframe>
           <p class="small fbfall">If the feed doesn't load here, <a href={fb} rel="noopener">open our Facebook page</a>.</p>
-        </div>
+        </div>}
       </div>
     </div>
   </section>

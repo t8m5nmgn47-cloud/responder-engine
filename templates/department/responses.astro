@@ -8,7 +8,8 @@ const rp = ((d as any).photos?.responses ?? d.photos.glow) as { src: string; alt
 const feed = (d as any).dispatch_feed as { label: string; url: string } | undefined;
 const fmt = (s: string) => new Date(s + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
 const years = inc.year_counts.slice().sort((a, b) => a.year - b.year);
-const max = Math.max(...years.map((y) => y.calls));
+const max = Math.max(1, ...years.map((y) => y.calls));
+const blankNum = (s: string) => !s || /^\s*$/.test(s) || /^\d{2}-0{3,}$/.test(s);
 ---
 <Base title="Responses" description={`Recent responses by the ${d.name}: what we were called to, when, where in general, which rigs went, and how many volunteers turned out. Plus calls by year.`}>
   <section class="phero two" style={`--pbg:url(${rp.src})`}>
@@ -35,29 +36,30 @@ const max = Math.max(...years.map((y) => y.calls));
       <ol class="runs">
         {inc.incidents.map((r) => (
           <li class="run">
-            <div class="run-n"><span class="num">{r.n}</span><time datetime={r.date}>{fmt(r.date)}{r.time && ` · ${r.time}`}</time></div>
+            <div class="run-n">{!blankNum(r.n) && <span class="num">{r.n}</span>}<time datetime={r.date}>{fmt(r.date)}{r.time && ` · ${r.time}`}</time></div>
             <div class="run-b">
               <h3>{r.type}</h3>
               <p class="loc">{r.location}</p>
               {r.notes && <p class="nt">{r.notes}</p>}
-              <p class="meta">Units {r.units.join(', ')} · {r.members} members{r.mutual_aid && r.mutual_aid.length ? ` · with ${r.mutual_aid.join(', ')}` : ''}</p>
+              {(r.units.length > 0 || r.members > 0 || (r.mutual_aid && r.mutual_aid.length > 0)) && <p class="meta">{[r.units.length > 0 ? `Units ${r.units.join(', ')}` : '', r.members > 0 ? `${r.members} members` : '', r.mutual_aid && r.mutual_aid.length ? `with ${r.mutual_aid.join(', ')}` : ''].filter(Boolean).join(' · ')}</p>}
+              {(r as any).source && <p class="meta"><a class="src" href={(r as any).source} rel="noopener">Source</a></p>}
             </div>
           </li>
         ))}
       </ol>
-      <p class="small" style="margin-top:1.5rem;max-width:62ch">This log is kept by the department from its run reports. It is built to be updated from a phone after each call: one line per response in a plain data file.</p>
+      <p class="small" style="margin-top:1.5rem;max-width:62ch">This log is kept by the department from its run reports.</p>
     </div>
   </section>
 
-  <section class="section band">
+  {years.length > 0 && <section class="section band">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">By the numbers</p><h2>Calls by year</h2></div>
       <div class="bars" role="img" aria-label={`Calls by year: ${years.map((y) => `${y.year}, ${y.calls}`).join('; ')}`}>
         {years.map((y) => <div class="bar-row"><span class="bar-y">{y.year}</span><span class="bar-t"><span class="bar-f" style={`width:${(y.calls / max * 100).toFixed(0)}%`}></span></span><span class="bar-v">{y.calls}</span></div>)}
       </div>
-      <p class="small" style="margin-top:1rem;max-width:62ch">The department's year-end counts go here, one line per year, and the chart draws itself. 2024 was the department's second-busiest year on record.</p>
+      {cp.year_counts_note && <p class="small" style="margin-top:1rem;max-width:62ch">{cp.year_counts_note}</p>}
     </div>
-  </section>
+  </section>}
 
   <section class="section tight">
     <div class="wrap">

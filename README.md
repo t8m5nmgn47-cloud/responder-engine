@@ -71,7 +71,8 @@ While the engine is unpublished, point at a checkout instead: `"@sightline/respo
 `facebook` (0.3): when set, the home page and the community page end with a "Follow us" section holding the
 Facebook Page Plugin timeline as a lazy-loaded `<iframe>` (plugin URL form, no SDK script, `title` set) with a plain
 "Open our Facebook page" link beside it as the fallback. Falls back to `dept.json` `facebook`; hidden when neither is
-set.
+set. 0.3.3: the iframe is rendered only for a canonical `https://www.facebook.com/<pagename>` URL; `profile.php?id=`
+and `/p/…` URLs (which the plugin refuses to frame) get the "Follow us" section with the button alone.
 
 ### What the integration does
 
@@ -97,7 +98,7 @@ Every field the `department` template reads. Paths are relative to the JSON root
 |---|---|---|
 | `name` | string | titles, header, footer, JSON-LD, print page |
 | `company` | string | footer "about" line |
-| `founded` | number | header tagline, JSON-LD, home, about |
+| `founded` | number | header tagline, JSON-LD, home, about (0.3.3: the about history heading "<founded> to now") |
 | `tagline` | string | home hero |
 | `radio` | string | footer radio designation |
 | `url` | string | JSON-LD, print footer (`replace(/^https?:\/\//,'')`) |
@@ -107,16 +108,16 @@ Every field the `department` template reads. Paths are relative to the JSON root
 | `district.area_sq_mi` | number | footer, home, about |
 | `district.members` | string[] | JSON-LD `areaServed`, about |
 | `district.contract` | string[] | JSON-LD, about (`join`) |
-| `district.board` | `{name, for}[]` | about |
+| `district.board` | `{name, for}[]` | about (0.3.3: rows with an empty `name` are hidden, as is the "By contract" row when `contract` is empty) |
 | `district.board_note` | string | about |
 | `district.mutual_aid` | string[] | about (`slice`) |
 | `stats.members`, `.officers`, `.firefighters`, `.juniors`, `.calls_2024` | number | home and responses stat tiles, members page |
 | `chiefs` | `{name, title, phone, since, note}[]` | about, contact, members (`filter` on title) |
 | `chiefs_note` | string | about |
-| `captains` | `{unit, name}[]` | members |
+| `captains` | `{unit, name}[]` | members (0.3.3: section hidden when empty) |
 | `apparatus` | `{id, kind, year, make, spec, role}[]` | apparatus, home (`slice`) |
 | `station.name`, `.opened`, `.cost`, `.size`, `.approved`, `.history` | string / number | about |
-| `honor_guard` | string | members |
+| `honor_guard` | string | members (0.3.3: section hidden when empty) |
 | `lodd` | `{name, age, died, joined, account, sources[]}[]` | memorial |
 | `memorial` | `{name, died}[]` | memorial |
 | `memorial_note` | string | memorial |
@@ -138,6 +139,9 @@ Every field the `department` template reads. Paths are relative to the JSON root
 | `iso_rating.class`, `.year?`, `.note?` | string, number, string (0.3) | "ISO rating" row in the about page's Fire Board facts and a short "ISO Class …" line in the footer. Hidden when absent. Only enter a rating the department has confirmed. |
 | `photos.about_hero`, `.members_hero`, `.responses`, `.apparatus_hero`, `.support_hero`, `.station` | `{src, alt, caption?}` (0.3.1, optional) | per-page overrides: about hero (else `hero_photo`), members hero (else `hero_photo`), responses hero (else `photos.glow`), a photo beside the apparatus and support page heroes (hidden when absent), the about page's station figure (else `hero_photo`). |
 | `copy.community_caption`, `.contact_caption`, `.responses_caption`, `.apparatus_h1`, `.apparatus_link`, `.support_h1`, `.members_lede`, `.community_door`, `.footer_kind`, `.members_label` | string (0.3.1, optional) | override sentences that were hardcoded with Paw Paw wording (photo captions on community/contact/responses, the apparatus and support headlines, the home "all rigs" button, the members lede, the home community door text). |
+| `copy.about_h1`, `.news_source`, `.year_counts_note`, `.pagers_step`, `.drive_step`, `.knox_box`, `.station_tours`, `.incident_reports`, `.honor_guard_title`, `.roster_note`, `.join_people`, `.join_address_label`, `.juniors_lede`, `.stat_247`, `.footer_about`, `.header_tagline` | string (0.3.3, optional) | more Paw Paw sentences made overridable: the about hero headline; the news-page source phrase ("as reported in …"); the note under the calls-by-year chart (`""` hides it); the heading and body of the "pagers go off" and "drive to the station" steps on the safety page; the Knox Box, station tours and incident reports tiles on the community page; the honor guard heading and the captains roster note (`""` hides it) on the members page; the "forty people who will come when you call" phrase and the address label on the join form; the junior-program lede (default counts `stats.juniors`, or a generic sentence when 0); the home "24/7" stat label; a single footer "about" sentence replacing the assembled one; the header tagline under the department name (default `<station_label> · Est. <founded>`). |
+| `programs[].photo_position` | string (0.3.3, optional) | CSS `object-position` for a program card's photo, such as `center 70%`. Program-card photos are 4:3 from 0.3.3. |
+| `incidents[].n`, `.units`, `.members`, `.source` | (0.3.3) | the responses page hides the incident number when it is blank or a `YY-000…` placeholder, hides the units/members line when both are empty or 0, and shows a "Source" link when `source` is set. The calls-by-year section is hidden when `year_counts` is empty. |
 | `photos.<key>.src`, `.alt` | string | keys used: `chief_engine`, `structure`, `glow`, `community`, `members_dog`, `dog_window`, `squad`. Pages derive the responsive 800px variant with `src.replace('.jpg', '-800.jpg')`, so every photo needs a `-800.jpg` sibling in `public/photos/`. |
 
 Present in Paw Paw's data but not read by any template: `short`, `email`, `phones.emergency`, `stats.apparatus`,

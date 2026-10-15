@@ -53,7 +53,7 @@ const inSeason = s && s.start <= today && today <= s.end;
         <div class="stat"><div class="v" data-count>{d.stats.members}</div><div class="k">{cp.members_label}</div></div>
         {d.stats.calls_2024 > 0 && <div class="stat"><div class="v" data-count>{d.stats.calls_2024}</div><div class="k">Calls in 2024</div></div>}
         {d.district.area_sq_mi > 0 && <div class="stat"><div class="v" data-count>{d.district.area_sq_mi}</div><div class="k">Square miles protected</div></div>}
-        {!(d.stats.calls_2024 > 0) && <div class="stat"><div class="v">24/7</div><div class="k">Volunteer response</div></div>}
+        {!(d.stats.calls_2024 > 0) && <div class="stat"><div class="v">24/7</div><div class="k">{cp.stat_247}</div></div>}
         <div class="stat"><div class="v" data-count>{new Date().getFullYear() - d.founded}</div><div class="k">Years of service</div></div>
       </div>
     </div>
@@ -83,7 +83,7 @@ const inSeason = s && s.start <= today && today <= s.end;
         <div>
           <div class="head" data-reveal><p class="kicker">Recent responses</p><h2>What the pager said</h2></div>
           <ol class="mini">
-            {runs.map((r) => <li><span class="mn">{r.n}</span><span class="md">{fmt(r.date)}</span><span class="mt"><b>{r.type}</b> · {r.location}</span></li>)}
+            {runs.map((r) => <li>{r.n && !/^\d{2}-0{3,}$/.test(r.n) && <span class="mn">{r.n}</span>}<span class="md">{fmt(r.date)}</span><span class="mt"><b>{r.type}</b> · {r.location}</span></li>)}
           </ol>
           <p style="margin-top:1.25rem"><a class="btn" href="/responses/">All responses</a></p>
         </div>
@@ -117,7 +117,7 @@ const inSeason = s && s.start <= today && today <= s.end;
       <div class="head" data-reveal><p class="kicker">On the floor</p><h2>{cp.rigs_title}</h2></div>
       <div class="rigs" data-reveal-group>
         {d.apparatus.slice(0, 4).map((r) => (
-          <div class="rig">{r.photo ? <img class="rphoto" src={r.photo.replace(".jpg","-800.jpg")} alt={r.alt || `${r.kind} ${r.id}`} loading="lazy" width="800" height="600" /> : <div class="photo" role="img" aria-label={`Reserved for a photograph of ${r.kind} ${r.id}`}></div>}<div class="in"><div class="id">{r.id}</div><div class="kind">{r.kind}{r.year ? ` · ${r.year}` : ""}</div><div class="mk">{r.make}</div><div class="sp">{r.spec}</div></div></div>
+          <div class="rig">{r.photo ? <img class="rphoto" src={r.photo.replace(".jpg","-800.jpg")} alt={r.alt || `${r.kind} ${r.id}`} loading="lazy" width="800" height="600" /> : <div class="photo" role="img" aria-label={`Reserved for a photograph of ${r.kind} ${r.id}`}></div>}<div class="in"><div class="id">{r.id}</div><div class="kind">{r.kind}{r.year ? ` · ${r.year}` : ""}</div>{r.make && <div class="mk">{r.make}</div>}<div class="sp">{r.spec}</div></div></div>
         ))}
       </div>
       <p style="margin-top:1.5rem"><a class="btn" href="/apparatus/">{cp.apparatus_link}</a></p>

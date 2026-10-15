@@ -11,7 +11,7 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
       <div>
         <p class="kicker">Junior program</p>
         <h1 style="margin-top:.75rem">Start before you're old enough.</h1>
-        <p class="lede">Two of the department's {d.stats.members} members are juniors: young people who train with the department, learn the equipment and the discipline, and step up to full membership when they come of age.</p>
+        <p class="lede">{cp.juniors_lede}</p>
         <div class="acts"><a class="btn red" href="/join/#apply">Ask about joining</a><a class="btn" href={tel(d.phones.station)}>Call the station</a></div>
       </div>
       <figure class="hphoto"><img src={d.photos.squad.src.replace(".jpg","-800.jpg")} alt={d.photos.squad.alt} width="800" height="600" fetchpriority="high" /><figcaption>{cp.squad_caption}</figcaption></figure>

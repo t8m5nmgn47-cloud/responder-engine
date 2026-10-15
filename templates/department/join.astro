@@ -37,7 +37,7 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
       <div class="head" data-reveal><p class="kicker">What you get</p><h2>More than you'd guess</h2></div>
       <div class="prose">
         <p>Turnout gear, a helmet, an air pack and a pager, all issued, all yours to use. State certification that is recognized anywhere in {cp.state_name} and most places beyond it. Vehicle extrication, water supply, aerial operations, wildland, hazardous materials awareness: skills most people never get the chance to learn. {cp.heritage}</p>
-        <p>And the part nobody can quite explain until you've had it: forty people who will come when you call, for the rest of your life.</p>
+        <p>And the part nobody can quite explain until you've had it: {cp.join_people}, for the rest of your life.</p>
       </div>
     </div>
   </section>
@@ -74,7 +74,7 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
         <div class="f"><label for="j-phone">Phone *</label><input id="j-phone" name="phone" type="tel" required></div>
         <div class="f"><label for="j-email">Email</label><input id="j-email" name="email" type="email"></div>
         <div class="f"><label for="j-age">Age *</label><input id="j-age" name="age" type="number" min="14" max="99" required></div>
-        <div class="f wide"><label for="j-addr">Where you live (street or area, and township) *</label><input id="j-addr" name="address" required placeholder={cp.address_placeholder}></div>
+        <div class="f wide"><label for="j-addr">{cp.join_address_label} *</label><input id="j-addr" name="address" required placeholder={cp.address_placeholder}></div>
         <div class="f wide"><label for="j-why">Anything you want us to know</label><textarea id="j-why" name="about" rows="4" placeholder="Experience, availability, questions"></textarea></div>
         <div class="bar2"><button class="btn red" type="submit">Send</button><p class="small" id="j-status" aria-live="polite"></p></div>
         <details class="fb" id="j-fb" hidden><summary>If your email program didn't open, copy this and send it, or call the station.</summary><textarea readonly rows="9"></textarea></details>

@@ -14,7 +14,7 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
     <div class="wrap">
       <div>
         <p class="kicker">About the department</p>
-        <h1 style="margin-top:.75rem">Organized the night after the second fire.</h1>
+        <h1 style="margin-top:.75rem">{cp.about_h1}</h1>
         <p class="lede">{cp.about_lede}</p>
       </div>
       <figure class="hphoto"><img src={ah.src} alt={ah.alt} width="1100" height="400" loading="eager" style="aspect-ratio:auto" /><figcaption>{ah.caption}</figcaption></figure>
@@ -23,7 +23,7 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 
   <section class="section">
     <div class="wrap">
-      <div class="head" data-reveal><p class="kicker">History</p><h2>1868 to now</h2></div>
+      <div class="head" data-reveal><p class="kicker">History</p><h2>{d.founded} to now</h2></div>
       <div class="prose">{d.history.map((p) => <p>{p}</p>)}</div>
     </div>
   </section>
@@ -44,8 +44,8 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
       <div class="head" data-reveal><p class="kicker">Governance</p><h2>{cp.board_title}</h2></div>
       <div class="prose"><p>{d.district.board_note}</p></div>
       <dl class="rows" style="margin-top:1.5rem;max-width:48rem">
-        {d.district.board.map((b) => <div class="row"><dt>{b.for}</dt><dd>{b.name}</dd></div>)}
-        <div class="row"><dt>By contract</dt><dd>{d.district.contract.join(', ')}</dd></div>
+        {d.district.board.filter((b) => b.name).map((b) => <div class="row"><dt>{b.for}</dt><dd>{b.name}</dd></div>)}
+        {d.district.contract.length > 0 && <div class="row"><dt>By contract</dt><dd>{d.district.contract.join(', ')}</dd></div>}
         {iso && iso.class && <div class="row"><dt>ISO rating</dt><dd>Public Protection Classification {iso.class}{iso.year && `, rated ${iso.year}`}.{iso.note && ` ${iso.note}`}</dd></div>}
       </dl>
       <p class="small" style="margin-top:1rem">{cp.board_source_note}</p>

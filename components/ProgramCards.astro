@@ -9,7 +9,7 @@ const items = Astro.props.limit ? all.slice(0, Astro.props.limit) : all;
   <div class="pcards" data-reveal-group>
     {items.map((p) => (
       <a class="pcard" href={p.href}>
-        {p.photo ? <img src={p.photo} alt="" width="800" height="600" loading="lazy" /> : <span class="pcard-none" aria-hidden="true"></span>}
+        {p.photo ? <img src={p.photo} alt="" width="800" height="600" loading="lazy" style={p.photo_position ? `object-position:${p.photo_position}` : undefined} /> : <span class="pcard-none" aria-hidden="true"></span>}
         <span class="in"><span class="h3">{p.title}</span><span class="sm">{p.summary}</span><span class="go">Read more<span class="sr"> about {p.title}</span></span></span>
       </a>
     ))}

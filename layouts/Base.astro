@@ -140,7 +140,7 @@ const jsonld = {
       <div class="wrap rail">
         <a class="brand" href="/" aria-label={`${d.name} home`}>
           <img class="mk" src={patch} alt="" width="44" height="50" />
-          <span><span class="bn">{cp.short}</span><span class="bs">{cp.station_label} · Est. {d.founded}</span></span>
+          <span><span class="bn">{cp.short}</span><span class="bs">{cp.header_tagline}</span></span>
         </a>
         <button class="menu-btn" type="button" aria-expanded="false" aria-controls="nav">Menu</button>
         <nav class="nav" id="nav" aria-label="Primary">
@@ -158,7 +158,7 @@ const jsonld = {
           <div class="fid">
             <img class="fpatch" src={patch} alt="" width="64" height="74" loading="lazy" />
             <h2>{d.name}</h2>
-            <p class="about">{d.company}. {cp.footer_kind} protecting {cp.territory}, {d.district.area_sq_mi > 0 ? `about ${d.district.area_sq_mi} square miles of ` : 'in '}{cp.county}, {cp.state_name}.</p>
+            <p class="about">{cp.footer_about ?? `${d.company}. ${cp.footer_kind} protecting ${cp.territory}, ${d.district.area_sq_mi > 0 ? `about ${d.district.area_sq_mi} square miles of ` : 'in '}${cp.county}, ${cp.state_name}.`}</p>
           </div>
           <div>
             <h2>Reach us</h2>
@@ -195,7 +195,8 @@ const jsonld = {
       b.addEventListener('click',function(){set(b.getAttribute('aria-expanded')!=='true');});
       document.addEventListener('keydown',function(e){if(e.key==='Escape'&&n.classList.contains('open')){set(false);b.focus();}});
       document.addEventListener('click',function(e){if(n.classList.contains('open')&&!n.contains(e.target)&&!b.contains(e.target))set(false);});})();
-      (function(){var d=document.getElementById('iwt');if(!d)return;var s=d.querySelector('summary');
+      (function(){var d=document.getElementById('iwt');if(!d)return;var s=d.querySelector('summary'),li=d.parentNode;
+      d.addEventListener('toggle',function(){if(!d.open)return;li.classList.remove('near-edge');var m=d.querySelector('.iwt-menu');if(m&&m.getBoundingClientRect().right>innerWidth-8)li.classList.add('near-edge');});
       document.addEventListener('keydown',function(e){if(e.key==='Escape'&&d.open){d.open=false;s.focus();}});
       document.addEventListener('click',function(e){if(d.open&&!d.contains(e.target))d.open=false;});
       d.addEventListener('focusout',function(e){if(d.open&&e.relatedTarget&&!d.contains(e.relatedTarget))d.open=false;});})();

@@ -17,22 +17,22 @@ const mh = ((d as any).photos?.members_hero ?? d.hero_photo) as { src: string; a
     </div>
   </section>
 
-  <section class="section band">
+  {d.captains.length > 0 && <section class="section band">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">Captains</p><h2>Who runs each rig</h2></div>
       <dl class="rows" style="max-width:48rem">
         {d.captains.map((c) => <div class="row"><dt>{c.unit}</dt><dd>{c.name}{c.note && <span class="small"> · {c.note}</span>}</dd></div>)}
       </dl>
-      <p class="small" style="margin-top:1rem;max-width:62ch">The full roster of lieutenants, firefighters and junior members will be listed here with the department's approval. Names come from the department's previous website and must be confirmed.</p>
+      {cp.roster_note && <p class="small" style="margin-top:1rem;max-width:62ch">{cp.roster_note}</p>}
     </div>
-  </section>
+  </section>}
 
-  <section class="section">
+  {d.honor_guard && <section class="section">
     <div class="wrap">
-      <div class="head" id="honor-guard" data-reveal><p class="kicker">Honor guard</p><h2>Formed in 2017, on donated time</h2></div>
+      <div class="head" id="honor-guard" data-reveal><p class="kicker">Honor guard</p><h2>{cp.honor_guard_title}</h2></div>
       <div class="prose"><p>{d.honor_guard}</p></div>
     </div>
-  </section>
+  </section>}
 
   <section class="section tight band">
     <div class="wrap">
