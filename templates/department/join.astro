@@ -2,13 +2,15 @@
 import Base from '../../layouts/Base.astro';
 import d from '@content/dept.json';
 import { copy } from '../../components/copy.js';
+import { pick, p800 } from '../../components/photos.js';
 const cp = copy(d);
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
+const jph = pick(d, 'members_dog', 'squad');
 // Optional career / paid-position block (0.3.4): `careers {kicker?, title, text, cta?, href?}` renders a #career section.
 const careers = (d as any).careers as { kicker?: string; title: string; text: string; cta?: string; href?: string } | undefined;
 ---
 <Base title="Join" description={`Become a volunteer firefighter with the ${d.name}. Training, gear and a pager are provided; what it takes, what you get, and how to start.`}>
-  <section class="phero two" style={`--pbg:url(${d.photos.members_dog.src})`}>
+  <section class={jph ? "phero two" : "phero"} style={jph ? `--pbg:url(${jph.src})` : undefined}>
     <div class="wrap">
       <div>
         <p class="kicker">Join the department</p>
@@ -16,7 +18,7 @@ const careers = (d as any).careers as { kicker?: string; title: string; text: st
         <p class="lede">{cp.join_lede}</p>
         <div class="acts"><a class="btn red" href="#apply">Start here</a><a class="btn" href={tel(d.phones.station)}>Call the station</a></div>
       </div>
-      <figure class="hphoto"><img src={d.photos.members_dog.src.replace(".jpg","-800.jpg")} alt={d.photos.members_dog.alt} width="800" height="600" fetchpriority="high" /><figcaption>{cp.join_caption}</figcaption></figure>
+      {jph && <figure class="hphoto"><img src={p800(jph)} alt={jph.alt} width="800" height="600" fetchpriority="high" /><figcaption>{cp.join_caption}</figcaption></figure>}
     </div>
   </section>
 
@@ -57,7 +59,7 @@ const careers = (d as any).careers as { kicker?: string; title: string; text: st
         <li><h3>Your first call.</h3><p>The tones go off, you drive to the station, and you're on the rig. Everyone remembers theirs.</p></li>
       </ol>
       <p class="small" style="margin-top:1.5rem;max-width:62ch">{cp.join_steps_note ? cp.join_steps_note + ' ' : ''}The National Volunteer Fire Council's <a href="https://makemeafirefighter.org" rel="noopener">Make Me A Firefighter</a> site answers the general questions, and lists departments near you.</p>
-      </div><aside class="aside"><figure class="aside-photo"><img src={d.photos.members_dog.src.replace(".jpg","-800.jpg")} alt={d.photos.members_dog.alt} loading="lazy" width="800" height="1000" /><figcaption>{d.photos.members_dog.alt}</figcaption></figure><div class="aside-card light"><p class="kicker">Not sure yet?</p><h3>Come stand in the bay first.</h3><p>Training night is the no-commitment way in. Call the station and ask when the next one is.</p><a class="btn red" href={tel(d.phones.station)}>{d.phones.station}</a></div></aside></div>
+      </div><aside class="aside">{jph && <figure class="aside-photo"><img src={p800(jph)} alt={jph.alt} loading="lazy" width="800" height="1000" /><figcaption>{jph.alt}</figcaption></figure>}<div class="aside-card light"><p class="kicker">Not sure yet?</p><h3>Come stand in the bay first.</h3><p>Training night is the no-commitment way in. Call the station and ask when the next one is.</p><a class="btn red" href={tel(d.phones.station)}>{d.phones.station}</a></div></aside></div>
     </div>
   </section>
 

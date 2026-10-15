@@ -2,9 +2,10 @@
 import Base from '../../layouts/Base.astro';
 import d from '@content/dept.json';
 import { copy } from '../../components/copy.js';
+import { pick, p800 } from '../../components/photos.js';
 const cp = copy(d);
 import inc from '@content/incidents.json';
-const rp = ((d as any).photos?.responses ?? d.photos.glow) as { src: string; alt: string };
+const rp = pick(d, 'responses', 'glow') as { src: string; alt: string } | null;
 const feed = (d as any).dispatch_feed as { label: string; url: string } | undefined;
 const fmt = (s: string) => new Date(s + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
 const years = inc.year_counts.slice().sort((a, b) => a.year - b.year);
@@ -15,7 +16,7 @@ const rs: any = (d as any).responses || {};
 const kinds: { title: string; text: string }[] = rs.kinds || [];
 ---
 <Base title="Responses" description={`Recent responses by the ${d.name}: what we were called to, when, where in general, which rigs went, and how many volunteers turned out. Plus calls by year.`}>
-  <section class="phero two" style={`--pbg:url(${rp.src})`}>
+  <section class={rp ? "phero two" : "phero"} style={rp ? `--pbg:url(${rp.src})` : undefined}>
     <div class="wrap">
       <div>
         <p class="kicker">Responses</p>
@@ -23,7 +24,7 @@ const kinds: { title: string; text: string }[] = rs.kinds || [];
         <p class="lede">{cp.responses_lede}</p>
       </div>
       <div>
-        <figure class="hphoto side"><img src={rp.src.replace(".jpg","-800.jpg")} alt={rp.alt} width="800" height="1067" fetchpriority="high" /><figcaption>{cp.responses_caption}</figcaption></figure>
+        {rp && <figure class="hphoto side"><img src={p800(rp)} alt={rp.alt} width="800" height="1067" fetchpriority="high" /><figcaption>{cp.responses_caption}</figcaption></figure>}
         {d.stats.calls_2024 > 0 && <div class="stats" data-reveal-group style="grid-template-columns:repeat(2,1fr);margin-top:1.25rem">
           <div class="stat"><div class="v" data-count>{d.stats.calls_2024}</div><div class="k">Calls in 2024</div></div>
           <div class="stat"><div class="v" data-count>{Math.round(d.stats.calls_2024 / 365 * 7)}</div><div class="k">Calls in a typical week</div></div>
@@ -60,7 +61,7 @@ const kinds: { title: string; text: string }[] = rs.kinds || [];
       </ol>
       <p class="small" style="margin-top:1.5rem;max-width:62ch">{cp.responses_list_note}</p>
       {rs.list_link && <p style="margin-top:1.25rem"><a class="btn" href={rs.list_link.href} rel="noopener">{rs.list_link.label}</a></p>}
-      </div><aside class="aside"><figure class="aside-photo"><img src={rp.src.replace(".jpg","-800.jpg")} alt={rp.alt} loading="lazy" width="800" height="1000" /></figure>{rs.report && <div class="aside-card"><p class="kicker">After a call</p><h3>Need an incident report?</h3><p>{cp.incident_reports}</p></div>}</aside></div>
+      </div><aside class="aside">{rp && <figure class="aside-photo"><img src={p800(rp)} alt={rp.alt} loading="lazy" width="800" height="1000" /></figure>}{rs.report && <div class="aside-card"><p class="kicker">After a call</p><h3>Need an incident report?</h3><p>{cp.incident_reports}</p></div>}</aside></div>
     </div>
   </section>
 

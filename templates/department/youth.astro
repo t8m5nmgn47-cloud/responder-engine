@@ -2,11 +2,13 @@
 import Base from '../../layouts/Base.astro';
 import d from '@content/dept.json';
 import { copy } from '../../components/copy.js';
+import { pick, p800 } from '../../components/photos.js';
 const cp = copy(d);
+const yph = pick(d, 'squad', 'structure');
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 ---
 <Base title="Junior program" description={`The ${d.name}'s junior firefighter program: how younger members train alongside the department, what they do and don't do, and how to ask about joining.`}>
-  <section class="phero two" style={`--pbg:url(${d.photos.squad.src})`}>
+  <section class={yph ? "phero two" : "phero"} style={yph ? `--pbg:url(${yph.src})` : undefined}>
     <div class="wrap">
       <div>
         <p class="kicker">Junior program</p>
@@ -14,7 +16,7 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
         <p class="lede">{cp.juniors_lede}</p>
         <div class="acts"><a class="btn red" href="/join/#apply">Ask about joining</a><a class="btn" href={tel(d.phones.station)}>Call the station</a></div>
       </div>
-      <figure class="hphoto"><img src={d.photos.squad.src.replace(".jpg","-800.jpg")} alt={d.photos.squad.alt} width="800" height="600" fetchpriority="high" /><figcaption>{cp.squad_caption}</figcaption></figure>
+      {yph && <figure class="hphoto"><img src={p800(yph)} alt={yph.alt} width="800" height="600" fetchpriority="high" /><figcaption>{cp.squad_caption}</figcaption></figure>}
     </div>
   </section>
   <section class="section band">

@@ -4,12 +4,13 @@ import d from '@content/dept.json';
 interface Props { limit?: number }
 const all: any[] = (d as any).programs || [];
 const items = Astro.props.limit ? all.slice(0, Astro.props.limit) : all;
+const anyPhoto = items.some((p) => p.photo); // 0.10.2: no photos at all -> no reserved slots
 ---
 {items.length > 0 && (
   <div class="pcards" data-reveal-group>
     {items.map((p) => (
       <a class="pcard" href={p.href}>
-        {p.photo ? <img src={p.photo} alt="" width="800" height="600" loading="lazy" style={p.photo_position ? `object-position:${p.photo_position}` : undefined} /> : <span class="pcard-none" aria-hidden="true"></span>}
+        {p.photo ? <img src={p.photo} alt="" width="800" height="600" loading="lazy" style={p.photo_position ? `object-position:${p.photo_position}` : undefined} /> : (anyPhoto ? <span class="pcard-none" aria-hidden="true"></span> : null)}
         <span class="in"><span class="h3">{p.title}</span><span class="sm">{p.summary}</span><span class="go">Read more<span class="sr"> about {p.title}</span></span></span>
       </a>
     ))}

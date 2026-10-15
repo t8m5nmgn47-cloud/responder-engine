@@ -2,8 +2,10 @@
 import Base from '../../layouts/Base.astro';
 import d from '@content/dept.json';
 import { copy } from '../../components/copy.js';
+import { pick, p800 } from '../../components/photos.js';
 const cp = copy(d);
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
+const sph = pick(d, 'structure', 'squad');
 const s = d.seasonal;
 const hz = (d.hazards || []) as any[]; // 0.5.2: optional local-hazard sections (hurricanes, floods, wildfire), opt-in via dept.json
 ---
@@ -53,7 +55,7 @@ const hz = (d.hazards || []) as any[]; // 0.5.2: optional local-hazard sections 
         <li><h3>We stay until it's done.</h3><p>Fire out, patients handed to {cp.ems}, scene safe, and then back to the station to wash hoses and fill air bottles so the next call starts clean.</p></li>
       </ol>
       <p class="small" style="margin-top:1.5rem;max-width:62ch">The honest version of "how long will it take": longer than in a city, and shorter the more volunteers we have within a few minutes of the station. If that bothers you, <a href="/join/">join</a>.</p>
-      </div><aside class="aside"><figure class="aside-photo"><img src={d.photos.structure.src.replace(".jpg","-800.jpg")} alt={d.photos.structure.alt} loading="lazy" width="800" height="1000" /><figcaption>{d.photos.structure.alt}</figcaption></figure><div class="aside-card light"><p class="kicker">The minutes that matter</p><h3>More members close to the station means a faster first rig.</h3><p>Every volunteer who lives within a few minutes of Station {d.radio} shortens the gap between your call and our arrival.</p><a class="btn red" href="/join/">Join the department</a></div></aside></div>
+      </div><aside class="aside">{sph && <figure class="aside-photo"><img src={p800(sph)} alt={sph.alt} loading="lazy" width="800" height="1000" /><figcaption>{sph.alt}</figcaption></figure>}<div class="aside-card light"><p class="kicker">The minutes that matter</p><h3>More members close to the station means a faster first rig.</h3><p>Every volunteer who lives within a few minutes of Station {d.radio} shortens the gap between your call and our arrival.</p><a class="btn red" href="/join/">Join the department</a></div></aside></div>
     </div>
   </section>
 

@@ -2,18 +2,19 @@
 import Base from '../../layouts/Base.astro';
 import d from '@content/dept.json';
 import { copy } from '../../components/copy.js';
+import { pick, p800 } from '../../components/photos.js';
 const cp = copy(d);
-const mh = ((d as any).photos?.members_hero ?? d.hero_photo) as { src: string; alt: string; caption: string };
+const mh = pick(d, 'members_hero') as { src: string; alt: string; caption: string } | null;
 ---
 <Base title="Members" description={cp.members_meta}>
-  <section class="phero two">
+  <section class={mh ? "phero two" : "phero"}>
     <div class="wrap">
       <div>
         <p class="kicker">Members</p>
         <h1 style="margin-top:.75rem">{cp.members_h1}</h1>
         <p class="lede">{cp.members_lede}</p>
       </div>
-      <figure class="hphoto"><img src={mh.src} alt={mh.alt} width="1100" height="400" fetchpriority="high" style="aspect-ratio:auto" /><figcaption>{mh.caption}</figcaption></figure>
+      {mh && <figure class="hphoto"><img src={mh.src} alt={mh.alt} width="1100" height="400" fetchpriority="high" style="aspect-ratio:auto" /><figcaption>{mh.caption}</figcaption></figure>}
     </div>
   </section>
 

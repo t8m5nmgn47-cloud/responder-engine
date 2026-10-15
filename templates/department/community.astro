@@ -2,21 +2,23 @@
 import Base from '../../layouts/Base.astro';
 import d from '@content/dept.json';
 import { copy } from '../../components/copy.js';
+import { pick, p800 } from '../../components/photos.js';
 const cp = copy(d);
 import FacebookFeed from '../../components/FacebookFeed.astro';
 import ProgramCards from '../../components/ProgramCards.astro';
 const programs: any[] = (d as any).programs || [];
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
+const cph = pick(d, 'community');
 ---
 <Base title="Community" description={cp.community_meta}>
-  <section class="phero two" style={`--pbg:url(${d.photos.community.src})`}>
+  <section class={cph ? "phero two" : "phero"} style={cph ? `--pbg:url(${cph.src})` : undefined}>
     <div class="wrap">
       <div>
         <p class="kicker">Community</p>
         <h1 style="margin-top:.75rem">Before, during, and after.</h1>
         <p class="lede">The practical things: how to keep a fire from starting, how to help us when one does, and what to do the morning after.</p>
       </div>
-      <figure class="hphoto side"><img src={d.photos.community.src.replace(".jpg","-800.jpg")} alt={d.photos.community.alt} width="800" height="1067" fetchpriority="high" /><figcaption>{cp.community_caption}</figcaption></figure>
+      {cph && <figure class="hphoto side"><img src={p800(cph)} alt={cph.alt} width="800" height="1067" fetchpriority="high" /><figcaption>{cp.community_caption}</figcaption></figure>}
     </div>
   </section>
 

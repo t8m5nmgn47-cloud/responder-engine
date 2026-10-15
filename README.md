@@ -160,6 +160,10 @@ Every field the `department` template reads. Paths are relative to the JSON root
 | `iso_page.work`, `.hours_member`, `.hours_dept`, `.peers[]`, `.state_stats[]`, `.kind` | (0.9.1, optional) | the rating page's "What it takes" section: a twelve-month strip of the tests, drills and paperwork (`work.year[] {label, months[], kind: drill|test|drive, note?}`, with a sensible default), hour figures (0 hides each), the four inspection-day steps (`work.inspection[] {t, d}`), and a comparison by department type: `peers[] {class, kind: municipal|rural, label?}` drawn as dots on a 1–10 ladder (no names), the department's own dot added from `rating` on the `kind` row (default `rural`), plus `state_stats[] {v, k}` tiles. |
 | (0.10.0) | | long single-column sections now use a `.split` layout: the readable column plus a sticky aside that carries something useful (a department photo from `photos.*`, a next-step card, the contact map from `district.map_embed`, the rating saving on the support page when `iso_page` is set). Pages touched: safety (smoke-alarm form, 911 steps), join (what you get, the road in, the form), contact, about (history, officers when two or fewer), community (morning after, FAQ), support (where a gift goes), responses (the list, with the incident-report card folded in), shop (how it works), members. |
 | `iso_page.nav_main`, `store.nav` | (0.10.1, optional) | `iso_page.nav_main: true` puts the rating page in the main nav as "ISO Class N" (or give it a string for another label); otherwise it sits in the footer list. `store.nav: false` moves the shop out of the main nav into the footer list (the home strip and any `tasks` tile stay). Keep the main nav at nine items or fewer. |
+| (0.10.2) photos optional | | every template renders a department with no photos at all (`photos: {}`, no `hero_photo`/`hero_bg`, no rig, program, chief, news or feature photos). Reserved "photograph goes here" slots appear only when at least one item in that set has a photo; otherwise rig, program and door cards are text cards and the feature band becomes title-left/text-right. `site.config.json` `"patch": false` omits the patch from header, hero and footer until the department supplies one. |
+| `copy.support_h2`, `copy.support_h2b` | (0.10.2, optional) | the home support headline's two halves (default "The rigs are paid for." / "The rest is us."). |
+| `phones.fax` | (0.10.2) | an empty or missing fax hides the fax line in the footer and on the contact page. |
+| (0.10.2) long names | | `short` over 18 characters adds `brand-long` to the header (smaller name, may wrap to two lines, tighter nav); over 26 adds `brand-xlong`. Fixed in the same release: the header rail had zero side gutter at exactly the container width (1366 showed Join flush against the edge), and a nine-item nav between 1025 and 1344px hid its links without showing the Menu button. |
 | `photos.<key>.src`, `.alt` | string | keys used: `chief_engine`, `structure`, `glow`, `community`, `members_dog`, `dog_window`, `squad`. Pages derive the responsive 800px variant with `src.replace('.jpg', '-800.jpg')`, so every photo needs a `-800.jpg` sibling in `public/photos/`. |
 
 Present in Paw Paw's data but not read by any template: `short`, `email`, `phones.emergency`, `stats.apparatus`,
@@ -233,7 +237,25 @@ git push && git push --tags           # tag is v0.x.y
 npm publish --access public           # once the package is published to a registry
 ```
 
-Department repos pin a caret range (`^0.1.0`) and pick up patch and minor releases with `npm update`.
+Department repos pin a tag (`github:t8m5nmgn47-cloud/responder-engine#v0.10.2`) and move forward deliberately.
+
+### Working with more than one session or agent (0.10.2)
+
+Several Claude sessions (or people) may work on departments at once. The engine is the one shared thing, so:
+
+1. **One writer on the engine at a time.** Before editing this repo, `git fetch origin && git status`, then say
+   "I have the engine" in whatever notes you hand back. Everyone else builds department content against the
+   latest tag; that is the normal case, since a new department needs content, not engine edits.
+2. **Tags are the contract.** Department `package.json` pins a tag, never a branch or `main`. A session that needs
+   an engine change writes it up (what breaks, what it should do) and hands it to whoever has the engine,
+   rather than patching a private copy. Repeated local patches are how chimera code happens.
+3. **No history rewrites on main.** `git pull` before `git push`. If main diverged, merge; never rebase, amend or
+   force-push a commit someone may already have pulled.
+4. **Every release gets a `CHANGELOG.md` entry and a tag** so the next session reads what changed instead of
+   re-discovering it. Bump `package.json`, add the entry, commit, `git tag v0.x.y`, push both.
+5. **Pixels before "done".** Build the photo-free test department, Paw Paw and the newest live department;
+   screenshot at 1366 and 390 (and 1200 for a nine-item nav); diff the normalized `dist/` trees against the
+   previous tag's build. Structure passing says nothing about how it looks.
 
 ## Feedback widget (0.5.0): guided review + markup
 

@@ -57,7 +57,7 @@ html.big{font-size:130%}
 .bar .em{color:#ffd0c8;font-weight:700}
 .bar .wrap{border-bottom:1px solid rgba(255,255,255,.1)}
 .top{position:sticky;top:0;z-index:50;background:rgba(29,29,31,.97);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:4px solid var(--red);color:#fff}
-.rail{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:4.75rem;padding:.6rem 0}
+.rail{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:4.75rem;padding-block:.6rem}
 .brand{display:flex;align-items:center;gap:.8rem;text-decoration:none;color:#fff}
 .brand .mk{width:2.75rem;height:auto;flex:none;display:block}
 .brand .bn{font:700 clamp(1.7rem,1.3rem + 1.2vw,2.3rem)/1 var(--display);letter-spacing:.03em;text-transform:uppercase;color:#fff}
@@ -84,7 +84,7 @@ html.big{font-size:130%}
 }
 /* 0.8.0: a nav with nine or more items (weather page + shop) collapses to the menu button sooner (media rems are 16px) */
 @media (max-width:84rem){
-  .nav-wide .nav-wide .menu-btn{display:inline-flex;align-items:center;gap:.5rem}
+  .nav-wide .menu-btn{display:inline-flex;align-items:center;gap:.5rem}
   .nav-wide .nav{display:none;position:absolute;left:0;right:0;top:100%;background:var(--char);border-bottom:4px solid var(--red);padding:.5rem var(--gutter) 1.25rem}
   .nav-wide .nav.open{display:block}
   .nav-wide .nav ul{flex-direction:column;align-items:stretch;gap:0}
@@ -92,6 +92,11 @@ html.big{font-size:130%}
   .nav-wide .nav a:hover,.nav a[aria-current=page]{border-bottom-color:var(--brass)}
   .nav-wide .nav a.cta,.nav a.cta[aria-current=page]{margin:.9rem 0 0;text-align:center;border:0}
 }
+/* 0.10.2: a long department name in the header shrinks and may wrap to two lines instead of pushing the nav off screen */
+.brand-long .brand .bn{font-size:clamp(1.3rem,1rem + .8vw,1.7rem);line-height:.95;display:block;max-width:14em}
+.brand-xlong .brand .bn{font-size:clamp(1.15rem,.9rem + .7vw,1.45rem);max-width:13em}
+@media (min-width:64.01rem){.brand-long .nav ul{gap:clamp(.5rem,.9vw,.9rem)}.brand-long .nav a{font-size:.9rem;letter-spacing:.04em}.brand-long .nav a.cta{padding:.75rem .9rem}}
+
 /* 0.8.0: a wide nav on a desktop screen: tighter items and a smaller brand so nine items fit the 76rem container */
 @media (min-width:84.01rem){
   .nav-wide .nav ul{gap:clamp(.5rem,.9vw,.9rem)}

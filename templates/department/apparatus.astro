@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import d from '@content/dept.json';
 import { copy } from '../../components/copy.js';
 const cp = copy(d);
+const rigPhotos = (d.apparatus || []).some((r: any) => r.photo); // 0.10.2: reserved slots only when some rigs have photos
 const ap = (d as any).photos?.apparatus_hero as { src: string; alt: string; caption?: string } | undefined;
 ---
 <Base title="Apparatus" description={cp.apparatus_meta}>

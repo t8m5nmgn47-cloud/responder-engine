@@ -10,7 +10,7 @@ import review from '@review';
 import Feedback from '../components/Feedback.astro';
 const hasReview = Array.isArray((review as any).items) && (review as any).items.length > 0;
 const analytics = siteConfig.analytics || '';
-const patch = (siteConfig as any).patch || '/patch.svg';
+const patch: string = (siteConfig as any).patch === false ? '' : ((siteConfig as any).patch || '/patch.svg'); // 0.10.2: patch:false omits it
 // Feedback widget (0.5.0): `"feedback": { "site": "<slug>", "endpoint"?: "<url>" }` renders components/Feedback.astro
 // once per page (guided review of review.json items + free markup). Absent, nothing is emitted.
 const fbCfg = (siteConfig as any).feedback;
@@ -79,7 +79,7 @@ const jsonld = {
     <meta property="og:type" content="website" />
     <meta name="theme-color" content="#b3261e" />
     <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32" />
-    {patch.endsWith(".svg") && <link rel="icon" href={patch} type="image/svg+xml" />}
+    {patch && patch.endsWith(".svg") && <link rel="icon" href={patch} type="image/svg+xml" />}
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -152,10 +152,10 @@ const jsonld = {
         <span class="st-upd">Updated {new Date(status.updated + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
       </div>
     </div>
-    <header class={`top${nav.length >= 9 ? " nav-wide" : ""}`} id="top">
+    <header class={`top${nav.length >= 9 ? " nav-wide" : ""}${cp.short.length > 18 ? " brand-long" : ""}${cp.short.length > 26 ? " brand-xlong" : ""}`} id="top">
       <div class="wrap rail">
         <a class="brand" href="/" aria-label={`${d.name} home`}>
-          <img class="mk" src={patch} alt="" width="44" height="50" />
+          {patch && <img class="mk" src={patch} alt="" width="44" height="50" />}
           <span><span class="bn">{cp.short}</span><span class="bs">{cp.header_tagline}</span></span>
         </a>
         <button class="menu-btn" type="button" aria-expanded="false" aria-controls="nav">Menu</button>
@@ -172,7 +172,7 @@ const jsonld = {
       <div class="wrap">
         <div class="cols">
           <div class="fid">
-            <img class="fpatch" src={patch} alt="" width="64" height="74" loading="lazy" />
+            {patch && <img class="fpatch" src={patch} alt="" width="64" height="74" loading="lazy" />}
             <h2>{d.name}</h2>
             <p class="about">{cp.footer_about ?? `${d.company}. ${cp.footer_kind} protecting ${cp.territory}, ${d.district.area_sq_mi > 0 ? `about ${d.district.area_sq_mi} square miles of ` : 'in '}${cp.county}, ${cp.state_name}.`}</p>
           </div>
@@ -181,7 +181,7 @@ const jsonld = {
             <ul>
               <li>Emergency: 911</li>
               <li>Station: <a href={tel(d.phones.station)}>{d.phones.station}</a></li>
-              <li>Fax: <span class="tn">{d.phones.fax}</span></li>
+              {d.phones.fax && <li>Fax: <span class="tn">{d.phones.fax}</span></li>}
               <li>{a.street}, {a.city}, {a.state} {a.zip}</li>
               <li><a href={d.facebook} rel="noopener">Facebook</a></li>
               {feed && feed.url && <li class="feed"><a href={feed.url} rel="noopener">Listen live: {feed.label}</a><br /><span class="fnote">Public scanner feed, run by volunteers. Not an official source.</span></li>}

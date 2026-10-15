@@ -3,13 +3,14 @@ import Base from '../../layouts/Base.astro';
 import DistrictMap from '../../components/DistrictMap.astro';
 import d from '@content/dept.json';
 import { copy } from '../../components/copy.js';
+import { pick, p800 } from '../../components/photos.js';
 const cp = copy(d);
 import inc from '@content/incidents.json';
 import ev from '@content/events.json';
 import FacebookFeed from '../../components/FacebookFeed.astro';
 import ProgramCards from '../../components/ProgramCards.astro';
 import siteConfig from '@siteconfig';
-const patch = (siteConfig as any).patch || '/patch.svg';
+const patch: string = (siteConfig as any).patch === false ? '' : ((siteConfig as any).patch || '/patch.svg'); // 0.10.2: patch:false omits it
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 const latest = d.news.slice(0, 3);
 const runs = inc.incidents.slice(0, 3);
@@ -19,11 +20,14 @@ const meeting = future.find((e) => e.type === 'meeting');
 const upcoming = future.filter((e) => e !== meeting).slice(0, 3);
 const tasks: { label: string; href: string; icon?: string }[] = ((d as any).tasks || []).slice(0, 6);
 const programs: any[] = (d as any).programs || [];
+const rigPhotos = (d.apparatus || []).slice(0, 4).some((r: any) => r.photo); // 0.10.2
 // "Right now" cards (0.3.4): hiring notices, upcoming events, anything current. Hidden when absent.
 const notices: { kind?: string; title: string; text: string; date?: string; href: string; cta?: string }[] = (d as any).notices || [];
 const noticeTag: Record<string, string> = { hiring: 'Now hiring', event: 'Event', notice: 'Notice' };
 // Optional feature-block photo (0.3.4): `feature.photo {src, alt, aspect?}` instead of photos.chief_engine.
-const featPhoto = (cp.feature && (cp.feature as any).photo) || d.photos.chief_engine;
+const featPhoto = (cp.feature && (cp.feature as any).photo) || pick(d, 'chief_engine');
+const doorA = pick(d, 'structure'), doorB = pick(d, 'community'), doorC = pick(d, 'glow');
+const heroPhoto = d.hero_photo && d.hero_photo.src ? d.hero_photo : null;
 const featAspect = (cp.feature && (cp.feature as any).photo && (cp.feature as any).photo.aspect) || '';
 const fmtLong = (s: string) => new Date(s + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 const fmt = (s: string) => new Date(s + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -53,7 +57,7 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
   <section class="hero-x" aria-label="Welcome" style={[d.hero_bg ? `--hero-bg:url(${d.hero_bg.src});--hero-bg-800:url(${d.hero_bg.src.replace(/\.jpg$/, "-800.jpg")});--hero-pos:${d.hero_bg.position || "center 40%"}` : "", d.hero_patch_scale ? `--hpatch-scale:${d.hero_patch_scale}` : ""].filter(Boolean).join(";") || undefined}>
     <div class="wrap">
       <div class={`hx${compact ? " compact" : ""}`}>
-        <img class="hpatch" src={patch} alt={`${d.name} patch`} width="140" height="161" loading="eager" />
+        {patch && <img class="hpatch" src={patch} alt={`${d.name} patch`} width="140" height="161" loading="eager" />}
         <p class="kicker">{d.tagline} · {cp.county} · Since {d.founded}</p>
         <h1>{cp.hero_h1}</h1>
         <p class="lede">{cp.hero_lede}</p>
@@ -93,16 +97,17 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
     </div>
   </section>
 
-  {!hide.has("groupband") && <figure class="groupband"><img src={d.hero_photo.src} alt={d.hero_photo.alt} width="1100" height="400" loading="eager" /><figcaption><div class="wrap">{d.hero_photo.caption}</div></figcaption></figure>}
+  {!hide.has("groupband") && heroPhoto && <figure class="groupband"><img src={heroPhoto.src} alt={heroPhoto.alt} width="1100" height="400" loading="eager" /><figcaption><div class="wrap">{heroPhoto.caption}</div></figcaption></figure>}
 
 
   {cp.feature && !hide.has("feature") && <section class="section feat">
     <div class="wrap">
-      <div class="featgrid" data-reveal-group>
-        <img src={featPhoto.src.replace(".jpg","-800.jpg")} alt={featPhoto.alt} width="800" height="1067" loading="lazy" style={featAspect ? `aspect-ratio:${featAspect}` : undefined} />
+      <div class={`featgrid${featPhoto ? "" : " solo"}`} data-reveal-group>
+        {featPhoto ? <img src={p800(featPhoto)} alt={featPhoto.alt} width="800" height="1067" loading="lazy" style={featAspect ? `aspect-ratio:${featAspect}` : undefined} />
+          : <div><p class="kicker">{cp.feature.kicker}</p><h2>{cp.feature.title}</h2></div>}
         <div>
-          <p class="kicker">{cp.feature.kicker}</p>
-          <h2>{cp.feature.title}</h2>
+          {featPhoto && <p class="kicker">{cp.feature.kicker}</p>}
+          {featPhoto && <h2>{cp.feature.title}</h2>}
           <p class="lede">{cp.feature.text}</p>
           <p style="margin-top:1.25rem"><a class="btn" href={cp.feature.href}>{cp.feature.link_label}</a></p>
         </div>
@@ -154,7 +159,7 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
       <div class="head" data-reveal><p class="kicker">On the floor</p><h2>{cp.rigs_title}</h2></div>
       <div class="rigs" data-reveal-group>
         {d.apparatus.slice(0, 4).map((r) => (
-          <div class="rig">{r.photo ? <img class="rphoto" src={r.photo.replace(".jpg","-800.jpg")} alt={r.alt || `${r.kind} ${r.id}`} loading="lazy" width="800" height="600" /> : <div class="photo" role="img" aria-label={`Reserved for a photograph of ${r.kind} ${r.id}`}></div>}<div class="in"><div class="id">{r.id}</div><div class="kind">{r.kind}{r.year ? ` · ${r.year}` : ""}</div>{r.make && <div class="mk">{r.make}</div>}{r.spec && <div class="sp">{r.spec}</div>}</div></div>
+          <div class="rig">{r.photo ? <img class="rphoto" src={r.photo.replace(".jpg","-800.jpg")} alt={r.alt || `${r.kind} ${r.id}`} loading="lazy" width="800" height="600" /> : (rigPhotos ? <div class="photo" role="img" aria-label={`Reserved for a photograph of ${r.kind} ${r.id}`}></div> : null)}<div class="in"><div class="id">{r.id}</div><div class="kind">{r.kind}{r.year ? ` · ${r.year}` : ""}</div>{r.make && <div class="mk">{r.make}</div>}{r.spec && <div class="sp">{r.spec}</div>}</div></div>
         ))}
       </div>
       {cp.rigs_note && <p class="small rignote">{cp.rigs_note}</p>}
@@ -172,10 +177,10 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
 
   {!hide.has("doors") && <section class="section band">
     <div class="wrap">
-      <div class="doors three pdoors" data-reveal-group>
-        <a class="door" href="/safety/#911"><span class="tag">Safety</span><img src={d.photos.structure.src.replace(".jpg","-800.jpg")} alt={d.photos.structure.alt} loading="lazy" width="800" height="600" /><h3>What happens when you call 911</h3><p>{cp.call_door}</p><span class="go">How it works</span></a>
-        <a class="door" href="/community/"><span class="tag">Community</span><img src={d.photos.community.src.replace(".jpg","-800.jpg")} alt={d.photos.community.alt} loading="lazy" width="800" height="1067" /><h3>For residents</h3><p>{cp.community_door}</p><span class="go">Community</span></a>
-        <a class="door" href="/memorial/"><span class="tag char">Memorial</span><img src={d.photos.glow.src.replace(".jpg","-800.jpg")} alt={d.photos.glow.alt} loading="lazy" width="800" height="1067" /><h3>In memory</h3><p>{cp.memorial_door}</p><span class="go">Memorial</span></a>
+      <div class={`doors three pdoors${doorA || doorB || doorC ? "" : " nophoto"}`} data-reveal-group>
+        <a class="door" href="/safety/#911"><span class="tag">Safety</span>{doorA && <img src={p800(doorA)} alt={doorA.alt} loading="lazy" width="800" height="600" />}<h3>What happens when you call 911</h3><p>{cp.call_door}</p><span class="go">How it works</span></a>
+        <a class="door" href="/community/"><span class="tag">Community</span>{doorB && <img src={p800(doorB)} alt={doorB.alt} loading="lazy" width="800" height="1067" />}<h3>For residents</h3><p>{cp.community_door}</p><span class="go">Community</span></a>
+        <a class="door" href="/memorial/"><span class="tag char">Memorial</span>{doorC && <img src={p800(doorC)} alt={doorC.alt} loading="lazy" width="800" height="1067" />}<h3>In memory</h3><p>{cp.memorial_door}</p><span class="go">Memorial</span></a>
       </div>
     </div>
   </section>}
@@ -214,7 +219,7 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
   {!hide.has("support") && <section class="section redband cut up">
     <div class="wrap">
       <div class="seasonal">
-        <div><p class="kicker">Support</p><h2 style="margin-top:.4rem">The rigs are paid for. <span>The rest is us.</span></h2><p style="margin-top:.6rem;max-width:56ch">{cp.support_blurb}</p></div>
+        <div><p class="kicker">Support</p><h2 style="margin-top:.4rem">{cp.support_h2} <span>{cp.support_h2b}</span></h2><p style="margin-top:.6rem;max-width:56ch">{cp.support_blurb}</p></div>
         <div><a class="btn light" href="/support/">Support the department</a></div>
       </div>
     </div>
@@ -228,6 +233,10 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
     .featgrid h2+.lede{margin-top:1rem}
     .featgrid img{width:100%;max-width:26rem;height:auto;aspect-ratio:3/4;object-fit:cover;border-radius:2px;border:4px solid var(--card);box-shadow:0 10px 30px rgba(0,0,0,.18)}
     @media (min-width:60rem){.featgrid{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:3.5rem}}
+    /* 0.10.2: no feature photo: title on the left, text on the right, so the band does not sit half empty */
+    .featgrid.solo{align-items:start}
+    .featgrid.solo .lede{max-width:52ch;margin-top:0}
+    @media (min-width:60rem){.featgrid.solo{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:4rem}.featgrid.solo>div:last-child{padding-top:.5rem}}
     .two{display:grid;gap:2.5rem;grid-template-columns:1fr}
     @media (min-width:60rem){.two{grid-template-columns:1fr 1fr}}
     .mini{display:grid;gap:0;border-top:1px solid var(--rule)}
@@ -274,6 +283,9 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
     .pdoors .door{padding-top:0;overflow:hidden;border-top:0}
     .pdoors .door img{display:block;width:calc(100% + 3.2rem);max-width:none;height:auto;margin:0 -1.6rem 1.1rem;aspect-ratio:3/2;object-fit:cover}
     .pdoors .door h3{font-size:1.7rem}
+    /* 0.10.2: no door photos: the tag sits in flow above the heading instead of over a missing image */
+    .pdoors.nophoto .door{padding-top:1.5rem;border-top:5px solid var(--red)}
+    .pdoors.nophoto .door .tag{position:static;align-self:flex-start;margin-bottom:.2rem}
     .nowband{background:var(--char);color:var(--char-ink);padding-top:2rem;padding-bottom:2.25rem}
     .nowband .head .kicker{color:var(--brass)}
     .nowband .head .kicker::after{background:var(--brass)}
