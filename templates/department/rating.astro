@@ -90,7 +90,26 @@ const spread = (list: any[]) => { const by: Record<string, any[]> = {}; list.for
     </div>
   </section>
 
-  <section class="section">
+  <section class="section work" id="what-it-takes">
+    <div class="wrap">
+      <div class="head" data-reveal><p class="kicker">{work.kicker || 'What it takes'}</p><h2>{work.title || `A year of keeping a ${cls}`}</h2></div>
+      <p class="lede" style="max-width:62ch">{work.intro || `Nobody is paid for the rating. It is earned on Tuesday nights and Saturday mornings by people who have already worked a shift somewhere else, and it has to be earned again every year.`}</p>
+      <figure class="yearstrip" aria-label="A calendar year of the tests, drills and paperwork that keep the rating.">
+        <div class="ys-head"><span class="ys-label"></span>{months.map((m) => <span class="ys-m">{m}</span>)}</div>
+        <ol class="ys-rows">{yearItems.map((it) => <li class={`ys-row ${it.kind}`}><span class="ys-label">{it.label}{it.note && <span class="ys-note">{it.note}</span>}</span>{months.map((m, i) => <span class={`ys-cell${it.months.includes(i + 1) ? ' on' : ''}`} aria-hidden="true"></span>)}</li>)}</ol>
+      </figure>
+      {(hoursMember > 0 || hoursDept > 0) && <div class="stats fit" data-reveal-group style="margin-top:1.75rem">
+        {hoursMember > 0 && <div class="stat"><div class="v" data-count>{hoursMember}</div><div class="k">{work.hours_member_label || 'Hours a year, one active member, before a single call'}</div></div>}
+        {hoursDept > 0 && <div class="stat"><div class="v" data-count>{hoursDept.toLocaleString('en-US')}</div><div class="k">{work.hours_dept_label || 'Unpaid hours a year across the department'}</div></div>}
+        <div class="stat"><div class="v">{usd(saved(worst))}</div><div class="k">Saved on one {usd(base)} policy, every year</div></div>
+      </div>}
+      <div class="head" data-reveal style="margin-top:2.5rem"><p class="kicker">{work.inspect_kicker || 'Inspection day'}</p><h2>{work.inspect_title || 'Then the state comes to check'}</h2></div>
+      <ol class="insp" data-reveal-group>{inspect.map((x, i) => <li><span class="n">{i + 1}</span><h3>{x.t}</h3><p>{x.d}</p></li>)}</ol>
+      <p class="small" style="margin-top:1.25rem;max-width:64ch">{work.note || `The equation is simple and nobody says it out loud: the hours above are what the savings below are made of. Take away the hours and the district is a ${worst || '9'}. Here is what that is worth to your house.`}</p>
+    </div>
+  </section>
+
+  <section class="section band">
     <div class="wrap">
       <div class="two">
         <div>
@@ -106,7 +125,7 @@ const spread = (list: any[]) => { const by: Record<string, any[]> = {}; list.for
     </div>
   </section>
 
-  <section class="section band calc" id="calculator">
+  <section class="section calc" id="calculator">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">Your house</p><h2>{ip.calc_title || `What Class ${cls} saves you`}</h2></div>
       <form class="cform" data-calc data-ours={ours} data-oursm={oursM} data-far={f(worst)} data-farm={f(worst, 1)} data-ten={f('10')} data-tenm={f('10', 1)} data-years={years} onsubmit="return false">
@@ -136,26 +155,7 @@ const spread = (list: any[]) => { const by: Record<string, any[]> = {}; list.for
     </div>
   </section>}
 
-  <section class="section band work" id="what-it-takes">
-    <div class="wrap">
-      <div class="head" data-reveal><p class="kicker">{work.kicker || 'What it takes'}</p><h2>{work.title || `A year of keeping a ${cls}`}</h2></div>
-      <p class="lede" style="max-width:62ch">{work.intro || `Nobody is paid for the rating. It is earned on Tuesday nights and Saturday mornings by people who have already worked a shift somewhere else, and it has to be earned again every year.`}</p>
-      <figure class="yearstrip" aria-label="A calendar year of the tests, drills and paperwork that keep the rating.">
-        <div class="ys-head"><span class="ys-label"></span>{months.map((m) => <span class="ys-m">{m}</span>)}</div>
-        <ol class="ys-rows">{yearItems.map((it) => <li class={`ys-row ${it.kind}`}><span class="ys-label">{it.label}{it.note && <span class="ys-note">{it.note}</span>}</span>{months.map((m, i) => <span class={`ys-cell${it.months.includes(i + 1) ? ' on' : ''}`} aria-hidden="true"></span>)}</li>)}</ol>
-      </figure>
-      {(hoursMember > 0 || hoursDept > 0) && <div class="stats fit" data-reveal-group style="margin-top:1.75rem">
-        {hoursMember > 0 && <div class="stat"><div class="v" data-count>{hoursMember}</div><div class="k">{work.hours_member_label || 'Hours a year, one active member, before a single call'}</div></div>}
-        {hoursDept > 0 && <div class="stat"><div class="v" data-count>{hoursDept.toLocaleString('en-US')}</div><div class="k">{work.hours_dept_label || 'Unpaid hours a year across the department'}</div></div>}
-        <div class="stat"><div class="v">{usd(saved(worst))}</div><div class="k">Saved on one {usd(base)} policy, every year</div></div>
-      </div>}
-      <div class="head" data-reveal style="margin-top:2.5rem"><p class="kicker">{work.inspect_kicker || 'Inspection day'}</p><h2>{work.inspect_title || 'Then the state comes to check'}</h2></div>
-      <ol class="insp" data-reveal-group>{inspect.map((x, i) => <li><span class="n">{i + 1}</span><h3>{x.t}</h3><p>{x.d}</p></li>)}</ol>
-      <p class="small" style="margin-top:1.25rem;max-width:64ch">{work.note || `The equation is simple and nobody says it out loud: the hours above are what the savings below are made of. Take away the hours and the district is a ${worst || '9'}.`}</p>
-    </div>
-  </section>
-
-  {(peers.length > 0 || stateStats.length > 0) && <section class="section tight peers">
+  {(peers.length > 0 || stateStats.length > 0) && <section class="section band peers">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">{ip.peers_kicker || 'For comparison'}</p><h2>{ip.peers_title || 'Where a volunteer district usually lands'}</h2></div>
       {peers.length > 0 && <figure class="peerladder" aria-label={`Protection classes of nearby departments by type. ${cp.place} is a ${cls}.`}>
