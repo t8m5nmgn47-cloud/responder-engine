@@ -4,6 +4,8 @@ import d from '@content/dept.json';
 import { copy } from '../../components/copy.js';
 const cp = copy(d);
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
+// Optional career / paid-position block (0.3.4): `careers {kicker?, title, text, cta?, href?}` renders a #career section.
+const careers = (d as any).careers as { kicker?: string; title: string; text: string; cta?: string; href?: string } | undefined;
 ---
 <Base title="Join" description={`Become a volunteer firefighter with the ${d.name}. Training, gear and a pager are provided; what it takes, what you get, and how to start.`}>
   <section class="phero two" style={`--pbg:url(${d.photos.members_dog.src})`}>
@@ -53,7 +55,7 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
         <li><h3>{cp.cert_short}.</h3><p>{cp.cert_step}</p></li>
         <li><h3>Your first call.</h3><p>The tones go off, you drive to the station, and you're on the rig. Everyone remembers theirs.</p></li>
       </ol>
-      <p class="small" style="margin-top:1.5rem;max-width:62ch">The department to confirm the steps and timing. The National Volunteer Fire Council's <a href="https://makemeafirefighter.org" rel="noopener">Make Me A Firefighter</a> site answers the general questions, and lists departments near you.</p>
+      <p class="small" style="margin-top:1.5rem;max-width:62ch">{cp.join_steps_note ? cp.join_steps_note + ' ' : ''}The National Volunteer Fire Council's <a href="https://makemeafirefighter.org" rel="noopener">Make Me A Firefighter</a> site answers the general questions, and lists departments near you.</p>
     </div>
   </section>
 
@@ -65,6 +67,16 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
       </div>
     </div>
   </section>
+
+  {careers && <section class="section band" id="career">
+    <div class="wrap">
+      <div class="head" data-reveal><p class="kicker">{careers.kicker || 'Career positions'}</p><h2>{careers.title}</h2></div>
+      <div class="prose" style="max-width:62ch">
+        <p>{careers.text}</p>
+        <p style="margin-top:1.25rem"><a class="btn red" href={careers.href || tel(d.phones.station)}>{careers.cta || 'Call the station'}</a></p>
+      </div>
+    </div>
+  </section>}
 
   <section class="section" id="apply">
     <div class="wrap">

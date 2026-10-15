@@ -7,7 +7,7 @@ stylesheet of a volunteer fire department website. A department's own repository
 (`site.config.json`, `content/*.json`), its photos and patch (`public/`), and a six-line `astro.config.mjs`.
 Upgrading every department site is a version bump of this package.
 
-Templates shipped today:
+Templates shipped today (0.3.4 adds an optional `/review` page, see `content/review.json`):
 
 | template     | pages |
 |--------------|-------|
@@ -142,6 +142,10 @@ Every field the `department` template reads. Paths are relative to the JSON root
 | `copy.about_h1`, `.news_source`, `.year_counts_note`, `.pagers_step`, `.drive_step`, `.knox_box`, `.station_tours`, `.incident_reports`, `.honor_guard_title`, `.roster_note`, `.join_people`, `.join_address_label`, `.juniors_lede`, `.stat_247`, `.footer_about`, `.header_tagline` | string (0.3.3, optional) | more Paw Paw sentences made overridable: the about hero headline; the news-page source phrase ("as reported in …"); the note under the calls-by-year chart (`""` hides it); the heading and body of the "pagers go off" and "drive to the station" steps on the safety page; the Knox Box, station tours and incident reports tiles on the community page; the honor guard heading and the captains roster note (`""` hides it) on the members page; the "forty people who will come when you call" phrase and the address label on the join form; the junior-program lede (default counts `stats.juniors`, or a generic sentence when 0); the home "24/7" stat label; a single footer "about" sentence replacing the assembled one; the header tagline under the department name (default `<station_label> · Est. <founded>`). |
 | `programs[].photo_position` | string (0.3.3, optional) | CSS `object-position` for a program card's photo, such as `center 70%`. Program-card photos are 4:3 from 0.3.3. |
 | `incidents[].n`, `.units`, `.members`, `.source` | (0.3.3) | the responses page hides the incident number when it is blank or a `YY-000…` placeholder, hides the units/members line when both are empty or 0, and shows a "Source" link when `source` is set. The calls-by-year section is hidden when `year_counts` is empty. |
+| `notices` | `{kind, title, text, date?, href, cta?}[]` (0.3.4, optional) | a "Right now" band of two-up charcoal cards directly under the hero and task tiles, before the stat band. `kind` is `hiring`, `event` or `notice` (sets the red tag text: Now hiring / Event / Notice); `date` (`YYYY-MM-DD`) renders as a brass "Saturday, October 24" line; `cta` is the link label (default "Details"). Hidden when absent. |
+| `careers` | `{kicker?, title, text, cta?, href?}` (0.3.4, optional) | a `#career` section on the join page, before the apply form, for a paid position or career-staff notice; `href` defaults to the station phone and `cta` to "Call the station". Hidden when absent. |
+| `feature.photo` | `{src, alt, aspect?}` (0.3.4, optional) | the home feature block's photo instead of `photos.chief_engine`; `aspect` such as `4/3` overrides the default 3:4 portrait frame. |
+| `copy.join_steps_note`, `.youth_note` | string (0.3.4, optional) | the "department to confirm" footnotes under the join-page steps and the junior-program page; `""` hides them. |
 | `photos.<key>.src`, `.alt` | string | keys used: `chief_engine`, `structure`, `glow`, `community`, `members_dog`, `dog_window`, `squad`. Pages derive the responsive 800px variant with `src.replace('.jpg', '-800.jpg')`, so every photo needs a `-800.jpg` sibling in `public/photos/`. |
 
 Present in Paw Paw's data but not read by any template: `short`, `email`, `phones.emergency`, `stats.apparatus`,
@@ -169,6 +173,20 @@ Present in Paw Paw's data but not read by any template: `short`, `email`, `phone
 |---|---|---|
 | `events` | `{date, end?, time, title, where, text, type?, agenda_url?}[]` | news page and home; past events are filtered out at build time, each event gets an `.ics` download link |
 | `events[].type` | `"meeting"` (0.3) | the next upcoming event marked `meeting` renders a "Next board meeting" card on the home page (date, time, place, agenda link, link to the schedule on News & events) and is left out of the home's short upcoming list; the news page shows the `agenda_url` as an "Agenda" link |
+
+### `content/review.json` (0.3.4, optional)
+
+When this file exists the template gains `/review/`: a plain, print-friendly checklist of every open question the
+draft raises for the department, `noindex`, with the motion layer off, titled "Review checklist for <department>".
+The draft banner (`draft_note`) then ends with a "Chiefs: review checklist →" link. Delete the file at launch;
+Paw Paw has none, so its output is unchanged.
+
+| field | type | used for |
+|---|---|---|
+| `intro` | string | lede under the heading |
+| `contact.name`, `.email` | string | "Questions: …" line beside the buttons |
+| `reply_to`, `subject` | string, optional | the "Reply by email" mailto (defaults `hello@sitesforservice.org`, "<short name> review") |
+| `items[]` | `{id, question, why, where: string[], current, status}` | one numbered block each: the question in bold, "Why we ask", "Where it appears" as links (page paths, with optional `#anchor`), "What the draft shows now", and a "Your answer" line to write on. `status` is for the editors (`open` / `done`) and is not rendered. |
 
 ### `public/`
 

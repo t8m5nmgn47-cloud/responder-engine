@@ -1,0 +1,81 @@
+---
+// Review checklist (0.3.4). Rendered at /review/ only when content/review.json exists.
+// A plain, print-friendly list of every open question the draft site raises for the department.
+import Base from '../../layouts/Base.astro';
+import d from '@content/dept.json';
+import review from '@review';
+import siteConfig from '@siteconfig';
+import { copy } from '../../components/copy.js';
+const cp = copy(d);
+const r = review as any;
+const items: { id: string; question: string; why?: string; where?: string[]; current?: string; status?: string }[] = r.items || [];
+const contact = r.contact || {};
+const replyTo = r.reply_to || 'hello@sitesforservice.org';
+const subject = r.subject || `${cp.short} review`;
+const mailto = `mailto:${replyTo}?subject=${encodeURIComponent(subject)}`;
+const site = ((siteConfig as any).domain || d.url || '').replace(/\/$/, '');
+const pageName = (p: string) => {
+  const map: Record<string, string> = { '/': 'Home', '/about/': 'About', '/apparatus/': 'Apparatus', '/responses/': 'Responses', '/safety/': 'Safety', '/community/': 'Community', '/news/': 'News & events', '/join/': 'Join', '/members/': 'Members', '/youth/': 'Junior program', '/memorial/': 'Memorial', '/support/': 'Support', '/contact/': 'Contact', '/accessibility/': 'Accessibility', '/escape-plan/': 'Escape plan' };
+  const base = p.replace(/#.*$/, '');
+  return map[base] ? `${map[base]}${p.includes('#') ? ' (' + p.slice(p.indexOf('#') + 1) + ')' : ''}` : p;
+};
+---
+<Base title="Review checklist" description={`Open questions for ${d.name} to answer before the draft website is published.`} noindex plain>
+  <section class="section tight rv">
+    <div class="wrap">
+      <p class="kicker">Draft site review</p>
+      <h1>Review checklist for {d.name}</h1>
+      {r.intro && <p class="lede rv-intro">{r.intro}</p>}
+      <div class="rv-acts">
+        <button class="btn red" type="button" onclick="window.print()">Print this checklist</button>
+        <a class="btn" href={mailto}>Reply by email</a>
+        {contact.name && <span class="small">Questions: {contact.name}{contact.email && <Fragment>, <a href={`mailto:${contact.email}`}>{contact.email}</a></Fragment>}</span>}
+      </div>
+      <p class="small rv-note">{items.length} items. Write on this page, or copy the numbered questions into an email to <a href={mailto}>{replyTo}</a>. The draft site is at <a href={site || '/'}>{site || 'this address'}</a>.</p>
+
+      <ol class="rv-list">
+        {items.map((it, i) => (
+          <li class="rv-item" id={it.id}>
+            <p class="rv-q"><span class="rv-n">{i + 1}.</span> <b>{it.question}</b></p>
+            {it.why && <p class="rv-row"><span class="rv-k">Why we ask</span><span>{it.why}</span></p>}
+            {it.where && it.where.length > 0 && <p class="rv-row"><span class="rv-k">Where it appears</span><span>{it.where.map((w, j) => <Fragment>{j > 0 && ', '}<a href={w}>{pageName(w)}</a></Fragment>)}</span></p>}
+            {it.current && <p class="rv-row"><span class="rv-k">What the draft shows now</span><span>{it.current}</span></p>}
+            <p class="rv-row rv-ans"><span class="rv-k">Your answer</span><span class="rv-line" aria-hidden="true"></span></p>
+          </li>
+        ))}
+      </ol>
+
+      <div class="rv-acts rv-end">
+        <button class="btn red" type="button" onclick="window.print()">Print this checklist</button>
+        <a class="btn" href={mailto}>Reply by email</a>
+      </div>
+    </div>
+  </section>
+  <style is:global>
+    .rv h1{font-size:clamp(2rem,1.5rem + 2vw,3rem);margin-top:.5rem}
+    .rv-intro{max-width:64ch;margin-top:1rem}
+    .rv-acts{display:flex;flex-wrap:wrap;gap:.75rem 1.25rem;align-items:center;margin-top:1.5rem}
+    .rv-note{max-width:64ch;margin-top:1rem;color:var(--ink-lo)}
+    .rv-note a,.rv-row a{text-decoration:underline;text-underline-offset:.2em}
+    .rv-list{counter-reset:none;margin-top:2rem;border-top:2px solid var(--ink-hi);max-width:64rem}
+    .rv-item{padding:1.25rem 0 1.4rem;border-bottom:1px solid var(--rule);break-inside:avoid;page-break-inside:avoid}
+    .rv-q{font-size:1.15rem;line-height:1.35}
+    .rv-n{font:700 1.3rem/1 var(--display);color:var(--red);margin-right:.25rem}
+    .rv-row{display:grid;grid-template-columns:1fr;gap:.15rem .9rem;margin-top:.65rem;font-size:.95rem;max-width:72ch}
+    .rv-k{font:700 .75rem/1.4 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-lo)}
+    .rv-line{display:block;height:2.4rem;border-bottom:1px solid var(--ink);margin-top:.3rem}
+    .rv-ans{max-width:none}
+    @media (min-width:44rem){.rv-row{grid-template-columns:12rem 1fr}.rv-line{margin-top:1.2rem}}
+    .rv-end{margin-top:2rem}
+    @media print{
+      .bar,.status,.foot,.rv-acts,.draft{display:none!important}
+      .rv .wrap{max-width:none}
+      .rv h1{font-size:22pt}
+      .rv-item{padding:.6rem 0 .8rem}
+      .rv-row{font-size:10.5pt;margin-top:.35rem}
+      .rv-q{font-size:12pt}
+      .rv-line{height:2.6rem}
+      a{text-decoration:none;color:inherit}
+    }
+  </style>
+</Base>

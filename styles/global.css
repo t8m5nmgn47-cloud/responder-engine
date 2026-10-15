@@ -30,6 +30,8 @@ img,svg{display:block;max-width:100%}
 .skip:focus{top:1rem}
 .wrap{max-width:var(--max);margin:0 auto;padding:0 var(--gutter)}
 .draft{background:#fff4cc;color:#4a3b00;border-bottom:1px solid #e6d58a;font-size:.8125rem;text-align:center;padding:.45rem var(--gutter)}
+.draft-link{color:#4a3b00;font-weight:700;text-decoration:underline;text-underline-offset:.2em;white-space:nowrap}
+.draft-link:hover{color:var(--red)}
 
 /* ---------- status banner + text size ---------- */
 html.big{font-size:130%}

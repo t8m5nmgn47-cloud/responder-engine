@@ -62,18 +62,27 @@ export default function engine(options = {}) {
         if (!fs.existsSync(contentDir)) logger.warn(`no content/ directory at ${contentDir}`);
         if (!fs.existsSync(siteConfig)) logger.warn(`no site.config.json at ${siteConfig}`);
 
+        // Optional review checklist (0.3.4): when content/review.json exists the template gets a /review page
+        // and the draft banner links to it. `@review` resolves to the site's file, or to an empty stub so the
+        // layout can import it unconditionally.
+        const reviewFile = path.join(contentDir, 'review.json');
+        const hasReview = fs.existsSync(reviewFile);
+        const reviewAlias = hasReview ? reviewFile : fileURLToPath(new URL('./components/no-review.json', import.meta.url));
+
         updateConfig({
           vite: {
             resolve: {
               alias: [
                 { find: /^@content\/(.*)$/, replacement: path.join(contentDir, '$1') },
                 { find: '@siteconfig', replacement: siteConfig },
+                { find: '@review', replacement: reviewAlias },
               ],
             },
           },
         });
 
-        for (const [pattern, file] of routes) {
+        const all = hasReview ? [...routes, ['/review', 'review.astro']] : routes;
+        for (const [pattern, file] of all) {
           injectRoute({
             pattern,
             entrypoint: `${PKG}/templates/${template}/${file}`,

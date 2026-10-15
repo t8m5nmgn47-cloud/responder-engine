@@ -19,6 +19,12 @@ const meeting = future.find((e) => e.type === 'meeting');
 const upcoming = future.filter((e) => e !== meeting).slice(0, 3);
 const tasks: { label: string; href: string; icon?: string }[] = ((d as any).tasks || []).slice(0, 6);
 const programs: any[] = (d as any).programs || [];
+// "Right now" cards (0.3.4): hiring notices, upcoming events, anything current. Hidden when absent.
+const notices: { kind?: string; title: string; text: string; date?: string; href: string; cta?: string }[] = (d as any).notices || [];
+const noticeTag: Record<string, string> = { hiring: 'Now hiring', event: 'Event', notice: 'Notice' };
+// Optional feature-block photo (0.3.4): `feature.photo {src, alt, aspect?}` instead of photos.chief_engine.
+const featPhoto = (cp.feature && (cp.feature as any).photo) || d.photos.chief_engine;
+const featAspect = (cp.feature && (cp.feature as any).photo && (cp.feature as any).photo.aspect) || '';
 const fmtLong = (s: string) => new Date(s + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 const fmt = (s: string) => new Date(s + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 const s = d.seasonal;
@@ -47,6 +53,15 @@ const inSeason = s && s.start <= today && today <= s.end;
     </div>
   </nav>}
 
+  {notices.length > 0 && <section class="section tight nowband" aria-label="Right now">
+    <div class="wrap">
+      <div class="head" data-reveal><p class="kicker">Right now</p><h2 class="sr">Current notices</h2></div>
+      <div class="nows" data-reveal-group>
+        {notices.map((n) => <a class="now" href={n.href}><span class="tag">{noticeTag[n.kind || 'notice'] || n.kind}</span>{n.date && <time class="nd" datetime={n.date}>{fmtLong(n.date)}</time>}<h3>{n.title}</h3><p>{n.text}</p><span class="go">{n.cta || 'Details'}</span></a>)}
+      </div>
+    </div>
+  </section>}
+
   <section class="statband" aria-label="The department by the numbers">
     <div class="wrap">
       <div class="stats" data-reveal-group>
@@ -65,7 +80,7 @@ const inSeason = s && s.start <= today && today <= s.end;
   {cp.feature && <section class="section feat">
     <div class="wrap">
       <div class="featgrid" data-reveal-group>
-        <img src={d.photos.chief_engine.src.replace(".jpg","-800.jpg")} alt={d.photos.chief_engine.alt} width="800" height="1067" loading="lazy" />
+        <img src={featPhoto.src.replace(".jpg","-800.jpg")} alt={featPhoto.alt} width="800" height="1067" loading="lazy" style={featAspect ? `aspect-ratio:${featAspect}` : undefined} />
         <div>
           <p class="kicker">{cp.feature.kicker}</p>
           <h2>{cp.feature.title}</h2>
@@ -181,5 +196,19 @@ const inSeason = s && s.start <= today && today <= s.end;
     .pdoors .door{padding-top:0;overflow:hidden;border-top:0}
     .pdoors .door img{display:block;width:calc(100% + 3.2rem);max-width:none;height:auto;margin:0 -1.6rem 1.1rem;aspect-ratio:3/2;object-fit:cover}
     .pdoors .door h3{font-size:1.7rem}
+    .nowband{background:var(--char);color:var(--char-ink);padding-top:2rem;padding-bottom:2.25rem}
+    .nowband .head .kicker{color:var(--brass)}
+    .nowband .head .kicker::after{background:var(--brass)}
+    .nows{display:grid;gap:1rem;grid-template-columns:1fr;margin-top:1.25rem}
+    @media (min-width:52rem){.nows{grid-template-columns:1fr 1fr}}
+    .now{position:relative;display:flex;flex-direction:column;gap:.5rem;background:#2a2a2c;border:1px solid rgba(255,255,255,.08);border-top:4px solid var(--red);padding:1.25rem 1.4rem 1.4rem;text-decoration:none;color:var(--char-ink);min-width:0;transition:transform .2s var(--ease),border-color .2s}
+    .now .tag{align-self:flex-start}
+    .now .nd{font:700 .8rem/1.3 var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--brass)}
+    .now h3{font-size:1.6rem;line-height:1.05;color:#fff}
+    .now p{font-size:.95rem;color:rgba(243,239,230,.85);max-width:52ch}
+    .now .go{margin-top:auto;padding-top:.5rem;font:700 .85rem/1.3 var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--brass-hi)}
+    .now .go::after{content:" \2192"}
+    .now:hover{border-color:var(--brass);transform:translateY(-2px)}
+    .now:focus-visible{outline-color:var(--brass)}
   </style>
 </Base>

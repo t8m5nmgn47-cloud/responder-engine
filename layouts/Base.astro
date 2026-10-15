@@ -6,16 +6,19 @@ import { copy } from '../components/copy.js';
 const cp = copy(d);
 import status from '@content/status.json';
 import siteConfig from '@siteconfig';
+import review from '@review';
+const hasReview = Array.isArray((review as any).items) && (review as any).items.length > 0;
 const analytics = siteConfig.analytics || '';
 const patch = (siteConfig as any).patch || '/patch.svg';
 // Motion layer: `"motion": false` turns it all off; `"motion": { "counters": false }` keeps the
 // reveals but leaves the stat numbers static. Default is everything on. The browser's
 // prefers-reduced-motion setting always wins (checked in motion.css and in the script below).
 const motionCfg = (siteConfig as any).motion;
-const motionOn = motionCfg !== false;
+interface Props { title: string; description: string; noindex?: boolean; plain?: boolean; }
+const { title, description, noindex = false, plain = false } = Astro.props;
+// `plain` (0.3.4): a print-friendly page with no motion layer (the review checklist).
+const motionOn = motionCfg !== false && !plain;
 const countersOn = motionOn && !(motionCfg && typeof motionCfg === 'object' && motionCfg.counters === false);
-interface Props { title: string; description: string; }
-const { title, description } = Astro.props;
 const path = Astro.url.pathname;
 const full = path === '/' ? `${d.name} · ${cp.title_suffix}` : `${title} · ${d.name}`;
 const nav = [
@@ -57,6 +60,7 @@ const jsonld = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{full}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={new URL(path, Astro.site)} />
     <meta property="og:title" content={full} />
     <meta property="og:description" content={description} />
@@ -119,7 +123,7 @@ const jsonld = {
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
-    {d.draft_note && <p class="draft">{d.draft_note}</p>}
+    {d.draft_note && <p class="draft">{d.draft_note}{hasReview && path !== '/review/' && <Fragment> <a class="draft-link" href="/review/">Chiefs: review checklist &rarr;</a></Fragment>}</p>}
     <div class="bar">
       <div class="wrap">
         <span><b class="em">Emergency: 911</b></span>

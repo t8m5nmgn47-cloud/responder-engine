@@ -50,6 +50,8 @@ export function copy(d) {
     join_address_label: c.join_address_label ?? 'Where you live (street or area, and township)',
     juniors_lede: c.juniors_lede ?? (d.stats?.juniors ? `${cap(words(d.stats.juniors))} of the department's ${n} members are juniors: young people who train with the department, learn the equipment and the discipline, and step up to full membership when they come of age.` : 'Young people who train with the department, learn the equipment and the discipline, and step up to full membership when they come of age.'),
     stat_247: c.stat_247 ?? 'Volunteer response',
+    join_steps_note: c.join_steps_note ?? 'The department to confirm the steps and timing.',
+    youth_note: c.youth_note ?? "The department to confirm the program's age limits, requirements and permission form before this page is published.",
     footer_about: c.footer_about,
     header_tagline: c.header_tagline ?? `${station_label} · Est. ${d.founded}`,
     about_meta: c.about_meta ?? `The ${d.name}: organized as Paw Paw Fire Company No. 1 in 1868, all-volunteer ever since, serving five communities in Van Buren County from Station 1200. History, leadership, the Fire Board, and the station.`,

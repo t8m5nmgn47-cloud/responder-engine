@@ -24,7 +24,7 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
         <div class="fact"><h3>What juniors don't do</h3><p>Go inside a burning building, ride to calls without a supervising officer, or do anything the department's insurer and {cp.state_name} law reserve for certified adults. The rules exist to bring them home.</p></div>
         <div class="fact"><h3>Who it's for</h3><p>Students in the district with a parent's permission and grades that hold up. The department sets the age and the details; ask the chief's officers. If you're in school in {cp.schools} and this sounds like you, call.</p></div>
       </div>
-      <p class="small" style="margin-top:1.5rem;max-width:62ch">The department to confirm the program's age limits, requirements and permission form before this page is published.</p>
+      {cp.youth_note && <p class="small" style="margin-top:1.5rem;max-width:62ch" set:html={cp.youth_note} />}
     </div>
   </section>
 </Base>
