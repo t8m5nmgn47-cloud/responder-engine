@@ -11,8 +11,8 @@ import Feedback from '../components/Feedback.astro';
 const hasReview = Array.isArray((review as any).items) && (review as any).items.length > 0;
 const analytics = siteConfig.analytics || '';
 const patch = (siteConfig as any).patch || '/patch.svg';
-// Feedback widget (0.4.0): `"feedback": { "site": "<slug>", "endpoint"?: "<url>" }` renders components/Feedback.astro
-// once per page. Absent, nothing is emitted.
+// Feedback widget (0.5.0): `"feedback": { "site": "<slug>", "endpoint"?: "<url>" }` renders components/Feedback.astro
+// once per page (guided review of review.json items + free markup). Absent, nothing is emitted.
 const fbCfg = (siteConfig as any).feedback;
 const feedback = fbCfg && typeof fbCfg === 'object' && fbCfg.site
   ? { site: String(fbCfg.site), endpoint: String(fbCfg.endpoint || 'https://sitesforservice.org/api/site-feedback'), siteName: String(siteConfig.name || d.name) }
@@ -130,7 +130,7 @@ const jsonld = {
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
-    {d.draft_note && <p class="draft">{d.draft_note}{hasReview && path !== '/review/' && <Fragment> <a class="draft-link" href="/review/">Chiefs: review checklist &rarr;</a></Fragment>}{feedback && <Fragment> Tap &ldquo;Suggest a change&rdquo; to mark up any page.</Fragment>}</p>}
+    {d.draft_note && <p class="draft">{d.draft_note}{hasReview && path !== '/review/' && <Fragment> <a class="draft-link" href="/review/">Chiefs: review checklist &rarr;</a></Fragment>}{feedback && <Fragment> Tap &ldquo;Review this site&rdquo; and we&rsquo;ll walk you through it.</Fragment>}</p>}
     <div class="bar">
       <div class="wrap">
         <span><b class="em">Emergency: 911</b></span>
@@ -212,6 +212,6 @@ const jsonld = {
       document.addEventListener('click',function(e){if(d.open&&!d.contains(e.target))d.open=false;});
       d.addEventListener('focusout',function(e){if(d.open&&e.relatedTarget&&!d.contains(e.relatedTarget))d.open=false;});})();
     </script>
-    {feedback && !plain && <Feedback site={feedback.site} endpoint={feedback.endpoint} siteName={feedback.siteName} />}
+    {feedback && !plain && <Feedback site={feedback.site} endpoint={feedback.endpoint} siteName={feedback.siteName} items={hasReview ? (review as any).items : []} />}
   </body>
 </html>

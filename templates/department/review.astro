@@ -14,6 +14,7 @@ const replyTo = r.reply_to || 'hello@sitesforservice.org';
 const subject = r.subject || `${cp.short} review`;
 const mailto = `mailto:${replyTo}?subject=${encodeURIComponent(subject)}`;
 const site = ((siteConfig as any).domain || d.url || '').replace(/\/$/, '');
+const guided = !!((siteConfig as any).feedback && (siteConfig as any).feedback.site);
 const pageName = (p: string) => {
   const map: Record<string, string> = { '/': 'Home', '/about/': 'About', '/apparatus/': 'Apparatus', '/responses/': 'Responses', '/safety/': 'Safety', '/community/': 'Community', '/news/': 'News & events', '/join/': 'Join', '/members/': 'Members', '/youth/': 'Junior program', '/memorial/': 'Memorial', '/support/': 'Support', '/contact/': 'Contact', '/accessibility/': 'Accessibility', '/escape-plan/': 'Escape plan' };
   const base = p.replace(/#.*$/, '');
@@ -25,6 +26,7 @@ const pageName = (p: string) => {
     <div class="wrap">
       <p class="kicker">Draft site review</p>
       <h1>Review checklist for {d.name}</h1>
+      {guided && <p class="lede rv-intro"><b>The easy way:</b> on any page of the draft site, tap the red <b>&ldquo;Review this site&rdquo;</b> button. It walks you through these {items.length} questions one at a time, showing each one on the page, and sends your answers for you. This printed list is the same set of questions.</p>}
       {r.intro && <p class="lede rv-intro">{r.intro}</p>}
       <div class="rv-acts">
         <button class="btn red" type="button" onclick="window.print()">Print this checklist</button>

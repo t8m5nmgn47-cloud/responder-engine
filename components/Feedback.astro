@@ -1,21 +1,55 @@
 ---
-// "Suggest a change" markup widget (0.4.0). Rendered by Base.astro only when site.config.json has
-// `feedback: { site }`. Zero dependencies, no external hosts; notes live in localStorage until sent.
-interface Props { site: string; endpoint: string; siteName: string }
-const { site, endpoint, siteName } = Astro.props;
+// "Review this site" widget (0.5.0). Rendered by Base.astro only when site.config.json has `feedback: { site }`.
+// Guided review (one review.json question at a time, highlighted on the page) + free markup mode with in-place
+// text edits, photo requests and notes. Zero dependencies, no external hosts; answers live in localStorage until sent.
+interface Props { site: string; endpoint: string; siteName: string; items?: any[] }
+const { site, endpoint, siteName, items = [] } = Astro.props;
+const qs = (items || []).map((it: any) => ({ id: it.id, q: it.question, cur: it.current || '', page: it.page || '/', sel: it.selector || '' }));
+const n = qs.length;
 ---
 <div id="sfs" data-site={site} data-endpoint={endpoint} data-name={siteName}>
-  <button id="sfs-btn" type="button" aria-pressed="false" aria-label="Suggest a change">
+  <script is:inline type="application/json" id="sfs-rv" set:html={JSON.stringify(qs).replace(/</g, '\\u003c')} />
+  <button id="sfs-btn" type="button" aria-pressed="false">
     <svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-    <span class="sfs-lbl">Suggest a change</span>
+    <span class="sfs-lbl">Review this site</span>
   </button>
+  <div id="sfs-dim" hidden></div>
+  <p id="sfs-live" class="sfs-sr" aria-live="polite"></p>
+  <div id="sfs-hl" hidden aria-hidden="true"></div>
+  <div id="sfs-wel" class="sfs-card" hidden role="dialog" aria-modal="true" aria-labelledby="sfs-wel-h">
+    <h2 id="sfs-wel-h">Chief, let&rsquo;s check this site together.</h2>
+    <p>{n} quick questions, then tap anything else you want changed. About 10 minutes. Your answers save as you go.</p>
+    <label for="sfs-name">Your name (optional)</label><input id="sfs-name" type="text" autocomplete="name" />
+    <button type="button" id="sfs-start" class="sfs-big sfs-pri">Start</button>
+    <button type="button" id="sfs-mark" class="sfs-big">Just mark things</button>
+    <button type="button" id="sfs-wel-x" class="sfs-lnk">Not now</button>
+  </div>
+  <div id="sfs-q" class="sfs-card sfs-sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sfs-q-h">
+    <div class="sfs-prog" aria-hidden="true"><span id="sfs-prog"></span></div>
+    <p id="sfs-cnt" class="sfs-cnt" aria-live="polite"></p>
+    <h2 id="sfs-q-h"></h2>
+    <p id="sfs-cur" class="sfs-cur"></p>
+    <div id="sfs-yn"><button type="button" id="sfs-ok" class="sfs-big sfs-ok">&#10003; Looks right</button><button type="button" id="sfs-chg" class="sfs-big sfs-pri">&#10007; Needs a change</button></div>
+    <div id="sfs-chgf" hidden><label for="sfs-ans">Tell us what it should say</label><textarea id="sfs-ans" rows="3"></textarea><button type="button" id="sfs-save" class="sfs-big sfs-pri">Save</button></div>
+    <div class="sfs-nav"><button type="button" id="sfs-back" class="sfs-lnk">&larr; Back</button><button type="button" id="sfs-pause" class="sfs-lnk">Pause</button><button type="button" id="sfs-skip" class="sfs-lnk">Skip</button></div>
+  </div>
+  <div id="sfs-end" class="sfs-card" hidden role="dialog" aria-modal="true" aria-labelledby="sfs-end-h">
+    <h2 id="sfs-end-h">That&rsquo;s all the questions.</h2>
+    <p>Now tap anything else you&rsquo;d like changed, or send your answers.</p>
+    <button type="button" id="sfs-more" class="sfs-big">Mark more things</button>
+    <button type="button" id="sfs-send2" class="sfs-big sfs-pri">Send to Sites for Service</button>
+  </div>
   <div id="sfs-bar" hidden role="region" aria-label="Markup mode">
     <span class="sfs-tip">Tap anything you want changed</span><span class="sfs-tip-s">Tap anything</span>
     <button type="button" id="sfs-notes" aria-expanded="false" aria-controls="sfs-panel">Notes (<span id="sfs-n">0</span>)</button>
     <button type="button" id="sfs-done">Done</button>
   </div>
+  <div id="sfs-act" hidden role="dialog" aria-label="What would you like to do?">
+    <button type="button" data-a="edit">Edit this text</button><button type="button" data-a="replace">Replace this photo</button><button type="button" data-a="remove">Remove this photo</button><button type="button" data-a="note">Leave a note</button><button type="button" data-a="cancel">Cancel</button>
+  </div>
+  <div id="sfs-ed" hidden role="region" aria-label="Editing text"><span>Type your change, then tap Done.</span><button type="button" id="sfs-ed-ok" class="sfs-pri">Done</button><button type="button" id="sfs-ed-x">Cancel</button></div>
   <form id="sfs-pop" hidden role="dialog" aria-labelledby="sfs-pop-h" novalidate>
-    <h2 id="sfs-pop-h">Suggest a change</h2>
+    <h2 id="sfs-pop-h">Leave a note</h2>
     <p class="sfs-ex" id="sfs-ex"></p>
     <label for="sfs-note">What should change?</label>
     <textarea id="sfs-note" rows="3" required></textarea>
@@ -28,37 +62,67 @@ const { site, endpoint, siteName } = Astro.props;
   </form>
   <aside id="sfs-panel" hidden role="dialog" aria-labelledby="sfs-panel-h">
     <div class="sfs-ph"><h2 id="sfs-panel-h">Your notes</h2><button type="button" id="sfs-close" aria-label="Close notes">&times;</button></div>
-    <ol id="sfs-list"></ol>
-    <p id="sfs-empty">No notes yet. Tap anything on the page to add one.</p>
-    <div class="sfs-who">
-      <label for="sfs-name">Your name</label><input id="sfs-name" type="text" autocomplete="name" />
-      <label for="sfs-email">Email (optional)</label><input id="sfs-email" type="email" autocomplete="email" />
+    <div id="sfs-pbody">
+      <ol id="sfs-list"></ol>
+      <p id="sfs-empty">No notes yet. Tap anything on the page to add one.</p>
+      <div class="sfs-who">
+        <label for="sfs-name2">Your name</label><input id="sfs-name2" type="text" autocomplete="name" />
+        <label for="sfs-email">Email (optional)</label><input id="sfs-email" type="email" autocomplete="email" />
+      </div>
+      <button type="button" id="sfs-send" class="sfs-big sfs-pri">Send to Sites for Service</button>
+      <p id="sfs-status" role="status"></p><a id="sfs-mail" hidden href="#">Email instead</a>
     </div>
-    <div class="sfs-row"><button type="button" id="sfs-send" class="sfs-pri">Send to Sites for Service</button><a id="sfs-mail" hidden href="#">Email instead</a></div>
-    <p id="sfs-status" role="status"></p>
+    <div id="sfs-ok-s" hidden><h2>Sent. Thank you, Chief.</h2><p>We&rsquo;ll make these changes and send you the updated site.</p><button type="button" id="sfs-reset" class="sfs-lnk">Start over</button></div>
   </aside>
   <div id="sfs-pins" aria-hidden="true"></div>
 </div>
 <style is:inline>
-#sfs{font:400 .95rem/1.4 var(--sans,system-ui,sans-serif);color:#111}
+#sfs{font:400 1rem/1.4 var(--sans,system-ui,sans-serif);color:#111}
 #sfs button{font:inherit;cursor:pointer;min-height:44px;border-radius:4px}
-#sfs-btn{position:fixed;right:1rem;bottom:1rem;z-index:1000;display:inline-flex;align-items:center;gap:.5rem;min-width:44px;padding:0 1rem;background:#b3261e;color:#fff;border:2px solid #fff;border-radius:999px;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.3)}
+#sfs-btn{position:fixed;right:1rem;bottom:1rem;z-index:1000;display:inline-flex;align-items:center;gap:.5rem;min-height:52px;padding:0 1.1rem;background:#b3261e;color:#fff;border:2px solid #fff;border-radius:999px;font-weight:700;font-size:1.05rem;box-shadow:0 2px 10px rgba(0,0,0,.3)}
 #sfs-btn[aria-pressed=true]{background:#1d1d1f}
-#sfs-btn:focus-visible{outline:3px solid #111;outline-offset:3px}
+#sfs-btn.sfs-pill{background:#1d1d1f;font-size:.95rem}
+#sfs :focus-visible{outline:3px solid #111;outline-offset:3px}
+#sfs-btn:focus-visible,#sfs-bar :focus-visible,#sfs-ed :focus-visible{outline-color:#fff}
+.sfs-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);margin:0}
+#sfs-dim{position:fixed;inset:0;z-index:1180;background:rgba(0,0,0,.45)}
+#sfs-hl{position:absolute;z-index:1185;border:4px solid #e4322b;border-radius:6px;box-shadow:0 0 0 9999px rgba(0,0,0,.45);pointer-events:none}
+.sfs-card{position:fixed;z-index:1190;left:50%;transform:translateX(-50%);width:min(34rem,100vw - 1rem);max-height:min(45vh,32rem);overflow:auto;background:#fff;color:#111;border:2px solid #1d1d1f;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.35);padding:1rem 1.1rem;bottom:.5rem;margin:0}
+#sfs-wel,#sfs-end{top:50%;bottom:auto;transform:translate(-50%,-50%);max-height:90vh}
+.sfs-card h2{font:700 1.3rem/1.25 var(--display,inherit);margin:0 0 .5rem}
+.sfs-card p{margin:0 0 .75rem}
+#sfs .sfs-big{display:block;width:100%;min-height:52px;margin-top:.55rem;background:#fff;color:#111;border:2px solid #111;font-weight:700;font-size:1.1rem;padding:.4rem 1rem}
+#sfs .sfs-pri{background:#b3261e;color:#fff;border-color:#b3261e}
+#sfs .sfs-ok{border-color:#1b6b2e;color:#1b6b2e}
+#sfs .sfs-lnk{background:transparent;border:0;color:#5f5b54;text-decoration:underline;font-weight:600;padding:0 .5rem}
+#sfs-wel .sfs-lnk{display:block;margin:.5rem auto 0}
+.sfs-prog{height:8px;background:#e6e2d9;border-radius:4px;overflow:hidden;margin:0 0 .4rem}
+.sfs-prog span{display:block;height:100%;background:#b3261e;width:0}
+.sfs-cnt{font-weight:700;color:#5f5b54;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.3rem!important}
+.sfs-cur{color:#3b3832;font-size:.95rem}
+#sfs-yn{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+#sfs-yn .sfs-big{margin-top:0}
+.sfs-nav{display:flex;justify-content:space-between;margin-top:.6rem}
 #sfs-bar{position:fixed;top:0;left:0;right:0;z-index:1100;display:flex;align-items:center;gap:.6rem;padding:.3rem 1rem;background:#1d1d1f;color:#fff;border-bottom:2px solid #c7a35a}
 #sfs-bar .sfs-tip,#sfs-bar .sfs-tip-s{flex:1;font-weight:600}#sfs-bar .sfs-tip-s{display:none}
 #sfs-bar button{background:transparent;color:#fff;border:1px solid #fff;padding:0 .9rem}
-#sfs-bar :focus-visible{outline:3px solid #fff;outline-offset:2px}
 html.sfs-mode body{padding-top:var(--sfs-bar,3rem)}
 html.sfs-mode .top{top:var(--sfs-bar,3rem)}
 [data-sfs]{cursor:crosshair!important;outline-offset:3px}
 [data-sfs]:hover,[data-sfs]:focus-visible{outline:3px dashed #b3261e!important}
+.sfs-editing,.sfs-editing:hover,.sfs-editing:focus-visible{outline:3px solid #1b6b2e!important;background:#fffbe6!important;color:#111!important;cursor:text!important}
+#sfs-act{position:absolute;z-index:1200;display:flex;flex-wrap:wrap;gap:.4rem;background:#1d1d1f;padding:.5rem;border-radius:8px;box-shadow:0 6px 24px rgba(0,0,0,.3);width:min(22rem,100vw - 1rem)}
+#sfs-act button{flex:1 1 45%;background:#fff;color:#111;border:0;font-weight:700;min-height:48px}
+#sfs-act button[data-a=cancel]{background:transparent;color:#fff;border:1px solid #fff}
+#sfs-ed{position:fixed;left:0;right:0;bottom:0;z-index:1200;display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;padding:.6rem 1rem;background:#1b6b2e;color:#fff;font-weight:600}
+#sfs-ed span{flex:1}#sfs-ed button{background:#fff;color:#111;border:2px solid #fff;padding:0 1.2rem;font-weight:700;min-height:48px}
+#sfs-ed .sfs-pri{background:#b3261e;color:#fff;border-color:#b3261e}
 #sfs-pop,#sfs-panel{background:#fff;border:2px solid #1d1d1f;border-radius:6px;box-shadow:0 6px 24px rgba(0,0,0,.3);padding:1rem}
 #sfs-pop{position:absolute;z-index:1200;width:min(22rem,calc(100vw - 2rem));margin:0}
 #sfs-pop h2,#sfs-panel h2{font:700 1.05rem/1.2 var(--display,inherit);letter-spacing:.04em;text-transform:uppercase;margin:0 0 .3rem}
 #sfs .sfs-ex{color:#5f5b54;font-size:.85rem;margin:0 0 .6rem;font-style:italic}
 #sfs label{display:block;font-weight:600;margin:.4rem 0 .2rem}
-#sfs textarea,#sfs input[type=text],#sfs input[type=email]{width:100%;font:inherit;padding:.5rem;border:1px solid #5f5b54;border-radius:4px;background:#fff;color:#111}
+#sfs textarea,#sfs input[type=text],#sfs input[type=email]{width:100%;font:inherit;font-size:1.05rem;padding:.6rem;border:2px solid #5f5b54;border-radius:4px;background:#fff;color:#111}
 #sfs fieldset{border:0;padding:0;margin:.5rem 0;display:flex;gap:.9rem;flex-wrap:wrap}
 #sfs legend{font-weight:600;padding:0;margin-bottom:.2rem}
 #sfs fieldset label{display:inline-flex;align-items:center;gap:.3rem;font-weight:400;margin:0}
@@ -74,103 +138,204 @@ html.sfs-mode .top{top:var(--sfs-bar,3rem)}
 #sfs-list .sfs-q{font-style:italic;color:#5f5b54;font-size:.85rem}
 #sfs-list .sfs-t{margin:.2rem 0}
 #sfs-list button{background:transparent;border:1px solid #5f5b54;color:#111;padding:0 .7rem;margin-right:.4rem;min-height:36px}
-#sfs-mail{color:#8e1a14;font-weight:700}
+#sfs-mail{color:#8e1a14;font-weight:700;display:inline-block;margin-top:.4rem}
 #sfs-status{margin:.6rem 0 0;font-weight:600}
 #sfs-status.err{color:#8e1a14}
 #sfs-pins{position:absolute;top:0;left:0;width:0;height:0;z-index:990}
 .sfs-pin{position:absolute;width:24px;height:24px;border-radius:50%;background:#b3261e;color:#fff;border:2px solid #fff;font:700 13px/20px var(--sans,sans-serif);text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.4)}
-@media (max-width:40rem){#sfs-btn .sfs-lbl{display:none}#sfs-bar .sfs-tip{display:none}#sfs-bar .sfs-tip-s{display:inline}#sfs-bar{justify-content:flex-end}#sfs-btn{padding:0;width:52px;height:52px;justify-content:center}#sfs-bar .sfs-tip{font-size:.85rem}}
+@media (max-width:40rem){#sfs-btn:not(.sfs-pill) .sfs-lbl{display:none}#sfs-bar .sfs-tip{display:none}#sfs-bar .sfs-tip-s{display:inline}#sfs-bar{justify-content:flex-end}#sfs-btn:not(.sfs-pill){padding:0;width:52px;justify-content:center}.sfs-card{bottom:0;width:100vw;border-radius:14px 14px 0 0;border-bottom:0}#sfs-wel,#sfs-end{top:auto;bottom:0;transform:translateX(-50%)}#sfs-yn{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:no-preference){.sfs-card{transition:transform .2s}}
 @media print{#sfs{display:none!important}}
 </style>
 <script is:inline>
 (function(){
-  var R=document.getElementById('sfs');if(!R)return;
-  var SITE=R.getAttribute('data-site'),EP=R.getAttribute('data-endpoint'),NAME=R.getAttribute('data-name');
-  var KEY='sfs_feedback_'+SITE,WHO='sfs_feedback_who';
-  var SEL='main p, main h1, main h2, main h3, main li, main img, main figcaption, main a.btn, main td, main dt, main dd, header .brand, footer p';
-  var $=function(id){return document.getElementById(id)};
-  var btn=$('sfs-btn'),bar=$('sfs-bar'),pop=$('sfs-pop'),panel=$('sfs-panel'),pins=$('sfs-pins'),list=$('sfs-list'),st=$('sfs-status');
-  var mode=false,cur=null,editing=null,raf=0;
-  function load(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return []}}
-  function save(n){try{localStorage.setItem(KEY,JSON.stringify(n))}catch(e){}}
-  var notes=load();
-  function selector(el){
-    if(el.id)return '#'+el.id;var parts=[];
-    while(el&&el.nodeType===1&&el.tagName!=='BODY'){
-      var t=el.tagName.toLowerCase();if(el.id){parts.unshift('#'+el.id);break}
-      var i=1,s=el;while((s=s.previousElementSibling))if(s.tagName===el.tagName)i++;
-      parts.unshift(t+':nth-of-type('+i+')');el=el.parentElement;
-    }return parts.join(' > ');
-  }
-  function excerpt(el){var t=el.tagName==='IMG'?(el.alt||el.getAttribute('src')||'image'):(el.textContent||'').replace(/\s+/g,' ').trim();return t.length>160?t.slice(0,157)+'…':t}
-  function targets(){return Array.prototype.slice.call(document.querySelectorAll(SEL)).filter(function(e){return !R.contains(e)})}
-  function setMode(on){
-    mode=on;document.documentElement.classList.toggle('sfs-mode',on);bar.hidden=!on;barH();btn.setAttribute('aria-pressed',String(on));
-    targets().forEach(function(e){if(on){e.setAttribute('data-sfs',e.hasAttribute('tabindex')||/^(A|BUTTON)$/.test(e.tagName)?'1':'t');if(e.getAttribute('data-sfs')==='t')e.setAttribute('tabindex','0')}
-      else{if(e.getAttribute('data-sfs')==='t')e.removeAttribute('tabindex');e.removeAttribute('data-sfs')}});
-    if(!on){closePop();showPanel(false)}
-  }
-  function findEl(n){try{return document.querySelector(n.selector)}catch(e){return null}}
-  function draw(){
-    pins.textContent='';var local=notes.filter(function(n){return n.page===location.pathname});
-    local.forEach(function(n){var el=findEl(n);if(!el)return;var r=el.getBoundingClientRect();
-      var p=document.createElement('span');p.className='sfs-pin';p.textContent=notes.indexOf(n)+1;
-      var x=r.left+scrollX-30;p.style.left=(x<0?r.left+scrollX+4:x)+'px';p.style.top=(r.top+scrollY-4)+'px';pins.appendChild(p)});
-    $('sfs-n').textContent=notes.length;
-  }
-  function barH(){if(mode)document.documentElement.style.setProperty('--sfs-bar',bar.offsetHeight+'px')}
-  function sched(){if(!raf)raf=requestAnimationFrame(function(){raf=0;draw()})}
-  addEventListener('resize',function(){barH();sched()});addEventListener('scroll',sched,{passive:true});
-  function openPop(el,note){
-    cur=el;editing=note||null;$('sfs-ex').textContent='“'+(note?note.excerpt:excerpt(el))+'”';
-    $('sfs-note').value=note?note.note:'';var k=note?note.kind:'text';pop.querySelectorAll('input[name=kind]').forEach(function(r){r.checked=r.value===k});
-    pop.hidden=false;
-    if(el){var r=el.getBoundingClientRect(),w=pop.offsetWidth;var x=Math.max(8,Math.min(r.left+scrollX,document.documentElement.clientWidth-w-8));pop.style.left=x+'px';pop.style.top=(r.bottom+scrollY+8)+'px';pop.style.position='absolute'}
-    else{pop.style.position='fixed';pop.style.left='50%';pop.style.top='30%';pop.style.transform='translateX(-50%)'}
-    $('sfs-note').focus();
-  }
-  function closePop(){if(pop.hidden)return;pop.hidden=true;pop.style.transform='';var f=cur;cur=null;editing=null;if(f&&f.focus)f.focus()}
-  pop.addEventListener('submit',function(e){e.preventDefault();var txt=$('sfs-note').value.trim();if(!txt){$('sfs-note').focus();return}
-    var kind=(pop.querySelector('input[name=kind]:checked')||{}).value||'other';
-    if(editing){editing.note=txt;editing.kind=kind}
-    else notes.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),page:location.pathname,url:location.href,selector:selector(cur),excerpt:excerpt(cur),kind:kind,note:txt,created_at:new Date().toISOString()});
-    save(notes);draw();render();closePop()});
-  $('sfs-cancel').addEventListener('click',closePop);
-  document.addEventListener('click',function(e){
-    if(!mode||R.contains(e.target))return;var el=e.target.closest&&e.target.closest('[data-sfs]');if(!el)return;
-    e.preventDefault();e.stopPropagation();var ex=notes.filter(function(n){return n.page===location.pathname&&findEl(n)===el})[0];openPop(el,ex)},true);
-  document.addEventListener('keydown',function(e){
-    if(e.key==='Escape'){if(!pop.hidden)closePop();else if(!panel.hidden)showPanel(false);else if(mode){setMode(false);btn.focus()}return}
-    if(e.key==='Enter'&&mode&&e.target.hasAttribute&&e.target.hasAttribute('data-sfs')&&!R.contains(e.target)){e.preventDefault();openPop(e.target)}
-  });
-  btn.addEventListener('click',function(){setMode(!mode)});
-  $('sfs-done').addEventListener('click',function(){setMode(false);btn.focus()});
-  function showPanel(on){panel.hidden=!on;$('sfs-notes').setAttribute('aria-expanded',String(on));if(on){render();$('sfs-panel-h').setAttribute('tabindex','-1');$('sfs-panel-h').focus()}}
-  $('sfs-notes').addEventListener('click',function(){showPanel(panel.hidden)});
-  $('sfs-close').addEventListener('click',function(){showPanel(false);$('sfs-notes').focus()});
-  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-  function render(){
-    list.innerHTML=notes.map(function(n,i){return '<li><div class="sfs-pg">'+(i+1)+' · '+esc(n.page)+' · '+esc(n.kind)+'</div><div class="sfs-q">“'+esc(n.excerpt)+'”</div><p class="sfs-t">'+esc(n.note)+'</p>'+
-      '<button type="button" data-edit="'+i+'" aria-label="Edit note '+(i+1)+'">Edit</button><button type="button" data-del="'+i+'" aria-label="Delete note '+(i+1)+'">Delete</button></li>'}).join('');
-    $('sfs-empty').hidden=notes.length>0;$('sfs-send').disabled=!notes.length;$('sfs-n').textContent=notes.length;
-  }
-  list.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
-    if(b.hasAttribute('data-del')){notes.splice(+b.getAttribute('data-del'),1);save(notes);draw();render();$('sfs-panel-h').focus()}
-    else if(b.hasAttribute('data-edit')){var n=notes[+b.getAttribute('data-edit')];openPop(n.page===location.pathname?findEl(n):null,n)}});
-  try{var w=JSON.parse(localStorage.getItem(WHO)||'{}');$('sfs-name').value=w.name||'';$('sfs-email').value=w.email||''}catch(e){}
-  function who(){var w={name:$('sfs-name').value.trim(),email:$('sfs-email').value.trim()};try{localStorage.setItem(WHO,JSON.stringify(w))}catch(e){}return w}
-  function mailto(){var body=notes.map(function(n){return '- '+n.page+' · "'+n.excerpt+'" → '+n.note}).join('\n');
-    return 'mailto:hello@sitesforservice.org?subject='+encodeURIComponent('Site changes: '+NAME)+'&body='+encodeURIComponent(body+'\n\n— '+(who().name||'')+' '+(who().email||''))}
-  function msg(t,err){st.textContent=t;st.className=err?'err':''}
-  $('sfs-send').addEventListener('click',function(){
-    var w=who();if(!w.name){msg('Please add your name so we know who to thank.',true);$('sfs-name').focus();return}
-    msg('Sending…');$('sfs-send').disabled=true;
-    var payload={site:SITE,site_name:NAME,submitted_at:new Date().toISOString(),reviewer:w,items:notes};
-    fetch(EP,{method:'POST',mode:'cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
-      .then(function(r){if(!r.ok)throw new Error('Server replied '+r.status);return r.json()})
-      .then(function(j){if(!j||j.ok!==true)throw new Error('Unexpected reply');notes=[];save(notes);draw();render();$('sfs-mail').hidden=true;msg('Sent — thank you. We’ll make the changes and let you know.')})
-      .catch(function(err){$('sfs-send').disabled=false;$('sfs-mail').href=mailto();$('sfs-mail').hidden=false;msg('Could not send ('+err.message+'). You can email the list instead.',true)});
-  });
-  draw();render();
+var R=document.getElementById('sfs');if(!R)return;
+var SITE=R.getAttribute('data-site'),EP=R.getAttribute('data-endpoint'),NAME=R.getAttribute('data-name');
+var KEY='sfs_feedback_'+SITE,WHO='sfs_feedback_who',RK='sfs_review_'+SITE;
+var SEL='main p, main h1, main h2, main h3, main li, main img, main figcaption, main a.btn, main td, main dt, main dd, header .brand, footer p';
+var $=function(id){return document.getElementById(id)};
+var Q=[];try{Q=JSON.parse($('sfs-rv').textContent||'[]')}catch(e){}
+var N=Q.length,PATH=location.pathname;
+var RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+var btn=$('sfs-btn'),bar=$('sfs-bar'),pop=$('sfs-pop'),panel=$('sfs-panel'),pins=$('sfs-pins'),list=$('sfs-list'),st=$('sfs-status');
+var wel=$('sfs-wel'),qc=$('sfs-q'),end=$('sfs-end'),hl=$('sfs-hl'),dim=$('sfs-dim'),act=$('sfs-act'),edb=$('sfs-ed');
+var mode=false,cur=null,editing=null,raf=0,hlEl=null,edEl=null,edBefore='',openCard=null,lastFocus=null;
+function load(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return []}}
+function save(n){try{localStorage.setItem(KEY,JSON.stringify(n))}catch(e){}}
+function rget(){try{return JSON.parse(localStorage.getItem(RK)||'null')}catch(e){return null}}
+function rset(s){try{if(s)localStorage.setItem(RK,JSON.stringify(s));else localStorage.removeItem(RK)}catch(e){}}
+var notes=load(),rv=rget();
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function selector(el){
+  if(el.id)return '#'+el.id;var parts=[];
+  while(el&&el.nodeType===1&&el.tagName!=='BODY'){
+    var t=el.tagName.toLowerCase();if(el.id){parts.unshift('#'+el.id);break}
+    var i=1,s=el;while((s=s.previousElementSibling))if(s.tagName===el.tagName)i++;
+    parts.unshift(t+':nth-of-type('+i+')');el=el.parentElement;
+  }return parts.join(' > ');
+}
+function txt(el){return (el.textContent||'').replace(/\s+/g,' ').trim()}
+function excerpt(el){var t=el.tagName==='IMG'?(el.alt||el.getAttribute('src')||'image'):txt(el);return t.length>160?t.slice(0,157)+'…':t}
+function q1(s){try{return s?document.querySelector(s):null}catch(e){return null}}
+function targets(){return Array.prototype.slice.call(document.querySelectorAll(SEL)).filter(function(e){return !R.contains(e)})}
+/* ---- cards / focus ---- */
+function focusables(c){return Array.prototype.filter.call(c.querySelectorAll('button,input,textarea,a[href]'),function(e){return !e.hidden&&!e.disabled&&e.offsetParent!==null})}
+function modal(on){Array.prototype.forEach.call(document.body.children,function(e){if(e===R)return;if(on){e.setAttribute('aria-hidden','true');e.inert=true}else{e.removeAttribute('aria-hidden');e.inert=false}})}
+function show(c){if(openCard&&openCard!==c)openCard.hidden=true;openCard=c;c.hidden=false;var m=c===wel||c===end;dim.hidden=!m;modal(m);btn.hidden=true;var f=focusables(c)[0];if(f)f.focus()}
+function hide(){if(openCard){openCard.hidden=true;openCard=null}dim.hidden=true;modal(false);btn.hidden=false;clearHl()}
+function trap(e){if(e.key!=='Tab'||!openCard)return;var f=focusables(openCard);if(!f.length)return;var a=document.activeElement;
+  if(!openCard.contains(a)){e.preventDefault();f[0].focus();return}
+  if(e.shiftKey&&a===f[0]){e.preventDefault();f[f.length-1].focus()}else if(!e.shiftKey&&a===f[f.length-1]){e.preventDefault();f[0].focus()}}
+/* ---- floating button ---- */
+function label(){
+  var s=rv;btn.className='';
+  if(s&&s.status!=='done'&&s.idx<N){btn.classList.add('sfs-pill');btn.querySelector('.sfs-lbl').textContent='Continue review ('+(s.idx+1)+' of '+N+')';btn.setAttribute('aria-label','Continue review, question '+(s.idx+1)+' of '+N)}
+  else{btn.querySelector('.sfs-lbl').textContent='Review this site';btn.setAttribute('aria-label','Review this site')}
+}
+btn.addEventListener('click',function(){
+  if(mode){setMode(false);return}
+  if(rv&&rv.status!=='done'&&rv.idx<N){rv.status='active';rset(rv);go(rv.idx)}
+  else if(N)show(wel);else setMode(true)
+});
+/* ---- guided pass ---- */
+function go(i){
+  if(i>=N){rv={idx:N,status:'done'};rset(rv);label();clearHl();show(end);return}
+  rv={idx:i,status:'active'};rset(rv);label();
+  var it=Q[i];
+  if(it.page!==PATH){location.href=it.page+'#sfs-review';return}
+  setMode(false);
+  $('sfs-prog').style.width=Math.round(i/N*100)+'%';$('sfs-cnt').textContent=(i+1)+' of '+N;
+  $('sfs-q-h').textContent=it.q;$('sfs-cur').textContent=it.cur?'The draft shows: '+it.cur:'';
+  $('sfs-chgf').hidden=true;$('sfs-yn').hidden=false;
+  var prev=notes.filter(function(n){return n.kind==='answer'&&n.question_id===it.id})[0];$('sfs-ans').value=prev&&prev.note||'';
+  $('sfs-back').hidden=i===0;
+  show(qc);
+  hlEl=q1(it.sel);
+  if(hlEl){var r=hlEl.getBoundingClientRect(),ch=qc.offsetHeight+16,free=innerHeight-ch;
+    scrollBy({top:r.top-(free-r.height)/2,behavior:RM?'auto':'smooth'});hl.hidden=false;placeHl()}
+  else clearHl();
+}
+function placeHl(){if(!hlEl||hl.hidden)return;var r=hlEl.getBoundingClientRect();hl.style.left=(r.left+scrollX-6)+'px';hl.style.top=(r.top+scrollY-6)+'px';hl.style.width=(r.width+4)+'px';hl.style.height=(r.height+4)+'px'}
+function clearHl(){hl.hidden=true;hlEl=null}
+function answer(a,note){
+  var it=Q[rv.idx],el=q1(it.sel);
+  notes=notes.filter(function(n){return !(n.kind==='answer'&&n.question_id===it.id)});
+  notes.push({id:uid(),kind:'answer',question_id:it.id,question:it.q,answer:a,note:note||'',page:it.page,url:location.origin+it.page,selector:it.sel||'',excerpt:el?excerpt(el):it.cur,created_at:new Date().toISOString()});
+  save(notes);draw();render();go(rv.idx+1);
+}
+$('sfs-ok').addEventListener('click',function(){answer('ok')});
+$('sfs-skip').addEventListener('click',function(){answer('skip')});
+$('sfs-pause').addEventListener('click',pause);
+$('sfs-back').addEventListener('click',function(){if(rv.idx>0)go(rv.idx-1)});
+$('sfs-chg').addEventListener('click',function(){$('sfs-yn').hidden=true;$('sfs-chgf').hidden=false;$('sfs-ans').focus()});
+$('sfs-save').addEventListener('click',function(){answer('change',$('sfs-ans').value.trim())});
+$('sfs-start').addEventListener('click',function(){who();go(0)});
+$('sfs-mark').addEventListener('click',function(){who();hide();setMode(true)});
+$('sfs-wel-x').addEventListener('click',function(){hide();btn.focus()});
+$('sfs-more').addEventListener('click',function(){hide();setMode(true)});
+$('sfs-send2').addEventListener('click',function(){hide();setMode(true);showPanel(true);send()});
+function pause(){hide();if(rv&&rv.status==='active'){rv.status='paused';rset(rv)}label();btn.focus();msgLive('Paused — tap Review this site to continue')}
+function msgLive(t){$('sfs-live').textContent=t}
+/* ---- markup mode ---- */
+function setMode(on){
+  mode=on;document.documentElement.classList.toggle('sfs-mode',on);bar.hidden=!on;barH();btn.setAttribute('aria-pressed',String(on));
+  targets().forEach(function(e){if(on){e.setAttribute('data-sfs',e.hasAttribute('tabindex')||/^(A|BUTTON)$/.test(e.tagName)?'1':'t');if(e.getAttribute('data-sfs')==='t')e.setAttribute('tabindex','0')}
+    else{if(e.getAttribute('data-sfs')==='t')e.removeAttribute('tabindex');e.removeAttribute('data-sfs')}});
+  if(!on){closePop();closeAct();endEdit(false);showPanel(false)}
+}
+function findEl(n){return n.selector?q1(n.selector):null}
+function pinned(n){return n.page===PATH&&n.selector&&!(n.kind==='answer'&&n.answer!=='change')}
+function draw(){
+  pins.textContent='';
+  notes.forEach(function(n){if(!pinned(n))return;var el=findEl(n);if(!el)return;var r=el.getBoundingClientRect();
+    var p=document.createElement('span');p.className='sfs-pin';p.textContent=notes.indexOf(n)+1;
+    var x=r.left+scrollX-30;p.style.left=(x<0?r.left+scrollX+4:x)+'px';p.style.top=(r.top+scrollY-4)+'px';pins.appendChild(p)});
+  $('sfs-n').textContent=notes.length;
+}
+function barH(){if(mode)document.documentElement.style.setProperty('--sfs-bar',bar.offsetHeight+'px')}
+function sched(){if(!raf)raf=requestAnimationFrame(function(){raf=0;draw();placeHl()})}
+addEventListener('resize',function(){barH();sched()});addEventListener('scroll',sched,{passive:true});
+function place(box,el){var r=el.getBoundingClientRect(),w=box.offsetWidth;var x=Math.max(8,Math.min(r.left+scrollX,document.documentElement.clientWidth-w-8));box.style.left=x+'px';box.style.top=(r.bottom+scrollY+8)+'px'}
+function openAct(el){cur=el;var img=el.tagName==='IMG';act.querySelectorAll('button').forEach(function(b){var a=b.getAttribute('data-a');b.hidden=img?a==='edit':(a==='replace'||a==='remove')});act.hidden=false;place(act,el);act.querySelector('button:not([hidden])').focus()}
+function closeAct(){act.hidden=true}
+act.addEventListener('click',function(e){var b=e.target.closest('button');if(!b||!cur)return;var a=b.getAttribute('data-a'),el=cur;closeAct();
+  if(a==='edit')startEdit(el);
+  else if(a==='note'){var ex=notes.filter(function(n){return n.page===PATH&&n.kind!=='answer'&&findEl(n)===el})[0];openPop(el,ex)}
+  else if(a==='replace'||a==='remove'){notes.push({id:uid(),kind:'photo',page:PATH,url:location.href,selector:selector(el),excerpt:excerpt(el),note:a==='replace'?'Replace this photo':'Remove this photo',created_at:new Date().toISOString()});save(notes);draw();render();el.focus()}
+  else{cur=null;el.focus()}});
+function startEdit(el){edEl=el;edBefore=txt(el);el.setAttribute('contenteditable','true');el.classList.add('sfs-editing');edb.hidden=false;bar.hidden=true;el.focus()}
+function endEdit(keep){if(!edEl)return;var el=edEl,after=txt(el);edEl=null;el.removeAttribute('contenteditable');el.classList.remove('sfs-editing');edb.hidden=true;if(mode)bar.hidden=false;
+  if(keep&&after!==edBefore)notes.push({id:uid(),kind:'edit',page:PATH,url:location.href,selector:selector(el),excerpt:edBefore.length>160?edBefore.slice(0,157)+'…':edBefore,before:edBefore,after:after,note:'Edited in place',created_at:new Date().toISOString()});
+  else el.textContent=edBefore;
+  save(notes);draw();render();el.focus()}
+$('sfs-ed-ok').addEventListener('click',function(){endEdit(true)});$('sfs-ed-x').addEventListener('click',function(){endEdit(false)});
+function openPop(el,note){
+  cur=el;editing=note||null;$('sfs-ex').textContent='“'+(note?note.excerpt:excerpt(el))+'”';
+  $('sfs-note').value=note?note.note:'';var k=note?note.kind:'text';if(k==='answer'||k==='edit')k='other';pop.querySelectorAll('input[name=kind]').forEach(function(r){r.checked=r.value===k});
+  pop.hidden=false;
+  if(el){pop.style.position='absolute';pop.style.transform='';place(pop,el)}
+  else{pop.style.position='fixed';pop.style.left='50%';pop.style.top='30%';pop.style.transform='translateX(-50%)'}
+  $('sfs-note').focus();
+}
+function closePop(){if(pop.hidden)return;pop.hidden=true;pop.style.transform='';var f=cur;cur=null;editing=null;if(f&&f.focus)f.focus()}
+pop.addEventListener('submit',function(e){e.preventDefault();var t=$('sfs-note').value.trim();if(!t){$('sfs-note').focus();return}
+  var kind=(pop.querySelector('input[name=kind]:checked')||{}).value||'other';
+  if(editing){editing.note=t;if(editing.kind!=='answer'&&editing.kind!=='edit')editing.kind=kind}
+  else notes.push({id:uid(),page:PATH,url:location.href,selector:selector(cur),excerpt:excerpt(cur),kind:kind,note:t,created_at:new Date().toISOString()});
+  save(notes);draw();render();closePop()});
+$('sfs-cancel').addEventListener('click',closePop);
+document.addEventListener('click',function(e){
+  if(!mode||R.contains(e.target)||edEl)return;var el=e.target.closest&&e.target.closest('[data-sfs]');if(!el)return;
+  e.preventDefault();e.stopPropagation();closePop();openAct(el)},true);
+document.addEventListener('keydown',function(e){
+  trap(e);
+  if(e.key==='Escape'){
+    if(!act.hidden)closeAct();else if(edEl)endEdit(false);else if(!pop.hidden)closePop();else if(openCard)pause();else if(!panel.hidden)showPanel(false);else if(mode){setMode(false);btn.focus()}return}
+  if(openCard===qc&&!/TEXTAREA|INPUT/.test(e.target.tagName)){
+    var k=e.key.toLowerCase();
+    if(k==='y')$('sfs-ok').click();else if(k==='n')$('sfs-chg').click();else if(e.key==='ArrowRight')$('sfs-skip').click();else if(e.key==='ArrowLeft')$('sfs-back').click();else return;e.preventDefault();return}
+  if(e.key==='Enter'&&mode&&!edEl&&e.target.hasAttribute&&e.target.hasAttribute('data-sfs')&&!R.contains(e.target)){e.preventDefault();openAct(e.target)}
+});
+$('sfs-done').addEventListener('click',function(){setMode(false);btn.focus()});
+function showPanel(on){panel.hidden=!on;$('sfs-notes').setAttribute('aria-expanded',String(on));if(on){render();$('sfs-panel-h').setAttribute('tabindex','-1');$('sfs-panel-h').focus()}}
+$('sfs-notes').addEventListener('click',function(){showPanel(panel.hidden)});
+$('sfs-close').addEventListener('click',function(){showPanel(false);$('sfs-notes').focus()});
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function qn(n){return 'Q'+(Q.map(function(q){return q.id}).indexOf(n.question_id)+1)}
+function line(n){
+  if(n.kind==='answer')return '<div class="sfs-q">'+qn(n)+' · '+esc(n.question)+'</div><p class="sfs-t">'+(n.answer==='ok'?'Looks right':n.answer==='skip'?'Skipped':'Needs a change: '+esc(n.note))+'</p>';
+  if(n.kind==='edit')return '<div class="sfs-q">“'+esc(n.excerpt)+'”</div><p class="sfs-t">Change to: “'+esc(n.after)+'”</p>';
+  return '<div class="sfs-q">“'+esc(n.excerpt)+'”</div><p class="sfs-t">'+esc(n.note)+'</p>'}
+function render(){
+  list.innerHTML=notes.map(function(n,i){return '<li><div class="sfs-pg">'+(i+1)+' · '+esc(n.page)+' · '+esc(n.kind)+'</div>'+line(n)+
+    (n.kind==='answer'||n.kind==='edit'?'':'<button type="button" data-edit="'+i+'" aria-label="Edit note '+(i+1)+'">Edit</button>')+'<button type="button" data-del="'+i+'" aria-label="Delete note '+(i+1)+'">Delete</button></li>'}).join('');
+  $('sfs-empty').hidden=notes.length>0;$('sfs-send').disabled=!notes.length;$('sfs-n').textContent=notes.length;
+}
+list.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
+  if(b.hasAttribute('data-del')){notes.splice(+b.getAttribute('data-del'),1);save(notes);draw();render();$('sfs-panel-h').focus()}
+  else if(b.hasAttribute('data-edit')){var n=notes[+b.getAttribute('data-edit')];openPop(n.page===PATH?findEl(n):null,n)}});
+try{var w0=JSON.parse(localStorage.getItem(WHO)||'{}');$('sfs-name').value=w0.name||'';$('sfs-name2').value=w0.name||'';$('sfs-email').value=w0.email||''}catch(e){}
+$('sfs-name').addEventListener('change',function(){$('sfs-name2').value=this.value});
+function who(){var w={name:$('sfs-name2').value.trim()||$('sfs-name').value.trim(),email:$('sfs-email').value.trim()};try{localStorage.setItem(WHO,JSON.stringify(w))}catch(e){}return w}
+function mailto(){var body=notes.map(function(n){
+    if(n.kind==='answer')return '- '+qn(n)+' '+(n.answer==='ok'?'Looks right':n.answer==='skip'?'Skipped':'Needs a change: '+n.note)+' ('+n.question+')';
+    if(n.kind==='edit')return '- '+n.page+' · "'+n.before+'" → "'+n.after+'"';
+    return '- '+n.page+' · "'+n.excerpt+'" → '+n.note}).join('\n');
+  var w=who();return 'mailto:hello@sitesforservice.org?subject='+encodeURIComponent('Site changes: '+NAME)+'&body='+encodeURIComponent(body+'\n\n— '+(w.name||'')+' '+(w.email||''))}
+function msg(t,err){st.textContent=t;st.className=err?'err':''}
+function send(){
+  if(!notes.length){msg('Nothing to send yet.',true);return}
+  var w=who();msg('Sending…');$('sfs-send').disabled=true;
+  var payload={site:SITE,site_name:NAME,submitted_at:new Date().toISOString(),reviewer:w,items:notes};
+  fetch(EP,{method:'POST',mode:'cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+    .then(function(r){if(!r.ok)throw new Error('Server replied '+r.status);return r.json()})
+    .then(function(j){if(!j||j.ok!==true)throw new Error('Unexpected reply');notes=[];save(notes);rv=null;rset(null);label();draw();render();$('sfs-mail').hidden=true;msg('');$('sfs-pbody').hidden=true;$('sfs-ok-s').hidden=false;$('sfs-ok-s').querySelector('h2').setAttribute('tabindex','-1');$('sfs-ok-s').querySelector('h2').focus()})
+    .catch(function(err){$('sfs-send').disabled=false;$('sfs-mail').href=mailto();$('sfs-mail').hidden=false;msg('Could not send ('+err.message+'). You can email the list instead.',true)});
+}
+$('sfs-send').addEventListener('click',send);
+$('sfs-reset').addEventListener('click',function(){notes=[];save(notes);rset(null);location.href=PATH});
+/* ---- boot ---- */
+label();draw();render();
+if(rv&&rv.status==='active'&&rv.idx<N&&location.hash==='#sfs-review'){history.replaceState(null,'',PATH);setTimeout(function(){go(rv.idx)},50)}
 })();
 </script>

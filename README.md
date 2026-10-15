@@ -221,22 +221,63 @@ npm publish --access public           # once the package is published to a regis
 
 Department repos pin a caret range (`^0.1.0`) and pick up patch and minor releases with `npm update`.
 
-## Feedback widget (0.4.0)
+## Feedback widget (0.5.0): guided review + markup
 
-Set `feedback` in `site.config.json` to render a "Suggest a change" button on every page (`components/Feedback.astro`,
-inline script and styles, no dependencies, no external hosts, about 14 KB). Absent, nothing is emitted.
+Set `feedback` in `site.config.json` to render a "Review this site" button on every page (`components/Feedback.astro`,
+inline script and styles, no dependencies, no external hosts, about 17 KB of script). Absent, nothing is emitted.
 
 ```json
 "feedback": { "site": "crains-creek-fire", "endpoint": "https://sitesforservice.org/api/site-feedback" }
 ```
 
-`site` is the slug the collector files notes under; `endpoint` is optional and defaults to the URL above. The button
-toggles markup mode: a slim top bar ("Tap anything you want changed · Notes (n) · Done"), targetable elements
-(`main p, h1-h3, li, img, figcaption, a.btn, td, dt, dd, header .brand, footer p`) outlined on hover/focus, and a
-popover (note, Text / Photo / Other) on click, tap or Enter. Link and button clicks are prevented in markup mode so
-tapping a button marks it instead of navigating. Each saved note gets a numbered red pin; notes persist across pages
-in `localStorage` (`sfs_feedback_<site>`, reviewer name/email in `sfs_feedback_who`) until sent. The Notes panel lists
-every note with Edit / Delete and posts them with `fetch` (`mode: 'cors'`, `Content-Type: application/json`):
+`site` is the slug the collector files notes under; `endpoint` is optional and defaults to the URL above.
+
+### Guided review
+
+When `content/review.json` has items, the button opens a welcome card ("Chief, let's check this site together. N quick
+questions… Your answers save as you go.") with an optional name field (remembered in `sfs_feedback_who`), **Start** and
+**Just mark things**. Start walks through the items in order: the widget navigates to the item's `page` (with
+`#sfs-review` on the URL so the pass resumes on load), scrolls the `selector` element to the middle of the free
+viewport, outlines it in red with a dimmed cut-out, and shows a bottom card with a progress bar, "3 of 24"
+(`aria-live`), the `question`, "The draft shows: `current`", **✓ Looks right** / **✗ Needs a change** (reveals
+"Tell us what it should say" + **Save**), and Back / Pause / Skip links. Keys: Y, N, ← →, Escape pauses. Each answer is
+stored immediately and the pass auto-advances. Progress lives in `localStorage` (`sfs_review_<site>` =
+`{ idx, status: active|paused|done }`); while a pass is in progress every page shows a pill "Continue review (12 of 24)"
+instead of the full button. After the last item an end card offers **Mark more things** and **Send to Sites for Service**.
+Welcome and end cards are modal (page content gets `inert` + `aria-hidden`); the bottom card traps focus;
+`prefers-reduced-motion` disables the smooth scroll. On phones the cards are bottom sheets at most 45% of the viewport
+with full-width 52 px buttons.
+
+review.json items take three optional anchor fields (everything else unchanged):
+
+```json
+{ "id": "founded", "question": "Was the department organized in 1977?", "current": "…", "where": ["/", "/about/"],
+  "page": "/", "selector": "header .brand .bs", "status": "open" }
+```
+
+`page` is where the widget takes the reviewer (defaults to `/`); `selector` is any CSS selector for the element the
+question is about — prefer stable ids/classes from the template (`header .brand .bs`, `.hero-x .kicker`,
+`.stats .stat:nth-child(1)`, `.rigs .rig:nth-child(1)`, `.people .person:nth-child(1)`, `main dl.rows .row:nth-child(3)`,
+`.doors .door:nth-child(1)`, `.mini`, `.mapgrid`, `#programs`, `footer a[href*="facebook"]`). Omit `selector` for items
+with nothing to point at (patch artwork, donation method): the card shows without a highlight. The `/review/` page keeps
+the printable checklist and, when `feedback` is configured, opens by saying the easy way is the button on the site.
+
+### Markup mode
+
+"Just mark things" / "Mark more things" (or the button when there is no review.json) toggles markup mode: a slim top bar
+("Tap anything you want changed · Notes (n) · Done"), targetable elements (`main p, h1-h3, li, img, figcaption, a.btn,
+td, dt, dd, header .brand, footer p`) outlined on hover/focus. Tapping a text element shows a small bar
+**Edit this text / Leave a note / Cancel**; "Edit this text" makes the element `contenteditable` with a green outline
+and a Done/Cancel strip, and on Done stores an `edit` item with `before`/`after`. Tapping an image shows
+**Replace this photo / Remove this photo / Leave a note**; the first two store a `photo` item whose `note` is the choice.
+"Leave a note" opens the note popover (Text / Photo / Other) as before. Link and button clicks are prevented in markup
+mode. Every stored item with a selector gets a numbered red pin on its page (answers marked "Looks right"/"Skip" get
+none). Items persist in `localStorage` (`sfs_feedback_<site>`) until sent.
+
+### Sending
+
+**Send to Sites for Service** (notes panel and end card) posts with `fetch` (`mode: 'cors'`,
+`Content-Type: application/json`):
 
 ```json
 {
@@ -245,28 +286,30 @@ every note with Edit / Delete and posts them with `fetch` (`mode: 'cors'`, `Cont
   "submitted_at": "2026-10-14T15:04:05.000Z",
   "reviewer": { "name": "Chief Smith", "email": "chief@example.org" },
   "items": [
-    {
-      "id": "mgq1x2ab3c",
-      "page": "/about/",
-      "url": "https://crains-creek-fire.vercel.app/about/",
-      "selector": "main > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2)",
-      "excerpt": "Crains Creek Volunteer Fire Department was organized in 1977 to protect…",
-      "kind": "text",
-      "note": "Founded 1976, not 1977.",
-      "created_at": "2026-10-14T15:01:00.000Z"
-    }
+    { "id": "mgq1x2ab3c", "kind": "answer", "question_id": "founded", "question": "Was the department organized in 1977?",
+      "answer": "change", "note": "1976.", "page": "/", "url": "https://…/", "selector": "header .brand .bs",
+      "excerpt": "Station 23 · Est. 1977", "created_at": "…" },
+    { "id": "…", "kind": "edit", "page": "/about/", "url": "…", "selector": "main > section:nth-of-type(2) > … > p:nth-of-type(1)",
+      "excerpt": "Crains Creek Volunteer Fire Department was organized in 1977…", "before": "…was organized in 1977…",
+      "after": "…was organized in 1976…", "note": "Edited in place", "created_at": "…" },
+    { "id": "…", "kind": "photo", "page": "/members/", "selector": ".phero img", "excerpt": "Crains Creek members with the engine",
+      "note": "Replace this photo", "created_at": "…" },
+    { "id": "…", "kind": "text", "page": "/about/", "selector": "…", "excerpt": "…", "note": "Founded 1976, not 1977.", "created_at": "…" }
   ]
 }
 ```
 
-`selector` is the nearest `#id` or an `nth-of-type` path from `<body>`; `excerpt` is the element text (or image
-alt) trimmed to 160 characters; `kind` is `text`, `photo` or `other`. The endpoint must answer 2xx with
-`{"ok": true}` (and CORS headers for the site's origin); the widget then clears the stored notes and pins. On any
-failure it shows the error and offers "Email instead", a `mailto:hello@sitesforservice.org` with subject
-`Site changes: <site_name>` and each note as `- /page · "excerpt" → note`. When `draft_note` is set the draft banner
-gains the hint "Tap "Suggest a change" to mark up any page." Escape closes the popover, then the panel, then markup
-mode; the widget is hidden in print, does not render on `plain` pages (the review checklist), and does not touch the
-motion layer or the "I want to" menu.
+`kind` is `answer` (`answer`: `ok` | `change` | `skip`, with `question_id`, `question`, `note`), `edit` (`before`,
+`after`), `photo`, `text` or `other`. `selector` is the item's anchor, or the nearest `#id` / `nth-of-type` path from
+`<body>` for free markup; `excerpt` is the element text (or image alt) trimmed to 160 characters. The endpoint must
+answer 2xx with `{"ok": true}` (and CORS headers for the site's origin); the widget then clears the stored items, pins and
+review progress and shows "Sent. Thank you, Chief. We'll make these changes and send you the updated site." with a
+**Start over** link. On any failure it shows the error and offers "Email instead", a `mailto:hello@sitesforservice.org`
+with subject `Site changes: <site_name>` and one line per item (`- Q3 Needs a change: … (question)`,
+`- /page · "before" → "after"`, `- /page · "excerpt" → note`). When `draft_note` is set the draft banner gains the hint
+"Tap "Review this site" and we'll walk you through it." Escape closes the action bar, edit, popover, card (pauses the
+pass), panel, then markup mode; the widget is hidden in print, does not render on `plain` pages (the review checklist),
+and does not touch the motion layer or the "I want to" menu.
 
 ## Gotchas
 
