@@ -16,7 +16,7 @@ const desc = q ? `In memory of the members of the ${d.name} who have died, and o
     {q ? <section class="ms-lodd">
       <div class="wrap">
         <p class="ms-kicker">Line of duty</p>
-        <p class="ms-name">{q.name}</p>
+        <h1 class="ms-name">{q.name}</h1>
         <p class="ms-dates"><span>Last alarm</span> {fmt(q.died)}<span class="ms-sep" aria-hidden="true">·</span><span>Member since</span> {fmt(q.joined)}</p>
         <div class="ms-rule" aria-hidden="true"></div>
         <p class="ms-account">{q.account}</p>
@@ -24,7 +24,7 @@ const desc = q ? `In memory of the members of the ${d.name} who have died, and o
     </section> : <section class="ms-lodd">
       <div class="wrap">
         <p class="ms-kicker">Memorial</p>
-        <p class="ms-name">{d.name}</p>
+        <h1 class="ms-name">{d.name}</h1>
         <div class="ms-rule" aria-hidden="true"></div>
         <p class="ms-account">In memory of the members who served this department and have died.</p>
       </div>

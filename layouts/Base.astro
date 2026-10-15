@@ -33,7 +33,7 @@ const nav = [
   { href: '/apparatus/', label: 'Apparatus' },
   { href: '/responses/', label: 'Responses' },
   { href: '/safety/', label: 'Safety' },
-  ...((d as any).weather ? [{ href: '/weather/', label: 'Weather' }] : []),
+  ...((d as any).weather ? [{ href: '/weather/', label: cp.weather_nav }] : []),
   { href: '/community/', label: 'Community' },
   { href: '/news/', label: 'News & events' },
   { href: '/join/', label: 'Join', cta: true },

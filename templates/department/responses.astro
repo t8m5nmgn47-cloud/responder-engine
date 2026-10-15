@@ -10,6 +10,9 @@ const fmt = (s: string) => new Date(s + 'T00:00:00').toLocaleDateString('en-US',
 const years = inc.year_counts.slice().sort((a, b) => a.year - b.year);
 const max = Math.max(1, ...years.map((y) => y.calls));
 const blankNum = (s: string) => !s || /^\s*$/.test(s) || /^\d{2}-0{3,}$/.test(s);
+// 0.7.0: `responses.kinds [{title, text}]` adds a 'The calls, by kind' row above the list; `responses.kinds_note`, `responses.list_link {label, href}`, `responses.report` (true shows an incident-report section using copy.incident_reports)
+const rs: any = (d as any).responses || {};
+const kinds: { title: string; text: string }[] = rs.kinds || [];
 ---
 <Base title="Responses" description={`Recent responses by the ${d.name}: what we were called to, when, where in general, which rigs went, and how many volunteers turned out. Plus calls by year.`}>
   <section class="phero two" style={`--pbg:url(${rp.src})`}>
@@ -17,7 +20,7 @@ const blankNum = (s: string) => !s || /^\s*$/.test(s) || /^\d{2}-0{3,}$/.test(s)
       <div>
         <p class="kicker">Responses</p>
         <h1 style="margin-top:.75rem">What the pager said.</h1>
-        <p class="lede">Every call, in general terms: the kind of incident, the road, which rigs went, how many of your neighbors dropped what they were doing. No names, no house numbers, no medical details.</p>
+        <p class="lede">{cp.responses_lede}</p>
       </div>
       <div>
         <figure class="hphoto side"><img src={rp.src.replace(".jpg","-800.jpg")} alt={rp.alt} width="800" height="1067" fetchpriority="high" /><figcaption>{cp.responses_caption}</figcaption></figure>
@@ -29,9 +32,17 @@ const blankNum = (s: string) => !s || /^\s*$/.test(s) || /^\d{2}-0{3,}$/.test(s)
     </div>
   </section>
 
+  {kinds.length > 0 && <section class="section tight band">
+    <div class="wrap">
+      <div class="head" data-reveal><p class="kicker">What we answer</p><h2>The calls, by kind</h2></div>
+      <div class="doors three kinds" data-reveal-group>{kinds.map((k) => <div class="door"><h3>{k.title}</h3><p>{k.text}</p></div>)}</div>
+      {rs.kinds_note && <p class="small" style="margin-top:1.25rem;max-width:62ch">{rs.kinds_note}</p>}
+    </div>
+  </section>}
+
   <section class="section tight">
     <div class="wrap">
-      <div class="head" data-reveal><p class="kicker">Recent</p><h2>Latest responses</h2></div>
+      <div class="head" data-reveal><p class="kicker">{cp.responses_list_kicker}</p><h2>{cp.responses_list_title}</h2></div>
       {feed && feed.url && <p class="listen" style="margin:0 0 1.5rem"><b>Listen live:</b> <a href={feed.url} rel="noopener">{feed.label}</a>. A public scanner feed run by volunteers, not an official source; what you hear there is unconfirmed until it appears below.</p>}
       <ol class="runs">
         {inc.incidents.map((r) => (
@@ -47,9 +58,17 @@ const blankNum = (s: string) => !s || /^\s*$/.test(s) || /^\d{2}-0{3,}$/.test(s)
           </li>
         ))}
       </ol>
-      <p class="small" style="margin-top:1.5rem;max-width:62ch">This log is kept by the department from its run reports.</p>
+      <p class="small" style="margin-top:1.5rem;max-width:62ch">{cp.responses_list_note}</p>
+      {rs.list_link && <p style="margin-top:1.25rem"><a class="btn" href={rs.list_link.href} rel="noopener">{rs.list_link.label}</a></p>}
     </div>
   </section>
+
+  {rs.report && <section class="section tight">
+    <div class="wrap">
+      <div class="head" data-reveal><p class="kicker">After a call</p><h2>Need an incident report?</h2></div>
+      <div class="prose"><p>{cp.incident_reports}</p></div>
+    </div>
+  </section>}
 
   {years.length > 0 && <section class="section band">
     <div class="wrap">
@@ -69,6 +88,9 @@ const blankNum = (s: string) => !s || /^\s*$/.test(s) || /^\d{2}-0{3,}$/.test(s)
   </section>
 
   <style is:global>
+    .kinds .door{padding:1.4rem 1.5rem;background:var(--card);border:1px solid var(--rule);border-top:4px solid var(--red)}
+    .kinds .door h3{font:700 1.6rem/1 var(--display);text-transform:uppercase;color:var(--ink-hi)}
+    .kinds .door p{margin-top:.6rem;color:var(--ink)}
     .runs{display:grid;gap:0;border-top:1px solid var(--rule)}
     .run{display:grid;grid-template-columns:1fr;gap:.4rem 2rem;padding:1.2rem 0;border-bottom:1px solid var(--rule)}
     @media (min-width:44rem){.run{grid-template-columns:11rem 1fr}}

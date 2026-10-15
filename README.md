@@ -7,7 +7,7 @@ stylesheet of a volunteer fire department website. A department's own repository
 (`site.config.json`, `content/*.json`), its photos and patch (`public/`), and a six-line `astro.config.mjs`.
 Upgrading every department site is a version bump of this package.
 
-Templates shipped today (0.3.4 adds an optional `/review` page, see `content/review.json`):
+Templates shipped today (0.3.4 adds an optional `/review` page, see `content/review.json`; 0.7.0 adds `home.hide`, `seasonal.photo`, `district.map_embed`, `responses.kinds` and friends, see the content contract):
 
 | template     | pages |
 |--------------|-------|
@@ -146,6 +146,14 @@ Every field the `department` template reads. Paths are relative to the JSON root
 | `careers` | `{kicker?, title, text, cta?, href?}` (0.3.4, optional) | a `#career` section on the join page, before the apply form, for a paid position or career-staff notice; `href` defaults to the station phone and `cta` to "Call the station". Hidden when absent. |
 | `feature.photo` | `{src, alt, aspect?}` (0.3.4, optional) | the home feature block's photo instead of `photos.chief_engine`; `aspect` such as `4/3` overrides the default 3:4 portrait frame. |
 | `copy.join_steps_note`, `.youth_note` | string (0.3.4, optional) | the "department to confirm" footnotes under the join-page steps and the junior-program page; `""` hides them. |
+| `home.hide` | string[] (0.7.0, optional) | home sections to leave out: `groupband`, `feature`, `seasonal`, `pager`, `district`, `rigs`, `programs`, `doors`, `news`, `facebook`, `support`. Use it when a section would only repeat another (the door row repeats the nav, the news cards repeat `notices`). Default: nothing hidden. |
+| `hero_compact` | boolean (0.7.0, optional) | a smaller home H1 (`clamp(3rem, 1.8rem + 5vw, 6.25rem)`, 12ch) so the hero buttons stay nearer the fold with a longer headline. |
+| `seasonal.photo` | `{src, alt, position?}` (0.7.0, optional) | turns the seasonal band into text beside a full-height photo (desktop; the photo is hidden on phones). With it, `seasonal.link`/`link_label` become the band's first button and "Fire safety at home" the second. |
+| `district.map_embed` | `{query, zoom?, note?}` (0.7.0, optional) | when there is no drawn `DistrictMap` (`copy.map: false`), embeds a map of `query` (the station address) with a Directions link and a "call the station" line; `note` replaces the default "<station>, <street>." caption. |
+| `apparatus[].spec`, `.role` | (0.7.0) | hidden when empty instead of rendering an empty line; use `copy.rigs_note` (home) / `copy.apparatus_note` (apparatus page) for one note about pending specs. |
+| `responses.kinds`, `.kinds_note`, `.list_link {label, href}`, `.report` | (0.7.0, optional) | responses page: a "The calls, by kind" row of `{title, text}` cards above the list, a note under it, a button under the list (a Facebook page, a scanner feed), and `report: true` adds a "Need an incident report?" section that prints `copy.incident_reports`. |
+| `copy.weather_nav`, `.events_link`, `.rigs_note`, `.district_note`, `.responses_lede`, `.responses_list_kicker`, `.responses_list_title`, `.responses_list_note` | string (0.7.0, optional) | the Weather nav label ("Burn & weather"), the home events button, the home rigs note (`""` hides it), the district paragraph's mutual-aid/address sentence, and the responses page lede, list heading and list footnote. |
+| (0.7.0) | | the memorial page's name is an `<h1>`; the home "Years of service" stat carries `data-since` and is recomputed in the browser so a static build does not go stale on New Year's Day. |
 | `photos.<key>.src`, `.alt` | string | keys used: `chief_engine`, `structure`, `glow`, `community`, `members_dog`, `dog_window`, `squad`. Pages derive the responsive 800px variant with `src.replace('.jpg', '-800.jpg')`, so every photo needs a `-800.jpg` sibling in `public/photos/`. |
 
 Present in Paw Paw's data but not read by any template: `short`, `email`, `phones.emergency`, `stats.apparatus`,
