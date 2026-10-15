@@ -1,0 +1,176 @@
+---
+// "Suggest a change" markup widget (0.4.0). Rendered by Base.astro only when site.config.json has
+// `feedback: { site }`. Zero dependencies, no external hosts; notes live in localStorage until sent.
+interface Props { site: string; endpoint: string; siteName: string }
+const { site, endpoint, siteName } = Astro.props;
+---
+<div id="sfs" data-site={site} data-endpoint={endpoint} data-name={siteName}>
+  <button id="sfs-btn" type="button" aria-pressed="false" aria-label="Suggest a change">
+    <svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+    <span class="sfs-lbl">Suggest a change</span>
+  </button>
+  <div id="sfs-bar" hidden role="region" aria-label="Markup mode">
+    <span class="sfs-tip">Tap anything you want changed</span><span class="sfs-tip-s">Tap anything</span>
+    <button type="button" id="sfs-notes" aria-expanded="false" aria-controls="sfs-panel">Notes (<span id="sfs-n">0</span>)</button>
+    <button type="button" id="sfs-done">Done</button>
+  </div>
+  <form id="sfs-pop" hidden role="dialog" aria-labelledby="sfs-pop-h" novalidate>
+    <h2 id="sfs-pop-h">Suggest a change</h2>
+    <p class="sfs-ex" id="sfs-ex"></p>
+    <label for="sfs-note">What should change?</label>
+    <textarea id="sfs-note" rows="3" required></textarea>
+    <fieldset><legend>This is about</legend>
+      <label><input type="radio" name="kind" value="text" checked /> Text</label>
+      <label><input type="radio" name="kind" value="photo" /> Photo</label>
+      <label><input type="radio" name="kind" value="other" /> Other</label>
+    </fieldset>
+    <div class="sfs-row"><button type="submit" class="sfs-pri">Save</button><button type="button" id="sfs-cancel">Cancel</button></div>
+  </form>
+  <aside id="sfs-panel" hidden role="dialog" aria-labelledby="sfs-panel-h">
+    <div class="sfs-ph"><h2 id="sfs-panel-h">Your notes</h2><button type="button" id="sfs-close" aria-label="Close notes">&times;</button></div>
+    <ol id="sfs-list"></ol>
+    <p id="sfs-empty">No notes yet. Tap anything on the page to add one.</p>
+    <div class="sfs-who">
+      <label for="sfs-name">Your name</label><input id="sfs-name" type="text" autocomplete="name" />
+      <label for="sfs-email">Email (optional)</label><input id="sfs-email" type="email" autocomplete="email" />
+    </div>
+    <div class="sfs-row"><button type="button" id="sfs-send" class="sfs-pri">Send to Sites for Service</button><a id="sfs-mail" hidden href="#">Email instead</a></div>
+    <p id="sfs-status" role="status"></p>
+  </aside>
+  <div id="sfs-pins" aria-hidden="true"></div>
+</div>
+<style is:inline>
+#sfs{font:400 .95rem/1.4 var(--sans,system-ui,sans-serif);color:#111}
+#sfs button{font:inherit;cursor:pointer;min-height:44px;border-radius:4px}
+#sfs-btn{position:fixed;right:1rem;bottom:1rem;z-index:1000;display:inline-flex;align-items:center;gap:.5rem;min-width:44px;padding:0 1rem;background:#b3261e;color:#fff;border:2px solid #fff;border-radius:999px;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.3)}
+#sfs-btn[aria-pressed=true]{background:#1d1d1f}
+#sfs-btn:focus-visible{outline:3px solid #111;outline-offset:3px}
+#sfs-bar{position:fixed;top:0;left:0;right:0;z-index:1100;display:flex;align-items:center;gap:.6rem;padding:.3rem 1rem;background:#1d1d1f;color:#fff;border-bottom:2px solid #c7a35a}
+#sfs-bar .sfs-tip,#sfs-bar .sfs-tip-s{flex:1;font-weight:600}#sfs-bar .sfs-tip-s{display:none}
+#sfs-bar button{background:transparent;color:#fff;border:1px solid #fff;padding:0 .9rem}
+#sfs-bar :focus-visible{outline:3px solid #fff;outline-offset:2px}
+html.sfs-mode body{padding-top:var(--sfs-bar,3rem)}
+html.sfs-mode .top{top:var(--sfs-bar,3rem)}
+[data-sfs]{cursor:crosshair!important;outline-offset:3px}
+[data-sfs]:hover,[data-sfs]:focus-visible{outline:3px dashed #b3261e!important}
+#sfs-pop,#sfs-panel{background:#fff;border:2px solid #1d1d1f;border-radius:6px;box-shadow:0 6px 24px rgba(0,0,0,.3);padding:1rem}
+#sfs-pop{position:absolute;z-index:1200;width:min(22rem,calc(100vw - 2rem));margin:0}
+#sfs-pop h2,#sfs-panel h2{font:700 1.05rem/1.2 var(--display,inherit);letter-spacing:.04em;text-transform:uppercase;margin:0 0 .3rem}
+#sfs .sfs-ex{color:#5f5b54;font-size:.85rem;margin:0 0 .6rem;font-style:italic}
+#sfs label{display:block;font-weight:600;margin:.4rem 0 .2rem}
+#sfs textarea,#sfs input[type=text],#sfs input[type=email]{width:100%;font:inherit;padding:.5rem;border:1px solid #5f5b54;border-radius:4px;background:#fff;color:#111}
+#sfs fieldset{border:0;padding:0;margin:.5rem 0;display:flex;gap:.9rem;flex-wrap:wrap}
+#sfs legend{font-weight:600;padding:0;margin-bottom:.2rem}
+#sfs fieldset label{display:inline-flex;align-items:center;gap:.3rem;font-weight:400;margin:0}
+#sfs .sfs-row{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-top:.6rem}
+#sfs .sfs-row button{background:#fff;color:#111;border:2px solid #111;padding:0 1rem;font-weight:700}
+#sfs .sfs-row .sfs-pri{background:#b3261e;color:#fff;border-color:#b3261e}
+#sfs-panel{position:fixed;top:var(--sfs-bar,3rem);right:0;bottom:0;z-index:1150;width:min(24rem,100vw);overflow:auto;border-radius:0;border-width:0 0 0 2px}
+#sfs .sfs-ph{display:flex;justify-content:space-between;align-items:center}
+#sfs-close{background:transparent;border:0;font-size:1.6rem;min-width:44px;color:#111}
+#sfs-list{list-style:none;padding:0;margin:0}
+#sfs-list li{border-top:1px solid rgba(20,20,20,.16);padding:.6rem 0}
+#sfs-list .sfs-pg{font-size:.8rem;color:#5f5b54}
+#sfs-list .sfs-q{font-style:italic;color:#5f5b54;font-size:.85rem}
+#sfs-list .sfs-t{margin:.2rem 0}
+#sfs-list button{background:transparent;border:1px solid #5f5b54;color:#111;padding:0 .7rem;margin-right:.4rem;min-height:36px}
+#sfs-mail{color:#8e1a14;font-weight:700}
+#sfs-status{margin:.6rem 0 0;font-weight:600}
+#sfs-status.err{color:#8e1a14}
+#sfs-pins{position:absolute;top:0;left:0;width:0;height:0;z-index:990}
+.sfs-pin{position:absolute;width:24px;height:24px;border-radius:50%;background:#b3261e;color:#fff;border:2px solid #fff;font:700 13px/20px var(--sans,sans-serif);text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+@media (max-width:40rem){#sfs-btn .sfs-lbl{display:none}#sfs-bar .sfs-tip{display:none}#sfs-bar .sfs-tip-s{display:inline}#sfs-bar{justify-content:flex-end}#sfs-btn{padding:0;width:52px;height:52px;justify-content:center}#sfs-bar .sfs-tip{font-size:.85rem}}
+@media print{#sfs{display:none!important}}
+</style>
+<script is:inline>
+(function(){
+  var R=document.getElementById('sfs');if(!R)return;
+  var SITE=R.getAttribute('data-site'),EP=R.getAttribute('data-endpoint'),NAME=R.getAttribute('data-name');
+  var KEY='sfs_feedback_'+SITE,WHO='sfs_feedback_who';
+  var SEL='main p, main h1, main h2, main h3, main li, main img, main figcaption, main a.btn, main td, main dt, main dd, header .brand, footer p';
+  var $=function(id){return document.getElementById(id)};
+  var btn=$('sfs-btn'),bar=$('sfs-bar'),pop=$('sfs-pop'),panel=$('sfs-panel'),pins=$('sfs-pins'),list=$('sfs-list'),st=$('sfs-status');
+  var mode=false,cur=null,editing=null,raf=0;
+  function load(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return []}}
+  function save(n){try{localStorage.setItem(KEY,JSON.stringify(n))}catch(e){}}
+  var notes=load();
+  function selector(el){
+    if(el.id)return '#'+el.id;var parts=[];
+    while(el&&el.nodeType===1&&el.tagName!=='BODY'){
+      var t=el.tagName.toLowerCase();if(el.id){parts.unshift('#'+el.id);break}
+      var i=1,s=el;while((s=s.previousElementSibling))if(s.tagName===el.tagName)i++;
+      parts.unshift(t+':nth-of-type('+i+')');el=el.parentElement;
+    }return parts.join(' > ');
+  }
+  function excerpt(el){var t=el.tagName==='IMG'?(el.alt||el.getAttribute('src')||'image'):(el.textContent||'').replace(/\s+/g,' ').trim();return t.length>160?t.slice(0,157)+'…':t}
+  function targets(){return Array.prototype.slice.call(document.querySelectorAll(SEL)).filter(function(e){return !R.contains(e)})}
+  function setMode(on){
+    mode=on;document.documentElement.classList.toggle('sfs-mode',on);bar.hidden=!on;barH();btn.setAttribute('aria-pressed',String(on));
+    targets().forEach(function(e){if(on){e.setAttribute('data-sfs',e.hasAttribute('tabindex')||/^(A|BUTTON)$/.test(e.tagName)?'1':'t');if(e.getAttribute('data-sfs')==='t')e.setAttribute('tabindex','0')}
+      else{if(e.getAttribute('data-sfs')==='t')e.removeAttribute('tabindex');e.removeAttribute('data-sfs')}});
+    if(!on){closePop();showPanel(false)}
+  }
+  function findEl(n){try{return document.querySelector(n.selector)}catch(e){return null}}
+  function draw(){
+    pins.textContent='';var local=notes.filter(function(n){return n.page===location.pathname});
+    local.forEach(function(n){var el=findEl(n);if(!el)return;var r=el.getBoundingClientRect();
+      var p=document.createElement('span');p.className='sfs-pin';p.textContent=notes.indexOf(n)+1;
+      var x=r.left+scrollX-30;p.style.left=(x<0?r.left+scrollX+4:x)+'px';p.style.top=(r.top+scrollY-4)+'px';pins.appendChild(p)});
+    $('sfs-n').textContent=notes.length;
+  }
+  function barH(){if(mode)document.documentElement.style.setProperty('--sfs-bar',bar.offsetHeight+'px')}
+  function sched(){if(!raf)raf=requestAnimationFrame(function(){raf=0;draw()})}
+  addEventListener('resize',function(){barH();sched()});addEventListener('scroll',sched,{passive:true});
+  function openPop(el,note){
+    cur=el;editing=note||null;$('sfs-ex').textContent='“'+(note?note.excerpt:excerpt(el))+'”';
+    $('sfs-note').value=note?note.note:'';var k=note?note.kind:'text';pop.querySelectorAll('input[name=kind]').forEach(function(r){r.checked=r.value===k});
+    pop.hidden=false;
+    if(el){var r=el.getBoundingClientRect(),w=pop.offsetWidth;var x=Math.max(8,Math.min(r.left+scrollX,document.documentElement.clientWidth-w-8));pop.style.left=x+'px';pop.style.top=(r.bottom+scrollY+8)+'px';pop.style.position='absolute'}
+    else{pop.style.position='fixed';pop.style.left='50%';pop.style.top='30%';pop.style.transform='translateX(-50%)'}
+    $('sfs-note').focus();
+  }
+  function closePop(){if(pop.hidden)return;pop.hidden=true;pop.style.transform='';var f=cur;cur=null;editing=null;if(f&&f.focus)f.focus()}
+  pop.addEventListener('submit',function(e){e.preventDefault();var txt=$('sfs-note').value.trim();if(!txt){$('sfs-note').focus();return}
+    var kind=(pop.querySelector('input[name=kind]:checked')||{}).value||'other';
+    if(editing){editing.note=txt;editing.kind=kind}
+    else notes.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),page:location.pathname,url:location.href,selector:selector(cur),excerpt:excerpt(cur),kind:kind,note:txt,created_at:new Date().toISOString()});
+    save(notes);draw();render();closePop()});
+  $('sfs-cancel').addEventListener('click',closePop);
+  document.addEventListener('click',function(e){
+    if(!mode||R.contains(e.target))return;var el=e.target.closest&&e.target.closest('[data-sfs]');if(!el)return;
+    e.preventDefault();e.stopPropagation();var ex=notes.filter(function(n){return n.page===location.pathname&&findEl(n)===el})[0];openPop(el,ex)},true);
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){if(!pop.hidden)closePop();else if(!panel.hidden)showPanel(false);else if(mode){setMode(false);btn.focus()}return}
+    if(e.key==='Enter'&&mode&&e.target.hasAttribute&&e.target.hasAttribute('data-sfs')&&!R.contains(e.target)){e.preventDefault();openPop(e.target)}
+  });
+  btn.addEventListener('click',function(){setMode(!mode)});
+  $('sfs-done').addEventListener('click',function(){setMode(false);btn.focus()});
+  function showPanel(on){panel.hidden=!on;$('sfs-notes').setAttribute('aria-expanded',String(on));if(on){render();$('sfs-panel-h').setAttribute('tabindex','-1');$('sfs-panel-h').focus()}}
+  $('sfs-notes').addEventListener('click',function(){showPanel(panel.hidden)});
+  $('sfs-close').addEventListener('click',function(){showPanel(false);$('sfs-notes').focus()});
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function render(){
+    list.innerHTML=notes.map(function(n,i){return '<li><div class="sfs-pg">'+(i+1)+' · '+esc(n.page)+' · '+esc(n.kind)+'</div><div class="sfs-q">“'+esc(n.excerpt)+'”</div><p class="sfs-t">'+esc(n.note)+'</p>'+
+      '<button type="button" data-edit="'+i+'" aria-label="Edit note '+(i+1)+'">Edit</button><button type="button" data-del="'+i+'" aria-label="Delete note '+(i+1)+'">Delete</button></li>'}).join('');
+    $('sfs-empty').hidden=notes.length>0;$('sfs-send').disabled=!notes.length;$('sfs-n').textContent=notes.length;
+  }
+  list.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
+    if(b.hasAttribute('data-del')){notes.splice(+b.getAttribute('data-del'),1);save(notes);draw();render();$('sfs-panel-h').focus()}
+    else if(b.hasAttribute('data-edit')){var n=notes[+b.getAttribute('data-edit')];openPop(n.page===location.pathname?findEl(n):null,n)}});
+  try{var w=JSON.parse(localStorage.getItem(WHO)||'{}');$('sfs-name').value=w.name||'';$('sfs-email').value=w.email||''}catch(e){}
+  function who(){var w={name:$('sfs-name').value.trim(),email:$('sfs-email').value.trim()};try{localStorage.setItem(WHO,JSON.stringify(w))}catch(e){}return w}
+  function mailto(){var body=notes.map(function(n){return '- '+n.page+' · "'+n.excerpt+'" → '+n.note}).join('\n');
+    return 'mailto:hello@sitesforservice.org?subject='+encodeURIComponent('Site changes: '+NAME)+'&body='+encodeURIComponent(body+'\n\n— '+(who().name||'')+' '+(who().email||''))}
+  function msg(t,err){st.textContent=t;st.className=err?'err':''}
+  $('sfs-send').addEventListener('click',function(){
+    var w=who();if(!w.name){msg('Please add your name so we know who to thank.',true);$('sfs-name').focus();return}
+    msg('Sending…');$('sfs-send').disabled=true;
+    var payload={site:SITE,site_name:NAME,submitted_at:new Date().toISOString(),reviewer:w,items:notes};
+    fetch(EP,{method:'POST',mode:'cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+      .then(function(r){if(!r.ok)throw new Error('Server replied '+r.status);return r.json()})
+      .then(function(j){if(!j||j.ok!==true)throw new Error('Unexpected reply');notes=[];save(notes);draw();render();$('sfs-mail').hidden=true;msg('Sent — thank you. We’ll make the changes and let you know.')})
+      .catch(function(err){$('sfs-send').disabled=false;$('sfs-mail').href=mailto();$('sfs-mail').hidden=false;msg('Could not send ('+err.message+'). You can email the list instead.',true)});
+  });
+  draw();render();
+})();
+</script>

@@ -221,6 +221,53 @@ npm publish --access public           # once the package is published to a regis
 
 Department repos pin a caret range (`^0.1.0`) and pick up patch and minor releases with `npm update`.
 
+## Feedback widget (0.4.0)
+
+Set `feedback` in `site.config.json` to render a "Suggest a change" button on every page (`components/Feedback.astro`,
+inline script and styles, no dependencies, no external hosts, about 14 KB). Absent, nothing is emitted.
+
+```json
+"feedback": { "site": "crains-creek-fire", "endpoint": "https://sitesforservice.org/api/site-feedback" }
+```
+
+`site` is the slug the collector files notes under; `endpoint` is optional and defaults to the URL above. The button
+toggles markup mode: a slim top bar ("Tap anything you want changed · Notes (n) · Done"), targetable elements
+(`main p, h1-h3, li, img, figcaption, a.btn, td, dt, dd, header .brand, footer p`) outlined on hover/focus, and a
+popover (note, Text / Photo / Other) on click, tap or Enter. Link and button clicks are prevented in markup mode so
+tapping a button marks it instead of navigating. Each saved note gets a numbered red pin; notes persist across pages
+in `localStorage` (`sfs_feedback_<site>`, reviewer name/email in `sfs_feedback_who`) until sent. The Notes panel lists
+every note with Edit / Delete and posts them with `fetch` (`mode: 'cors'`, `Content-Type: application/json`):
+
+```json
+{
+  "site": "crains-creek-fire",
+  "site_name": "Crains Creek Fire-Rescue",
+  "submitted_at": "2026-10-14T15:04:05.000Z",
+  "reviewer": { "name": "Chief Smith", "email": "chief@example.org" },
+  "items": [
+    {
+      "id": "mgq1x2ab3c",
+      "page": "/about/",
+      "url": "https://crains-creek-fire.vercel.app/about/",
+      "selector": "main > section:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2)",
+      "excerpt": "Crains Creek Volunteer Fire Department was organized in 1977 to protect…",
+      "kind": "text",
+      "note": "Founded 1976, not 1977.",
+      "created_at": "2026-10-14T15:01:00.000Z"
+    }
+  ]
+}
+```
+
+`selector` is the nearest `#id` or an `nth-of-type` path from `<body>`; `excerpt` is the element text (or image
+alt) trimmed to 160 characters; `kind` is `text`, `photo` or `other`. The endpoint must answer 2xx with
+`{"ok": true}` (and CORS headers for the site's origin); the widget then clears the stored notes and pins. On any
+failure it shows the error and offers "Email instead", a `mailto:hello@sitesforservice.org` with subject
+`Site changes: <site_name>` and each note as `- /page · "excerpt" → note`. When `draft_note` is set the draft banner
+gains the hint "Tap "Suggest a change" to mark up any page." Escape closes the popover, then the panel, then markup
+mode; the widget is hidden in print, does not render on `plain` pages (the review checklist), and does not touch the
+motion layer or the "I want to" menu.
+
 ## Gotchas
 
 - `injectRoute` entrypoints are resolved as bare module specifiers, so the `.astro` files must be reachable
