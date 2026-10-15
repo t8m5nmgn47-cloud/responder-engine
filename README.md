@@ -11,7 +11,7 @@ Templates shipped today (0.3.4 adds an optional `/review` page, see `content/rev
 
 | template     | pages |
 |--------------|-------|
-| `department` | `/`, `/about`, `/apparatus`, `/responses`, `/safety`, `/community`, `/news`, `/join`, `/members`, `/youth`, `/memorial`, `/support`, `/contact`, `/accessibility`, `/escape-plan` (printable), `/404` |
+| `department` | `/`, `/about`, `/apparatus`, `/responses`, `/safety`, `/weather`, `/community`, `/news`, `/join`, `/members`, `/youth`, `/memorial`, `/support`, `/contact`, `/accessibility`, `/escape-plan` (printable), `/shop` (0.8.0, when `store` is set), `/404` |
 
 ## Consuming the engine
 
@@ -154,6 +154,8 @@ Every field the `department` template reads. Paths are relative to the JSON root
 | `responses.kinds`, `.kinds_note`, `.list_link {label, href}`, `.report` | (0.7.0, optional) | responses page: a "The calls, by kind" row of `{title, text}` cards above the list, a note under it, a button under the list (a Facebook page, a scanner feed), and `report: true` adds a "Need an incident report?" section that prints `copy.incident_reports`. |
 | `copy.weather_nav`, `.events_link`, `.rigs_note`, `.district_note`, `.responses_lede`, `.responses_list_kicker`, `.responses_list_title`, `.responses_list_note` | string (0.7.0, optional) | the Weather nav label ("Burn & weather"), the home events button, the home rigs note (`""` hides it), the district paragraph's mutual-aid/address sentence, and the responses page lede, list heading and list footnote. |
 | (0.7.0) | | the memorial page's name is an `<h1>`; the home "Years of service" stat carries `data-since` and is recomputed in the browser so a static build does not go stale on New Year's Day. |
+| `store` | object (0.8.0, optional) | adds `/shop/`, a "Shop" item in the main nav (label `copy.shop_nav`) and, with `store.home: true`, a three-card strip on the home page. Static page, no scripts: every Buy button is a Stripe Payment Link (create them in the Stripe dashboard with shipping address collection and a Size custom field). Fields: `kicker`, `h1`, `intro`, `meta`; `featured {edition, title, blurb, price, sizes, ships, deadline?, photos[{src,alt}], link, cta?}` (the current limited edition; a past `deadline` turns the button into "Orders closed"); `items[] {name, price, blurb, options?, photo?, alt?, link, cta?}`; `past[] {title, edition?, when?, photo?, alt?}`; `items_kicker/title`, `how_title`, `how`, `proceeds`, `contact`, `contact_email`, `past_title`, `home_kicker/title/link`. A product without a photo renders a reserved patch slot; without a `link` the button reads "Coming soon". Add a `tasks` entry and a `support.ways` entry yourself if you want the shop in the "I want to" menu and on the support page. |
+| (0.8.0) | | a nav of nine or more items (weather page + shop) gets `header.nav-wide`: tighter items on desktop and the menu button below 84rem instead of 64rem, so the Join button is never clipped. |
 | `photos.<key>.src`, `.alt` | string | keys used: `chief_engine`, `structure`, `glow`, `community`, `members_dog`, `dog_window`, `squad`. Pages derive the responsive 800px variant with `src.replace('.jpg', '-800.jpg')`, so every photo needs a `-800.jpg` sibling in `public/photos/`. |
 
 Present in Paw Paw's data but not read by any template: `short`, `email`, `phones.emergency`, `stats.apparatus`,

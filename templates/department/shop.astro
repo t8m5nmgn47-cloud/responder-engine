@@ -1,0 +1,102 @@
+---
+// /shop (0.8.0): department merchandise sold through Stripe Payment Links. Static page, no scripts:
+// every Buy button opens Stripe's hosted checkout. Rendered only when dept.json has a `store` block.
+import Base from '../../layouts/Base.astro';
+import d from '@content/dept.json';
+import { copy } from '../../components/copy.js';
+const cp = copy(d);
+const st: any = (d as any).store || {};
+const items: any[] = st.items || [];
+const past: any[] = st.past || [];
+const f = st.featured;
+const today = new Date().toISOString().slice(0, 10);
+const open = (p: any) => !p.deadline || p.deadline >= today;
+const fmtLong = (s: string) => new Date(s + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
+const buyLabel = (p: any) => p.cta || `Buy · ${p.price}`;
+const soonLabel = (p: any) => (p.deadline && !open(p)) ? 'Orders closed' : 'Coming soon';
+---
+<Base title={st.title || 'Shop'} description={st.meta || `${d.name} shirts and gear. Printed to order; a portion of every sale supports the department.`}>
+  <section class="phero"><div class="wrap"><div><p class="kicker">{st.kicker || 'Shop'}</p><h1 style="margin-top:.75rem">{st.h1 || 'Wear the patch.'}</h1><p class="lede">{st.intro || `Shirts and gear for the ${cp.place} community. Printed to order, shipped to your door, and a portion of every sale goes to the department.`}</p></div></div></section>
+
+  {f && <section class="section band shop-feat">
+    <div class="wrap">
+      <div class="featgrid2" data-reveal-group>
+        <div class="fphotos">{(f.photos && f.photos.length ? f.photos : [f, {}]).slice(0, 2).map((ph: any, i: number) => ph.src || ph.photo
+          ? <img src={ph.src || ph.photo} alt={ph.alt || `${f.title}, ${i === 0 ? 'front' : 'back'}`} loading={i === 0 ? 'eager' : 'lazy'} width="800" height="800" />
+          : <div class="reserved" role="img" aria-label={`Reserved for a photograph of ${f.title}, ${i === 0 ? 'front' : 'back'}`}></div>)}</div>
+        <div>
+          <p class="kicker">{f.edition || 'This season'}</p>
+          <h2>{f.title}</h2>
+          {f.blurb && <p class="lede" style="margin-top:.8rem">{f.blurb}</p>}
+          <dl class="specs">
+            {f.price && <div><dt>Price</dt><dd>{f.price}</dd></div>}
+            {f.sizes && <div><dt>Sizes</dt><dd>{f.sizes}</dd></div>}
+            {f.deadline && <div><dt>{open(f) ? 'Orders close' : 'Orders closed'}</dt><dd>{fmtLong(f.deadline)}</dd></div>}
+            {f.ships && <div><dt>Ships</dt><dd>{f.ships}</dd></div>}
+          </dl>
+          <p style="margin-top:1.5rem">{f.link && open(f) ? <a class="btn red big" href={f.link} rel="noopener">{buyLabel(f)}</a> : <span class="btn soon big" aria-disabled="true">{soonLabel(f)}</span>}</p>
+        </div>
+      </div>
+    </div>
+  </section>}
+
+  {items.length > 0 && <section class="section tight">
+    <div class="wrap">
+      <div class="head" data-reveal><p class="kicker">{st.items_kicker || 'Always available'}</p><h2>{st.items_title || 'Shirts and gear'}</h2></div>
+      <div class="products" data-reveal-group>
+        {items.map((p) => <div class="product">{p.photo ? <img class="pphoto" src={p.photo} alt={p.alt || p.name} loading="lazy" width="800" height="800" /> : <div class="pphoto reserved" role="img" aria-label={`Reserved for a photograph of ${p.name}`}></div>}<div class="in"><h3>{p.name}</h3>{p.blurb && <p>{p.blurb}</p>}{p.options && <p class="small">{p.options}</p>}<p class="buy">{p.link && open(p) ? <a class="btn red" href={p.link} rel="noopener">{buyLabel(p)}</a> : <span class="btn soon" aria-disabled="true">{soonLabel(p)}</span>}</p></div></div>)}
+      </div>
+    </div>
+  </section>}
+
+  <section class="section band">
+    <div class="wrap">
+      <div class="head" data-reveal><p class="kicker">How it works</p><h2>{st.how_title || 'Printed when you order it'}</h2></div>
+      <div class="prose" style="max-width:62ch">
+        <p>{st.how || 'Each piece is printed and pressed after you order, so nothing sits in a box waiting. Checkout runs through Stripe; we never see your card number. Allow about two weeks from order to doorstep.'}</p>
+        {st.proceeds && <p style="margin-top:1rem">{st.proceeds}</p>}
+        <p class="small" style="margin-top:1rem">{st.contact || 'Questions about an order?'} {st.contact_email ? <a href={`mailto:${st.contact_email}`}>{st.contact_email}</a> : <a href={tel(d.phones.station)}>{d.phones.station}</a>}.</p>
+      </div>
+    </div>
+  </section>
+
+  {past.length > 0 && <section class="section tight">
+    <div class="wrap">
+      <div class="head" data-reveal><p class="kicker">Past editions</p><h2>{st.past_title || 'The series so far'}</h2></div>
+      <div class="products past" data-reveal-group>
+        {past.map((p) => <div class="product">{p.photo ? <img class="pphoto" src={p.photo} alt={p.alt || p.title} loading="lazy" width="800" height="800" /> : <div class="pphoto reserved" role="img" aria-label={`Reserved for a photograph of ${p.title}`}></div>}<div class="in"><h3>{p.title}</h3><p class="small">{[p.edition, p.when].filter(Boolean).join(' · ')}</p></div></div>)}
+      </div>
+    </div>
+  </section>}
+
+  <style is:global>
+    .shop-feat{background:var(--char);color:var(--char-ink)}
+    .shop-feat .kicker{color:var(--brass)}
+    .shop-feat h2{color:#fff;font-size:clamp(2.2rem,1.6rem + 2.4vw,3.6rem)}
+    .shop-feat .lede{color:rgba(243,239,230,.9)}
+    .featgrid2{display:grid;gap:2rem;grid-template-columns:1fr;align-items:center}
+    @media (min-width:60rem){.featgrid2{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:3.5rem}}
+    .fphotos{display:grid;gap:1rem;grid-template-columns:1fr 1fr}
+    .fphotos img,.fphotos .reserved{width:100%;height:auto;aspect-ratio:1;object-fit:cover;border-radius:2px;border:4px solid #2a2a2c;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    .reserved{background:var(--bg-2) url(/patch.svg) center/38% no-repeat;opacity:.9}
+    .shop-feat .reserved{background-color:#2a2a2c}
+    .specs{display:grid;gap:.6rem 2rem;grid-template-columns:repeat(2,auto);justify-content:start;margin-top:1.25rem}
+    .specs dt{font:700 .75rem/1.3 var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--brass)}
+    .specs dd{font-weight:600;color:#fff;margin-top:.15rem}
+    .btn.big{font-size:1.1rem;padding:.95rem 1.6rem}
+    .btn.soon{opacity:.7;cursor:default;border-style:dashed}
+    .shop-feat .btn.soon{color:#fff;border-color:rgba(255,255,255,.55);opacity:1}
+    .products{display:grid;gap:1rem;grid-template-columns:1fr}
+    @media (min-width:44rem){.products{grid-template-columns:repeat(2,1fr)}}
+    @media (min-width:64rem){.products{grid-template-columns:repeat(3,1fr)}.products.past{grid-template-columns:repeat(4,1fr)}}
+    .product{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--rule);border-top:4px solid var(--red);min-width:0}
+    .product .pphoto{width:100%;height:auto;aspect-ratio:1;object-fit:cover;border-bottom:1px solid var(--rule);display:block}
+    .product .in{display:flex;flex-direction:column;gap:.5rem;padding:1.1rem 1.2rem 1.3rem;flex:1}
+    .product h3{font-size:1.5rem;line-height:1.05}
+    .product p{color:var(--ink);font-size:.95rem}
+    .product .buy{margin-top:auto;padding-top:.6rem}
+    .products.past .product{border-top-color:var(--brass)}
+    .products.past h3{font-size:1.25rem}
+  </style>
+</Base>

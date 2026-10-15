@@ -38,6 +38,9 @@ const mapEmbed = (d as any).district && (d as any).district.map_embed;
 const mapSrc = mapEmbed ? `https://www.google.com/maps?q=${encodeURIComponent(mapEmbed.query)}&z=${mapEmbed.zoom || 11}&output=embed` : '';
 const mapDir = mapEmbed ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapEmbed.query)}` : '';
 const compact = !!(d as any).hero_compact;
+// 0.8.0: `store.home` (true) shows the featured edition and up to three items on the home page
+const st: any = (d as any).store || {};
+const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st.featured.title, photo: (st.featured.photos && st.featured.photos[0] && st.featured.photos[0].src) || st.featured.photo, alt: st.featured.photos && st.featured.photos[0] && st.featured.photos[0].alt }] : []), ...(st.items || [])].slice(0, 3) : [];
 ---
 <Base title="Home" description={cp.home_meta}>
   <section class="hero-x" aria-label="Welcome" style={[d.hero_bg ? `--hero-bg:url(${d.hero_bg.src});--hero-bg-800:url(${d.hero_bg.src.replace(/\.jpg$/, "-800.jpg")});--hero-pos:${d.hero_bg.position || "center 40%"}` : "", d.hero_patch_scale ? `--hpatch-scale:${d.hero_patch_scale}` : ""].filter(Boolean).join(";") || undefined}>
@@ -177,6 +180,14 @@ const compact = !!(d as any).hero_compact;
     </div>
   </section>}
 
+  {shopHome.length > 0 && <section class="section tight">
+    <div class="wrap">
+      <div class="head" data-reveal><p class="kicker">{st.home_kicker || "Shop"}</p><h2>{st.home_title || "Wear the patch"}</h2></div>
+      <div class="shophome" data-reveal-group>{shopHome.map((p) => <a class="shopcard" href="/shop/">{p.photo ? <img src={p.photo} alt={p.alt || p.name} loading="lazy" width="800" height="800" /> : <span class="reserved" role="img" aria-label={`Reserved for a photograph of ${p.name}`}></span>}<span class="in"><span class="h3">{p.name}</span>{p.price && <span class="pr">{p.price}</span>}</span></a>)}</div>
+      <p style="margin-top:1.5rem"><a class="btn" href="/shop/">{st.home_link || "Open the shop"}</a></p>
+    </div>
+  </section>}
+
   {!hide.has("facebook") && <FacebookFeed />}
 
   {!hide.has("support") && <section class="section redband cut up">
@@ -224,6 +235,15 @@ const compact = !!(d as any).hero_compact;
     .dmap{width:100%;aspect-ratio:4/3;border:0;border-radius:2px;background:var(--bg-2);box-shadow:0 10px 30px rgba(0,0,0,.12)}
     .mapnote{color:var(--ink-lo)}
     .rignote{margin:1.25rem 0 0;max-width:60ch;color:rgba(243,239,230,.7)}
+    .shophome{display:grid;gap:1rem;grid-template-columns:1fr}
+    @media (min-width:44rem){.shophome{grid-template-columns:repeat(3,1fr)}}
+    .shopcard{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--rule);border-top:4px solid var(--red);text-decoration:none;color:inherit;min-width:0;transition:transform .2s var(--ease),box-shadow .2s}
+    .shopcard:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(20,20,20,.12)}
+    .shopcard img,.shopcard .reserved{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:cover;border-bottom:1px solid var(--rule)}
+    .shopcard .reserved{background:var(--bg-2) url(/patch.svg) center/38% no-repeat;opacity:.9}
+    .shopcard .in{display:flex;justify-content:space-between;gap:1rem;padding:.9rem 1.1rem 1rem}
+    .shopcard .h3{font:700 1.25rem/1.1 var(--display);text-transform:uppercase;color:var(--ink-hi)}
+    .shopcard .pr{font-weight:600;color:var(--red);white-space:nowrap}
     .pdoors .door{padding-top:0;overflow:hidden;border-top:0}
     .pdoors .door img{display:block;width:calc(100% + 3.2rem);max-width:none;height:auto;margin:0 -1.6rem 1.1rem;aspect-ratio:3/2;object-fit:cover}
     .pdoors .door h3{font-size:1.7rem}

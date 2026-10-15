@@ -82,6 +82,23 @@ html.big{font-size:130%}
   .nav a:hover,.nav a[aria-current=page]{border-bottom-color:var(--brass)}
   .nav a.cta,.nav a.cta[aria-current=page]{margin:.9rem 0 0;text-align:center;border:0}
 }
+/* 0.8.0: a nav with nine or more items (weather page + shop) collapses to the menu button sooner (media rems are 16px) */
+@media (max-width:84rem){
+  .nav-wide .nav-wide .menu-btn{display:inline-flex;align-items:center;gap:.5rem}
+  .nav-wide .nav{display:none;position:absolute;left:0;right:0;top:100%;background:var(--char);border-bottom:4px solid var(--red);padding:.5rem var(--gutter) 1.25rem}
+  .nav-wide .nav.open{display:block}
+  .nav-wide .nav ul{flex-direction:column;align-items:stretch;gap:0}
+  .nav-wide .nav a{display:block;padding:.95rem 0;border-bottom:1px solid rgba(255,255,255,.12);font-size:1.2rem;border-bottom-width:1px}
+  .nav-wide .nav a:hover,.nav a[aria-current=page]{border-bottom-color:var(--brass)}
+  .nav-wide .nav a.cta,.nav a.cta[aria-current=page]{margin:.9rem 0 0;text-align:center;border:0}
+}
+/* 0.8.0: a wide nav on a desktop screen: tighter items and a smaller brand so nine items fit the 76rem container */
+@media (min-width:84.01rem){
+  .nav-wide .nav ul{gap:clamp(.5rem,.9vw,.9rem)}
+  .nav-wide .nav a{font-size:.9rem;letter-spacing:.04em}
+  .nav-wide .nav a.cta{padding:.75rem .9rem;margin-left:.1rem}
+  .nav-wide .brand .bn{font-size:clamp(1.4rem,1rem + .9vw,1.8rem)}
+}
 
 /* ---------- type ---------- */
 .kicker{font:700 .875rem/1.3 var(--display);letter-spacing:.2em;text-transform:uppercase;color:var(--red)}

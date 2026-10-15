@@ -52,6 +52,7 @@ export function copy(d) {
     stat_247: c.stat_247 ?? 'Volunteer response',
     // 0.7.0
     weather_nav: c.weather_nav ?? 'Weather',
+    shop_nav: c.shop_nav ?? 'Shop',
     events_link: c.events_link ?? 'News & events',
     rigs_note: c.rigs_note ?? '',
     district_note: c.district_note ?? `Mutual aid with ${(d.district.mutual_aid || []).slice(0, 2).join(' and ')} and every department in the county. ${station_label}, ${d.address.street}.`,

@@ -36,6 +36,7 @@ const nav = [
   ...((d as any).weather ? [{ href: '/weather/', label: cp.weather_nav }] : []),
   { href: '/community/', label: 'Community' },
   { href: '/news/', label: 'News & events' },
+  ...((d as any).store ? [{ href: '/shop/', label: cp.shop_nav }] : []),
   { href: '/join/', label: 'Join', cta: true },
 ];
 const more = [
@@ -148,7 +149,7 @@ const jsonld = {
         <span class="st-upd">Updated {new Date(status.updated + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
       </div>
     </div>
-    <header class="top" id="top">
+    <header class={`top${nav.length >= 9 ? " nav-wide" : ""}`} id="top">
       <div class="wrap rail">
         <a class="brand" href="/" aria-label={`${d.name} home`}>
           <img class="mk" src={patch} alt="" width="44" height="50" />
