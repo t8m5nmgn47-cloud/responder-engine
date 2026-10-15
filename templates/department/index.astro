@@ -38,6 +38,13 @@ const mapEmbed = (d as any).district && (d as any).district.map_embed;
 const mapSrc = mapEmbed ? `https://www.google.com/maps?q=${encodeURIComponent(mapEmbed.query)}&z=${mapEmbed.zoom || 11}&output=embed` : '';
 const mapDir = mapEmbed ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapEmbed.query)}` : '';
 const compact = !!(d as any).hero_compact;
+// 0.9.0: iso_page.home (true) adds a 'what the rating saves you' band before the support band
+const ipg: any = (d as any).iso_page || {};
+const ipCls = String(ipg.rating || ((d as any).iso_rating || {}).class || '');
+const ipF: Record<string, number[]> = ipg.factors || { '3': [.98, .88], '9E': [1.4, 1.25], '9': [1.4, 1.25], '10': [1.75, 1.55] };
+const ipBase = Number(ipg.base_premium || 2400);
+const ipWorst = ipg.split || '9';
+const ipSave = ipg.home && ipF[ipCls] && ipF[ipWorst] ? Math.round((ipBase * ipF[ipWorst][0] / ipF[ipCls][0] - ipBase) / 50) * 50 : 0;
 // 0.8.0: `store.home` (true) shows the featured edition and up to three items on the home page
 const st: any = (d as any).store || {};
 const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st.featured.title, photo: (st.featured.photos && st.featured.photos[0] && st.featured.photos[0].src) || st.featured.photo, alt: st.featured.photos && st.featured.photos[0] && st.featured.photos[0].alt }] : []), ...(st.items || [])].slice(0, 3) : [];
@@ -190,6 +197,20 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
 
   {!hide.has("facebook") && <FacebookFeed />}
 
+  {ipg.home && ipSave > 0 && <section class="section tight isoband" aria-label="Insurance rating">
+    <div class="wrap">
+      <div class="isogrid" data-reveal-group>
+        <div class="isonum" aria-hidden="true"><span class="n">{ipCls}</span><span class="l">ISO class</span></div>
+        <div>
+          <p class="kicker">{ipg.home_kicker || "What our rating saves you"}</p>
+          <h2>{ipg.home_title || `About $${ipSave.toLocaleString("en-US")} a year on a typical home's insurance.`}</h2>
+          <p class="lede" style="margin-top:.6rem;max-width:52ch">{ipg.home_text || `Insurers price every policy in the district on the department's Class ${ipCls} rating. Without a rated department the same house is a ${ipWorst}. See what it means for yours.`}</p>
+          <p style="margin-top:1.25rem"><a class="btn red" href="/rating/#calculator">{ipg.home_link || "Run the numbers for your house"}</a></p>
+        </div>
+      </div>
+    </div>
+  </section>}
+
   {!hide.has("support") && <section class="section redband cut up">
     <div class="wrap">
       <div class="seasonal">
@@ -235,6 +256,12 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
     .dmap{width:100%;aspect-ratio:4/3;border:0;border-radius:2px;background:var(--bg-2);box-shadow:0 10px 30px rgba(0,0,0,.12)}
     .mapnote{color:var(--ink-lo)}
     .rignote{margin:1.25rem 0 0;max-width:60ch;color:rgba(243,239,230,.7)}
+    .isoband{background:var(--bg-2)}
+    .isogrid{display:grid;gap:1.5rem 3rem;grid-template-columns:1fr;align-items:center}
+    @media (min-width:52rem){.isogrid{grid-template-columns:auto 1fr}}
+    .isonum{display:flex;flex-direction:column;align-items:center;line-height:1}
+    .isonum .n{font:700 clamp(6rem,5rem + 6vw,10rem)/.85 var(--display);color:var(--red)}
+    .isonum .l{font:700 .8rem/1 var(--display);letter-spacing:.18em;text-transform:uppercase;color:var(--ink-lo);margin-top:.4rem}
     .shophome{display:grid;gap:1rem;grid-template-columns:1fr}
     @media (min-width:44rem){.shophome{grid-template-columns:repeat(3,1fr)}}
     .shopcard{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--rule);border-top:4px solid var(--red);text-decoration:none;color:inherit;min-width:0;transition:transform .2s var(--ease),box-shadow .2s}

@@ -44,6 +44,7 @@ const more = [
   { href: '/youth/', label: 'Junior program' },
   { href: '/memorial/', label: 'Memorial' },
   { href: '/support/', label: 'Support the department' },
+  ...((d as any).iso_page ? [{ href: '/rating/', label: (d as any).iso_page.nav || 'What our rating saves you' }] : []),
   { href: '/contact/', label: 'Contact' },
   { href: '/accessibility/', label: 'Accessibility' },
 ];
@@ -196,7 +197,7 @@ const jsonld = {
         <div class="base">
           <span>&copy; {new Date().getFullYear()} {d.name}</span>
           <span>{d.radio && `Radio designation ${d.radio} · `}{cp.county}</span>
-          {iso && iso.class && <span>ISO Class {iso.class}{iso.year && ` (${iso.year})`}</span>}
+          {iso && iso.class && <span>{(d as any).iso_page ? <a href="/rating/">ISO Class {iso.class}{iso.year && ` (${iso.year})`}</a> : <>ISO Class {iso.class}{iso.year && ` (${iso.year})`}</>}</span>}
         </div>
       </div>
     </footer>

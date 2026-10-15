@@ -85,7 +85,10 @@ export default function engine(options = {}) {
         // Optional shop (0.8.0): when content/dept.json has a `store` block the template gets a /shop page.
         let hasStore = false;
         try { hasStore = !!JSON.parse(fs.readFileSync(path.join(contentDir, 'dept.json'), 'utf8')).store; } catch {}
-        const all = [...routes, ...(hasReview ? [['/review', 'review.astro']] : []), ...(hasStore ? [['/shop', 'shop.astro']] : [])];
+        // Optional rating page (0.9.0): when dept.json has `iso_page` the template gets /rating.
+        let hasRating = false;
+        try { hasRating = !!JSON.parse(fs.readFileSync(path.join(contentDir, 'dept.json'), 'utf8')).iso_page; } catch {}
+        const all = [...routes, ...(hasReview ? [['/review', 'review.astro']] : []), ...(hasStore ? [['/shop', 'shop.astro']] : []), ...(hasRating ? [['/rating', 'rating.astro']] : [])];
         for (const [pattern, file] of all) {
           injectRoute({
             pattern,

@@ -1,0 +1,259 @@
+---
+// /rating (0.9.0): what the department's ISO / state response rating is worth to residents, in dollars.
+// Rendered only when dept.json has an `iso_page` block. All arithmetic uses the state rate bureau's
+// published protection-class factors (North Carolina's by default; override with iso_page.factors).
+import Base from '../../layouts/Base.astro';
+import d from '@content/dept.json';
+import { copy } from '../../components/copy.js';
+const cp = copy(d);
+const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
+const ip: any = (d as any).iso_page || {};
+const iso: any = (d as any).iso_rating || {};
+const cls: string = String(ip.rating || iso.class || '');
+const split: string = ip.split || '';                 // e.g. "9E": the class beyond 5 road miles
+const base: number = Number(ip.base_premium || 2400);  // example premium at the department's class
+const homes: number = Number(ip.homes || 0);
+const years: number = Number(ip.horizon_years || 30);
+const fmtLong = (s: string) => new Date(s + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+// NC Rate Bureau protection/construction factors, HO-3 one/two-family, territory groups 2–4 (circular P-17-4, in force since 4/1/2018).
+const NC: Record<string, [number, number]> = { '1': [.97, .87], '2': [.98, .88], '3': [.98, .88], '4': [.99, .89], '5': [1, .9], '6': [1, .9], '7': [1.1, 1], '8': [1.25, 1.1], '9': [1.4, 1.25], '9E': [1.4, 1.25], '9S': [1.4, 1.25], '10': [1.75, 1.55] };
+const F: Record<string, [number, number]> = ip.factors || NC;
+const f = (c: string, i = 0) => (F[c] || F[c.replace(/\D/g, '')] || [1, 1])[i];
+const ours = f(cls), oursM = f(cls, 1);
+const at = (c: string, m = 0) => Math.round(base * f(c, m) / f(cls, m));
+const saved = (c: string, m = 0) => at(c, m) - base;
+const pct = (c: string, m = 0) => Math.round((1 - f(cls, m) / f(c, m)) * 100);
+const worst = split || '9';
+const ladder = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+const bars = [cls, '5', '7', '8', worst, '10'].filter((v, i, a) => a.indexOf(v) === i).map((c) => ({ c, v: f(c) }));
+const maxV = Math.max(...bars.map((b) => b.v));
+const usd = (n: number) => '$' + n.toLocaleString('en-US');
+const issued = ip.issued ? fmtLong(ip.issued) : '';
+const effective = ip.effective ? fmtLong(ip.effective) : '';
+const navLabel = ip.nav || 'What our rating saves you';
+const title = ip.title || `Class ${cls}: the rating that lowers your insurance bill.`;
+const meta = ip.meta || `${d.name} holds a Class ${cls} fire protection rating. Here is what that is worth to every home and business in the district, in dollars.`;
+const sections = { 'Fire department': 50, 'Water supply': 40, '911 center': 10 };
+---
+<Base title={ip.page_title || 'Our rating'} description={meta}>
+  <section class="phero rhero">
+    <div class="wrap">
+      <div class="rgrid">
+        <div>
+          <p class="kicker">{ip.kicker || `ISO Class ${cls}${issued ? ` · rated ${ip.issued.slice(0, 4)}` : ''}`}</p>
+          <h1 style="margin-top:.75rem">{title}</h1>
+          <p class="lede">{ip.lede || `Every home and business in the district is rated for fire protection on a scale from 1 to 10. Insurers price your policy on that number. ${cp.place}'s is a ${cls}. Without a department it would be a 10.`}</p>
+        </div>
+        <div class="bigclass" aria-hidden="true"><span class="bc-n">{cls}</span><span class="bc-l">of 10</span></div>
+      </div>
+      <figure class="ladder" aria-label={`Fire protection classes 1 to 10. ${d.name} is rated ${cls}${split ? `, ${split} beyond five road miles` : ''}; a community with no recognized protection is a 10.`}>
+        <ol class="rungs">{ladder.map((c) => <li class={c === cls ? 'us' : (c === worst.replace(/\D/g, '') ? 'far' : '') + (c === '10' ? ' none' : '')}><span class="rn">{c}</span></li>)}</ol>
+        <div class="rlabels">
+          <p class="rl best">Best protection</p>
+          <p class="rl worst">No recognized protection</p>
+        </div>
+        <ul class="pins">
+          <li class="pin us" style={`--at:${(ladder.indexOf(cls) + .5) / 10 * 100}%`}><b>{cls}</b> {ip.us_label || `${cp.place}, within 5 road miles of the station`}</li>
+          {split && <li class="pin far" style={`--at:${(ladder.indexOf(worst.replace(/\D/g, '')) + .5) / 10 * 100}%`}><b>{split}</b> {ip.split_label || 'Beyond 5 road miles from the station'}</li>}
+        </ul>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="two">
+        <div>
+          <div class="head" data-reveal><p class="kicker">The rate table</p><h2>What each class costs</h2></div>
+          <div class="prose"><p>{ip.table_text || `The ${cp.state_name} Rate Bureau multiplies the base homeowner rate by a factor for your protection class. Class ${cls} and Class 5 are nearly the same. The gap opens at 7 and becomes a cliff at 9 and 10, which is where a rural district lands without a rated department.`}</p></div>
+        </div>
+        <figure class="barchart" aria-label={`Rate factor by protection class for a frame house: ${bars.map((b) => `class ${b.c}, ${b.v.toFixed(2)}`).join('; ')}.`}>
+          <figcaption class="small">Base-rate multiplier, frame house</figcaption>
+          <ol class="bars">{bars.map((b) => <li class={b.c === cls ? 'us' : (b.c === worst || b.c === '10' ? 'far' : '')}><span class="bl">Class {b.c}</span><span class="bt"><span class="bf" style={`width:${(b.v / maxV * 100).toFixed(1)}%`}></span></span><span class="bv">{b.v.toFixed(2)}×</span></li>)}</ol>
+          <p class="small" style="margin-top:.75rem">Brick or masonry homes use a lower set of factors with the same gaps: {oursM.toFixed(2)}× at Class {cls}, {f(worst, 1).toFixed(2)}× at {worst}, {f('10', 1).toFixed(2)}× at 10.</p>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="section band calc" id="calculator">
+    <div class="wrap">
+      <div class="head" data-reveal><p class="kicker">Your house</p><h2>{ip.calc_title || `What Class ${cls} saves you`}</h2></div>
+      <form class="cform" data-calc data-ours={ours} data-oursm={oursM} data-far={f(worst)} data-farm={f(worst, 1)} data-ten={f('10')} data-tenm={f('10', 1)} data-years={years} onsubmit="return false">
+        <label><span>Your homeowner premium today, per year</span><span class="money"><span>$</span><input type="number" inputmode="numeric" min="200" max="30000" step="10" value={base} data-prem /></span></label>
+        <fieldset><legend>Construction</legend><label><input type="radio" name="con" value="0" checked /> Frame, siding or veneer</label><label><input type="radio" name="con" value="1" /> Brick or masonry</label></fieldset>
+      </form>
+      <div class="tiles" data-reveal-group>
+        <div class="tile us"><p class="tk">Rated Class {cls} · what you pay</p><p class="tv" data-out="ours">{usd(base)}</p><p class="ts">per year, with the department</p></div>
+        <div class="tile"><p class="tk">Same house rated {worst}</p><p class="tv" data-out="far">{usd(at(worst))}</p><p class="ts">{pct(worst)}% more</p></div>
+        <div class="tile"><p class="tk">Same house rated 10</p><p class="tv" data-out="ten">{usd(at('10'))}</p><p class="ts">{pct('10')}% more</p></div>
+      </div>
+      <div class="savedrow">
+        <p class="saved"><span class="sk">Saved every year</span><span class="sv"><span data-out="save1">{usd(saved(worst))}</span> to <span data-out="save2">{usd(saved('10'))}</span></span></p>
+        <p class="saved"><span class="sk">Over {years} years</span><span class="sv"><span data-out="life1">{usd(saved(worst) * years)}</span> to <span data-out="life2">{usd(saved('10') * years)}</span></span></p>
+      </div>
+      <p class="small" style="margin-top:1.25rem;max-width:64ch">{ip.calc_note || `Rate Bureau base factors; insurers deviate from them, so your agent has the exact figure for your policy. The low end assumes the district without this station would be rated ${worst}; the high end, a 10.`}</p>
+    </div>
+  </section>
+
+  {homes > 0 && <section class="section tight">
+    <div class="wrap">
+      <div class="stats" data-reveal-group>
+        <div class="stat"><div class="v" data-count>{homes.toLocaleString('en-US')}</div><div class="k">{ip.homes_label || 'Homes in the district'}</div></div>
+        <div class="stat"><div class="v">{usd(Math.round(saved(worst) * homes / 1e5) / 10)}M</div><div class="k">Kept in the community every year, at a {usd(base)} premium</div></div>
+        <div class="stat"><div class="v">{usd(Math.round(saved(worst) * homes * years / 1e6))}M</div><div class="k">Over {years} years</div></div>
+      </div>
+    </div>
+  </section>}
+
+  <section class="section charband miles">
+    <div class="wrap">
+      <div class="two">
+        <div>
+          <div class="head" data-reveal><p class="kicker">The five-mile line</p><h2>{ip.miles_title || 'Where the rating reaches'}</h2></div>
+          <div class="prose">
+            <p>{ip.miles_text || `Class ${cls} covers every property within five road miles of the station${split ? `. Past that line the state rates the same house a ${split}, no matter how good the department is` : ''}. Road miles, not straight-line, so two neighbors can land on different sides of it.`}</p>
+            <p style="margin-top:1rem">{ip.miles_cta || 'Not sure which side you are on?'} <a href={tel(d.phones.station)}>Call the station</a>. {ip.miles_help || 'There are sometimes ways to fix it, like a certified water source closer to your property.'}</p>
+          </div>
+        </div>
+        <figure class="ring" aria-label="Diagram: the station at the center, a ring at five road miles, homes inside rated at the department's class and homes outside rated lower.">
+          <svg viewBox="0 0 400 300" role="img">
+            <defs><pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="currentColor" stroke-width="1.2" opacity=".35"/></pattern></defs>
+            <rect x="0" y="0" width="400" height="300" fill="url(#hatch)" />
+            <circle cx="200" cy="150" r="118" fill="var(--char)" stroke="var(--brass)" stroke-width="2" />
+            <circle cx="200" cy="150" r="118" fill="none" stroke="var(--brass)" stroke-width="1" stroke-dasharray="4 4" opacity=".6" />
+            <g fill="var(--red)"><rect x="193" y="143" width="14" height="14" transform="rotate(45 200 150)" /></g>
+            <text x="200" y="176" text-anchor="middle" class="st">{cp.station_label}</text>
+            <text x="200" y="48" text-anchor="middle" class="st big">Class {cls}</text>
+            <text x="200" y="64" text-anchor="middle" class="st sm">within 5 road miles</text>
+            <text x="356" y="282" text-anchor="end" class="st big">{split ? `Class ${split}` : 'Lower class'}</text>
+            <text x="356" y="296" text-anchor="end" class="st sm">beyond</text>
+            <line x1="200" y1="150" x2="318" y2="150" stroke="var(--brass)" stroke-width="1.5" />
+            <text x="259" y="143" text-anchor="middle" class="st sm">5 miles</text>
+          </svg>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="head" data-reveal><p class="kicker">How the score is built</p><h2>{ip.score_title || 'A hundred points, earned every year'}</h2></div>
+      <figure class="stack" aria-label="The rating schedule: fire department 50 points, water supply 40, emergency communications 10, plus up to 5.5 bonus points for community risk reduction.">
+        <div class="sbar">{Object.entries(sections).map(([k, v]) => <span class="seg" style={`flex:${v}`}><b>{v}</b><i>{k}</i></span>)}<span class="seg bonus" style="flex:5.5"><b>+5.5</b><i>Bonus</i></span></div>
+      </figure>
+      <div class="doors three howdoors" data-reveal-group>
+        <div class="door"><h3>Fire department · 50</h3><p>{ip.how_dept || 'Engines and tankers against the national standard, the gear on them, how many members actually turn out, the training hours logged every month, and an engine within 1.5 road miles of the homes it protects.'}</p></div>
+        <div class="door"><h3>Water supply · 40</h3><p>{ip.how_water || 'Can the district deliver the water a fire needs? With few hydrants, that credit is earned with tankers, dry hydrants on ponds, and timed shuttle tests that prove the flow.'}</p></div>
+        <div class="door"><h3>Communications · 10</h3><p>{ip.how_comms || `The 911 center: how fast a call becomes a page, dispatcher staffing, and radio coverage across the district.`}</p></div>
+      </div>
+      <p class="small" style="margin-top:1.25rem;max-width:64ch">{ip.score_note || 'The bonus points are prevention: code enforcement, public education like the preschool visits, and fire investigation. All of it is re-inspected, so a Class 3 is kept, not owned.'}</p>
+    </div>
+  </section>
+
+  <section class="section redband cut up">
+    <div class="wrap">
+      <div class="seasonal">
+        <div><p class="kicker">Keep it a {cls}</p><h2 style="margin-top:.4rem">{ip.cta_title || 'The rating is the department.'} <span>{ip.cta_title2 || 'The department is you.'}</span></h2><p style="margin-top:.6rem;max-width:56ch">{ip.cta_text || `Training hours, tanker upkeep, gear that passes inspection: the points behind Class ${cls} are paid for by the people who live here. A gift or a few hours a month is how it stays a ${cls}.`}</p></div>
+        <div class="acts"><a class="btn light" href="/support/">Support the department</a><a class="btn light ghost" href="/join/">Join us</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <p class="kicker">Sources</p>
+      <ul class="srcs small">
+        {(ip.sources || [
+          { t: `${cp.state_name} Rate Bureau, homeowners protection/construction factors (circular P-17-4, effective April 1, 2018)`, u: 'https://www.ncrb.org/Portals/0/ncrb/circular%20letters/property/2017/P-17-4%20Revised%20Homeowners%20Relativities.pdf' },
+          { t: 'ISO Fire Suppression Rating Schedule: fire department 50 points, water supply 40, emergency communications 10, community risk reduction up to 5.5', u: 'https://www.isomitigation.com/ppc/' },
+        ]).map((s: any) => <li><a href={s.u} rel="noopener">{s.t}</a></li>)}
+        {issued && <li>Rating issued {issued}{effective ? `, effective ${effective}` : ''}{ip.rating_source ? <>: <a href={ip.rating_source} rel="noopener">source</a></> : ''}.</li>}
+      </ul>
+    </div>
+  </section>
+
+  <script>
+    (function(){var f=document.querySelector('[data-calc]');if(!f)return;var P=f.querySelector('[data-prem]'),Y=Number(f.dataset.years||30);
+    var out=function(k){return document.querySelector('[data-out="'+k+'"]')};var usd=function(n){return '$'+Math.round(n).toLocaleString('en-US')};
+    function run(){var m=f.querySelector('input[name=con]:checked').value==='1';var p=Number(P.value)||0;var o=Number(m?f.dataset.oursm:f.dataset.ours),a=Number(m?f.dataset.farm:f.dataset.far),t=Number(m?f.dataset.tenm:f.dataset.ten);
+      var far=p*a/o,ten=p*t/o;out('ours').textContent=usd(p);out('far').textContent=usd(far);out('ten').textContent=usd(ten);out('save1').textContent=usd(far-p);out('save2').textContent=usd(ten-p);out('life1').textContent=usd((far-p)*Y);out('life2').textContent=usd((ten-p)*Y)}
+    f.addEventListener('input',run);run()})();
+  </script>
+
+  <style is:global>
+    .two{display:grid;gap:2.5rem;grid-template-columns:1fr;align-items:center}
+    @media (min-width:60rem){.two{grid-template-columns:1fr 1fr}}
+    .rhero{background:var(--char);color:var(--char-ink)}
+    .rhero .kicker{color:var(--brass)}
+    .rhero h1{color:#fff}
+    .rhero .lede{color:rgba(243,239,230,.9);max-width:46ch}
+    .rgrid{display:grid;gap:2rem;grid-template-columns:1fr;align-items:center}
+    @media (min-width:60rem){.rgrid{grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr)}}
+    .bigclass{display:flex;align-items:baseline;justify-content:center;gap:.6rem;color:#fff}
+    .bigclass .bc-n{font:700 clamp(8rem,6rem + 14vw,20rem)/.85 var(--display);color:var(--red);text-shadow:0 10px 40px rgba(0,0,0,.45)}
+    .bigclass .bc-l{font:700 1.2rem/1 var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--brass)}
+    .ladder{margin-top:3rem;position:relative}
+    .rungs{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;list-style:none;padding:0}
+    .rungs li{display:flex;align-items:center;justify-content:center;height:3.2rem;background:#2a2a2c;border:1px solid rgba(255,255,255,.12);border-radius:2px;font:700 1.3rem/1 var(--display);color:rgba(243,239,230,.7)}
+    .rungs li.us{background:var(--red);color:#fff;border-color:var(--red);box-shadow:0 6px 20px rgba(179,38,30,.45)}
+    .rungs li.far{background:#4a4a4e;color:#fff}
+    .rungs li.none{background:repeating-linear-gradient(45deg,#2a2a2c 0 6px,#3a3a3e 6px 12px)}
+    .rlabels{display:flex;justify-content:space-between;margin-top:.5rem}
+    .rl{font:700 .75rem/1.3 var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--brass)}
+    .pins{margin-top:1.25rem;display:grid;gap:.5rem;list-style:none;padding:0}
+    .pin{position:relative;padding-left:1.5rem;font-size:.95rem}
+    .pin::before{content:"";position:absolute;left:0;top:.35em;width:.8rem;height:.8rem;border-radius:50%;background:var(--red)}
+    .pin.far::before{background:#4a4a4e;border:1px solid rgba(255,255,255,.4)}
+    .pin b{font:700 1.1rem/1 var(--display);margin-right:.3rem}
+    .barchart{padding:1.25rem 1.4rem;background:var(--card);border:1px solid var(--rule)}
+    .barchart figcaption{font:700 .75rem/1.3 var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-lo);margin-bottom:.9rem}
+    .bars{display:grid;gap:.55rem;list-style:none;padding:0}
+    .bars li{display:grid;grid-template-columns:5.5rem 1fr 3.6rem;align-items:center;gap:.75rem}
+    .bars .bl{font:700 .95rem/1 var(--display);letter-spacing:.04em;text-transform:uppercase;color:var(--ink)}
+    .bars .bt{height:1.1rem;background:var(--bg-2);border-radius:2px;overflow:hidden}
+    .bars .bf{display:block;height:100%;background:#8e8a82;border-radius:0 4px 4px 0;transition:width .6s var(--ease)}
+    .bars li.us .bf{background:var(--red)}
+    .bars li.us .bl{color:var(--red)}
+    .bars li.far .bf{background:var(--char)}
+    .bars .bv{font-variant-numeric:tabular-nums;font-weight:600;text-align:right;color:var(--ink)}
+    .calc .cform{display:grid;gap:1.25rem;grid-template-columns:1fr;margin-top:1.5rem;max-width:44rem}
+    @media (min-width:52rem){.calc .cform{grid-template-columns:1fr 1fr;align-items:end}}
+    .cform label>span:first-child,.cform legend{display:block;font:700 .75rem/1.3 var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-lo);margin-bottom:.5rem}
+    .cform .money{display:flex;align-items:center;gap:.4rem;border:2px solid var(--ink);background:var(--card);padding:.2rem .8rem;font:700 1.6rem/1 var(--display)}
+    .cform .money input{border:0;background:none;font:700 1.6rem/1.2 var(--display);width:100%;min-width:0;color:var(--ink-hi);outline:none}
+    .cform fieldset{border:0;padding:0;margin:0;display:grid;gap:.4rem}
+    .cform fieldset label{display:flex;align-items:center;gap:.5rem;font-size:1rem}
+    .cform input[type=radio]{accent-color:var(--red);width:1.1rem;height:1.1rem}
+    .tiles{display:grid;gap:1rem;grid-template-columns:1fr;margin-top:1.75rem}
+    @media (min-width:52rem){.tiles{grid-template-columns:repeat(3,1fr)}}
+    .tile{background:var(--card);border:1px solid var(--rule);border-top:4px solid #8e8a82;padding:1.1rem 1.25rem 1.2rem}
+    .tile.us{border-top-color:var(--red)}
+    .tile .tk{font:700 .75rem/1.3 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-lo)}
+    .tile .tv{font:700 clamp(2.2rem,1.8rem + 1.5vw,3rem)/1 var(--display);color:var(--ink-hi);margin-top:.4rem;font-variant-numeric:tabular-nums}
+    .tile.us .tv{color:var(--red)}
+    .tile .ts{color:var(--ink-lo);font-size:.9rem;margin-top:.3rem}
+    .savedrow{display:grid;gap:1rem;grid-template-columns:1fr;margin-top:1.25rem}
+    @media (min-width:52rem){.savedrow{grid-template-columns:1fr 1fr}}
+    .saved{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:.5rem 1.5rem;background:var(--char);color:#fff;padding:1rem 1.25rem}
+    .saved .sk{font:700 .8rem/1.3 var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--brass)}
+    .saved .sv{font:700 clamp(1.6rem,1.3rem + 1vw,2.2rem)/1 var(--display);font-variant-numeric:tabular-nums}
+    .miles .ring{color:rgba(243,239,230,.5)}
+    .miles .ring svg{width:100%;height:auto;display:block}
+    .miles .st{font:600 13px/1 var(--sans);fill:#f3efe6}
+    .miles .st.big{font:700 18px/1 var(--display);letter-spacing:.06em;text-transform:uppercase;fill:#fff}
+    .miles .st.sm{font-size:11px;fill:var(--brass);letter-spacing:.08em;text-transform:uppercase}
+    .stack .sbar{display:flex;gap:2px;height:4.5rem;margin:1.5rem 0 1.25rem}
+    .stack .seg{display:flex;flex-direction:column;justify-content:center;gap:.2rem;padding:0 .8rem;min-width:0;background:var(--char);color:#fff;border-radius:2px;overflow:hidden}
+    .stack .seg:nth-child(2){background:#4a4a4e}.stack .seg:nth-child(3){background:#8e8a82}
+    .stack .seg.bonus{background:var(--brass);color:var(--char)}
+    .stack .seg b{font:700 1.4rem/1 var(--display)}
+    .stack .seg i{font:600 .68rem/1.1 var(--sans);letter-spacing:.06em;text-transform:uppercase;font-style:normal}
+    .stack .seg:nth-child(3),.stack .seg.bonus{padding:0 .5rem}
+    .howdoors .door h3{font-size:1.4rem}
+    .redband .acts{display:flex;flex-wrap:wrap;gap:.75rem}
+    .redband .btn.ghost{border-color:rgba(255,255,255,.5)}
+    .srcs{margin-top:.75rem;display:grid;gap:.4rem;list-style:none;padding:0;color:var(--ink-lo);max-width:70ch}
+    .srcs a{color:inherit}
+  </style>
+</Base>
