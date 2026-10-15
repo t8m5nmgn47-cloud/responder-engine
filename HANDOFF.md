@@ -15,19 +15,29 @@ before it finishes. `CHANGELOG.md` is the history; this file is the present.
    at the images. A clean build and a passing structural check say nothing about how the page looks; today's
    two header bugs were both invisible until a screenshot.
 
-## Current state (2026-10-15, written by the session that shipped 0.10.2)
+## Current state (2026-10-15, written by Kris's main Cowork session after building Hegins Valley on 0.10.2)
 
-- Engine: `main` = `1a155e3`, version 0.10.2. Tag `v0.10.2` must be pushed from the Mac (`git push origin v0.10.2`);
-  the cloud session's git proxy refuses tag pushes.
+- Engine: `main` = `85e5b40` (HANDOFF commit on top of `1a155e3`, the 0.10.2 code), version 0.10.2. Tag `v0.10.2` is
+  STILL NOT on GitHub: Kris runs `cd ~/responder-engine && git pull && git tag v0.10.2 1a155e3 && git push origin v0.10.2`.
+  Department pins on `#v0.10.2` fail to install until then.
 - Crains Creek Fire-Rescue (`sightline-studio`, branch `crains-creek-review-fixes` = `8fc330e`): rebuilt on 0.10.2,
-  HTML identical to the live deploy, CSS carries the header fixes. Needs merge to main and
-  `npx -y vercel@latest deploy --prod --yes` from `sites/crains-creek-fire`. Shop is in the footer (`store.nav:false`)
-  until Stripe Payment Links and product photos exist. Review page has 28 open items for the chief.
-- Hegins Valley Fire-Rescue (Hegins, PA; Nicholas Morgan, president@hvfr.org): not started. Build on `#v0.10.2`
-  with `"patch": false` until a patch file arrives; needs PA rate-bureau factors before a rating page.
-- Station Ops (operation-charity repo, ADR + SO1): owned by whichever session Kris points at it; nothing in the
-  engine depends on it.
-- Known gaps: Facebook embed renders blank in headless screenshots (loads in real browsers; `home.hide` can drop it).
+  not merged, not deployed. Kris: merge to main, then `npx -y vercel@latest deploy --prod --yes` from
+  `sites/crains-creek-fire`. Review page has 28 open items for Chief Mackey.
+- Hegins Valley Fire-Rescue (Hegins, PA; Nicholas Morgan, president@hvfr.org): FIRST DRAFT BUILT on 0.10.2
+  (engine @ `85e5b40`, pinned `#v0.10.2`, `"patch": false`, photo-free, fax empty, `copy.support_h2`/`h2b` set).
+  Source + dist delivered to the Mac at `~/sightline-studio/cofff-build/hegins-valley-fire-{src,dist}-0102.zip`;
+  intended home is `~/sightline-studio/sites/hegins-valley-fire` (new Vercel project). Not deployed, not sent to
+  Nicholas. Content is sourced from the old Google Site, a 2016 Republican & Herald story and public records;
+  review.json has 25 questions (officers, history/founding years, truck years, member and call counts, logo).
+  Facebook was unreadable; no photos; no memorial names. Needs PA rate-bureau factors before any rating page.
+- Engine gaps found by the Hegins build (also in `~/sightline-studio/cofff-build/hegins-ENGINE-NOTES.md`):
+  (1) the home members stat tile always renders and cannot be hidden; a department with no sourced count has to
+  relabel it. (2) A photo-free hero still references `/photos/structure-fire.jpg` and `-800`, giving a build
+  warning and a 404. (3) `patch:false` still links the default favicon/apple-touch-icon. Fixed vs 0.7.0 and
+  verified by screenshots at 1366/1200/390: header overflow, support headline override, fax line, photos optional.
+- Station Ops (operation-charity repo, ADR + SO1): owned by the second account's session; nothing in the engine
+  depends on it.
+- Known gaps: Facebook embed and map embed render blank in headless screenshots (both load in real browsers).
 
 ## End-of-session
 
