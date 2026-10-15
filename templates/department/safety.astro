@@ -27,6 +27,7 @@ const hz = (d.hazards || []) as any[]; // 0.5.2: optional local-hazard sections 
   <section class="section band" id="alarm">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">Free</p><h2>Request a smoke alarm check</h2><p class="small" style="max-width:62ch">A member will come to your home, test every alarm, replace dead batteries, and install an alarm where one is missing, at no charge. We make a point of it for older residents and anyone who can't get up a ladder.</p></div>
+      <div class="split"><div>
       <form class="jf" id="sf" novalidate data-site={d.name}>
         <div class="f"><label for="s-name">Your name *</label><input id="s-name" name="name" required></div>
         <div class="f"><label for="s-phone">Phone *</label><input id="s-phone" name="phone" type="tel" required></div>
@@ -36,12 +37,14 @@ const hz = (d.hazards || []) as any[]; // 0.5.2: optional local-hazard sections 
         <div class="bar2"><button class="btn red" type="submit">Request a visit</button><p class="small" id="s-status" aria-live="polite"></p></div>
         <details class="fb" id="s-fb" hidden><summary>If your email program didn't open, copy this and send it, or call the station.</summary><textarea readonly rows="8"></textarea></details>
       </form>
+      </div><aside class="aside"><div class="aside-card"><p class="kicker">What to expect</p><h3>A member, a ladder, a few minutes.</h3><ul><li>Every alarm tested; dead batteries replaced on the spot.</li><li>An alarm installed where one is missing, with a 10-year battery.</li><li>A quick look at your two ways out.</li><li>No charge, no sales pitch.</li></ul><p>Rather talk to a person? <a href={tel(d.phones.station)}>{d.phones.station}</a>.</p></div></aside></div>
     </div>
   </section>
 
   <section class="section" id="911">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">How it works</p><h2>What happens when you call 911</h2></div>
+      <div class="split"><div>
       <ol class="steps2">
         <li><h3>You call. Stay on the line.</h3><p>{cp.dispatch} answers. The dispatcher asks where, what, and whether anyone is hurt. Answer the questions; the page is going out while you talk.</p></li>
         <li><h3>{cp.pagers_step}</h3><p>{cp.no_one_in_station}</p></li>
@@ -50,6 +53,7 @@ const hz = (d.hazards || []) as any[]; // 0.5.2: optional local-hazard sections 
         <li><h3>We stay until it's done.</h3><p>Fire out, patients handed to {cp.ems}, scene safe, and then back to the station to wash hoses and fill air bottles so the next call starts clean.</p></li>
       </ol>
       <p class="small" style="margin-top:1.5rem;max-width:62ch">The honest version of "how long will it take": longer than in a city, and shorter the more volunteers we have within a few minutes of the station. If that bothers you, <a href="/join/">join</a>.</p>
+      </div><aside class="aside"><figure class="aside-photo"><img src={d.photos.structure.src.replace(".jpg","-800.jpg")} alt={d.photos.structure.alt} loading="lazy" width="800" height="1000" /><figcaption>{d.photos.structure.alt}</figcaption></figure><div class="aside-card light"><p class="kicker">The minutes that matter</p><h3>More members close to the station means a faster first rig.</h3><p>Every volunteer who lives within a few minutes of Station {d.radio} shortens the gap between your call and our arrival.</p><a class="btn red" href="/join/">Join the department</a></div></aside></div>
     </div>
   </section>
 

@@ -6,6 +6,14 @@ const cp = copy(d);
 const s = d.support;
 const sp = (d as any).photos?.support_hero as { src: string; alt: string; caption?: string } | undefined;
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
+// 0.10.0: tie the ask to the rating when iso_page is set
+const ipg: any = (d as any).iso_page;
+const ipCls = ipg ? String(ipg.rating || ((d as any).iso_rating || {}).class || '') : '';
+const ipF: Record<string, number[]> = (ipg && ipg.factors) || { '3': [.98, .88], '9E': [1.4, 1.25], '9': [1.4, 1.25], '10': [1.75, 1.55] };
+const ipBase = Number((ipg && ipg.base_premium) || 2400);
+const ipWorst = (ipg && ipg.split) || '9';
+const ipSave = ipg && ipF[ipCls] && ipF[ipWorst] ? Math.round((ipBase * ipF[ipWorst][0] / ipF[ipCls][0] - ipBase) / 50) * 50 : 0;
+const usd = (n: number) => '$' + n.toLocaleString('en-US');
 ---
 <Base title="Support the department" description={`How to support the ${d.name}: give, sponsor, or show up. What the community's support pays for.`}>
   <section class={sp ? "phero two" : "phero"}><div class="wrap"><div><p class="kicker">Support</p><h1 style="margin-top:.75rem">{cp.support_h1}</h1><p class="lede">{s.intro}</p></div>{sp && <figure class="hphoto"><img src={sp.src} alt={sp.alt} width="1100" height="400" fetchpriority="high" style="aspect-ratio:auto" />{sp.caption && <figcaption>{sp.caption}</figcaption>}</figure>}</div></section>
@@ -14,7 +22,8 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
   </div></section>
   <section class="section tight"><div class="wrap">
     <div class="head" data-reveal><p class="kicker">What it buys</p><h2>Where a gift goes</h2></div>
-    <dl class="rows" style="max-width:40rem">{s.what_it_buys.map(([a, b]) => <div class="row"><dt>{a}</dt><dd>{b}</dd></div>)}</dl>
-    <p class="small" style="margin-top:1rem">{s.what_it_buys_note} Questions: <a href={tel(d.phones.station)}>{d.phones.station}</a>.</p>
+    <div class="split"><div><dl class="rows" style="max-width:40rem">{s.what_it_buys.map(([a, b]) => <div class="row"><dt>{a}</dt><dd>{b}</dd></div>)}</dl>
+    <p class="small" style="margin-top:1rem">{s.what_it_buys_note} Questions: <a href={tel(d.phones.station)}>{d.phones.station}</a>.</p></div>
+    <aside class="aside">{ipg && ipSave > 0 ? <div class="aside-card"><p class="kicker">What it protects</p><h3>Your gift keeps the district a Class {ipCls}.</h3><p class="big">{usd(ipSave)} <b>a year</b></p><p>What a typical home saves on insurance because the department holds that rating. Gear, training and water tests are what the rating is made of.</p><a class="btn light" href="/rating/">See what the rating saves you</a></div> : <div class="aside-card"><p class="kicker">Where it goes</p><h3>Gear, training, and the water to put fires out.</h3><p>{cp.support_blurb}</p></div>}</aside></div>
   </div></section>
 </Base>

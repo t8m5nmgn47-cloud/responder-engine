@@ -43,19 +43,19 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
   <section class="section">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">After the fire</p><h2>The morning after</h2></div>
-      <div class="prose">
+      <div class="split"><div class="prose">
         <p>Call your insurance company first; they will tell you what to do and will often arrange cleanup and a place to stay. Don't go back into the building until we have told you it's safe, and don't reconnect gas, electric or water until the utility or an electrician has checked them. The Red Cross can help with immediate needs. Gather what documents you can: insurance, identification, bank, medical.</p>
         <p>You may notice we opened windows, cut holes in the roof, or opened walls. Ventilation lets heat and smoke out so firefighters can get in, and fire hides in walls and ceilings; we open them to make sure it's out. It looks like damage. It's how the rest of the house survived.</p>
-      </div>
+      </div><aside class="aside"><div class="aside-card"><p class="kicker">First three calls</p><ul><li>Your insurance company. They arrange cleanup and a place to stay.</li><li>The utility, before gas, power or water goes back on.</li><li>The station, <a href={tel(d.phones.station)}>{d.phones.station}</a>, for the incident report your insurer will ask for.</li></ul></div><div class="aside-card light"><p class="kicker">Red Cross</p><h3>Help the same night.</h3><p>The American Red Cross answers house fires around the clock with shelter, clothing and meals. 1-800-RED-CROSS.</p></div></aside></div>
     </div>
   </section>
 
   <section class="section">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">Common questions</p><h2>Things people ask us</h2></div>
-      <div class="faq" style="max-width:62ch">
+      <div class="split"><div class="faq" style="max-width:62ch">
         {d.faq.map((f) => <details><summary>{f.q}</summary><p>{f.a}</p></details>)}
-      </div>
+      </div><aside class="aside"><div class="aside-card"><p class="kicker">Didn't find it?</p><h3>Ask a person.</h3><p>Station, non-emergency: <a href={tel(d.phones.station)}>{d.phones.station}</a>. Someone picks up or calls you back.</p><p>{d.address.street}, {d.address.city}</p><a class="btn light" href="/contact/">Contact and directions</a></div></aside></div>
     </div>
   </section>
 

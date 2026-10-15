@@ -53,11 +53,11 @@ const soonLabel = (p: any) => (p.deadline && !open(p)) ? 'Orders closed' : 'Comi
   <section class="section band">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">How it works</p><h2>{st.how_title || 'Printed when you order it'}</h2></div>
-      <div class="prose" style="max-width:62ch">
+      <div class="split"><div class="prose" style="max-width:62ch">
         <p>{st.how || 'Each piece is printed and pressed after you order, so nothing sits in a box waiting. Checkout runs through Stripe; we never see your card number. Allow about two weeks from order to doorstep.'}</p>
         {st.proceeds && <p style="margin-top:1rem">{st.proceeds}</p>}
         <p class="small" style="margin-top:1rem">{st.contact || 'Questions about an order?'} {st.contact_email ? <a href={`mailto:${st.contact_email}`}>{st.contact_email}</a> : <a href={tel(d.phones.station)}>{d.phones.station}</a>}.</p>
-      </div>
+      </div><aside class="aside"><div class="aside-card"><p class="kicker">Order to doorstep</p><ul><li>Pick a size and pay on Stripe's secure page.</li><li>We print and press your piece, one at a time.</li><li>It ships to the address you gave, usually inside two weeks.</li><li>A share of the sale goes to the department.</li></ul></div></aside></div>
     </div>
   </section>
 

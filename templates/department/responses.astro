@@ -44,7 +44,7 @@ const kinds: { title: string; text: string }[] = rs.kinds || [];
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">{cp.responses_list_kicker}</p><h2>{cp.responses_list_title}</h2></div>
       {feed && feed.url && <p class="listen" style="margin:0 0 1.5rem"><b>Listen live:</b> <a href={feed.url} rel="noopener">{feed.label}</a>. A public scanner feed run by volunteers, not an official source; what you hear there is unconfirmed until it appears below.</p>}
-      <ol class="runs">
+      <div class="split"><div><ol class="runs">
         {inc.incidents.map((r) => (
           <li class="run">
             <div class="run-n">{!blankNum(r.n) && <span class="num">{r.n}</span>}<time datetime={r.date}>{fmt(r.date)}{r.time && ` · ${r.time}`}</time></div>
@@ -60,15 +60,11 @@ const kinds: { title: string; text: string }[] = rs.kinds || [];
       </ol>
       <p class="small" style="margin-top:1.5rem;max-width:62ch">{cp.responses_list_note}</p>
       {rs.list_link && <p style="margin-top:1.25rem"><a class="btn" href={rs.list_link.href} rel="noopener">{rs.list_link.label}</a></p>}
+      </div><aside class="aside"><figure class="aside-photo"><img src={rp.src.replace(".jpg","-800.jpg")} alt={rp.alt} loading="lazy" width="800" height="1000" /></figure>{rs.report && <div class="aside-card"><p class="kicker">After a call</p><h3>Need an incident report?</h3><p>{cp.incident_reports}</p></div>}</aside></div>
     </div>
   </section>
 
-  {rs.report && <section class="section tight">
-    <div class="wrap">
-      <div class="head" data-reveal><p class="kicker">After a call</p><h2>Need an incident report?</h2></div>
-      <div class="prose"><p>{cp.incident_reports}</p></div>
-    </div>
-  </section>}
+
 
   {years.length > 0 && <section class="section band">
     <div class="wrap">
@@ -82,8 +78,9 @@ const kinds: { title: string; text: string }[] = rs.kinds || [];
 
   <section class="section tight">
     <div class="wrap">
-      <div class="head" data-reveal><p class="kicker">Why it takes a few minutes</p><h2>What happens when you call 911</h2></div>
-      <div class="prose"><p>Read <a href="/safety/#911">how a volunteer response works</a>, from the dispatcher's questions to the first rig out of the station, and why the time between your call and our arrival is what it is.</p></div>
+      <div class="split"><div><div class="head" data-reveal><p class="kicker">Why it takes a few minutes</p><h2>What happens when you call 911</h2></div>
+      <div class="prose"><p>Read <a href="/safety/#911">how a volunteer response works</a>, from the dispatcher's questions to the first rig out of the station, and why the time between your call and our arrival is what it is.</p></div></div>
+      <aside class="aside"><div class="aside-card light"><p class="kicker">The short version</p><ul><li>You call; the page goes out while you talk.</li><li>Members drive to the station from wherever they are.</li><li>The first rig rolls as soon as a crew is aboard.</li></ul><a class="btn red" href="/safety/#911">How it works, step by step</a></div></aside></div>
     </div>
   </section>
 

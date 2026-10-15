@@ -24,18 +24,19 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
   <section class="section">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">History</p><h2>{d.founded} to now</h2></div>
-      <div class="prose">{d.history.map((p) => <p>{p}</p>)}</div>
+      <div class="split"><div class="prose">{d.history.map((p) => <p>{p}</p>)}</div><aside class="aside"><figure class="aside-photo"><img src={(ah.src).replace(".jpg","-800.jpg")} alt={ah.alt} loading="lazy" width="800" height="1000" /><figcaption>{ah.caption || ah.alt}</figcaption></figure><div class="aside-card"><p class="kicker">By the numbers</p><p class="big">{new Date().getFullYear() - d.founded} <b>years</b></p><p>{d.stats.members} members, career and volunteer, from {cp.station_label}.</p></div></aside></div>
     </div>
   </section>
 
   <section class="section band">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">Leadership</p><h2>Chief's officers</h2></div>
-      <div class="people" data-reveal-group>
+      <div class={d.chiefs.length <= 2 ? "split" : ""}><div><div class="people" data-reveal-group>
         {d.chiefs.map((c) => <div class="person">{c.photo && <img class="pimg" src={c.photo} alt={`${c.name}`} loading="lazy" />}<div class="nm">{c.name}</div><div class="tt">{c.title}</div>{c.since && <div class="nt">Chief since {c.since}</div>}{c.note && <div class="nt">{c.note}</div>}<div class="nt"><a href={tel(c.phone)}>{c.phone}</a></div></div>)}
       </div>
       <p class="small" style="margin-top:1rem;max-width:62ch">{d.chiefs_note}</p>
       <p class="small" style="margin-top:.5rem;max-width:62ch">{d.past_chiefs_note}</p>
+      </div>{d.chiefs.length <= 2 && <aside class="aside"><figure class="aside-photo wide"><img src={(((d as any).photos && (d as any).photos.members_hero) || d.hero_photo).src.replace(".jpg","-800.jpg")} alt={(((d as any).photos && (d as any).photos.members_hero) || d.hero_photo).alt} loading="lazy" width="800" height="600" /><figcaption>{(((d as any).photos && (d as any).photos.members_hero) || d.hero_photo).alt}</figcaption></figure></aside>}</div>
     </div>
   </section>
 
