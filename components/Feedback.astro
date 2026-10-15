@@ -194,8 +194,7 @@ function label(){
 }
 btn.addEventListener('click',function(){
   if(mode){setMode(false);return}
-  if(rv&&rv.status!=='done'&&rv.idx<N){rv.status='active';rset(rv);go(rv.idx)}
-  else if(N)show(wel);else setMode(true)
+  begin();
 });
 /* ---- guided pass ---- */
 function go(i){
@@ -336,6 +335,8 @@ $('sfs-send').addEventListener('click',send);
 $('sfs-reset').addEventListener('click',function(){notes=[];save(notes);rset(null);location.href=PATH});
 /* ---- boot ---- */
 label();draw();render();
-if(rv&&rv.status==='active'&&rv.idx<N&&location.hash==='#sfs-review'){history.replaceState(null,'',PATH);setTimeout(function(){go(rv.idx)},50)}
+function begin(){if(rv&&rv.status!=='done'&&rv.idx<N){rv.status='active';rset(rv);go(rv.idx)}else if(N)show(wel);else setMode(true)}
+if(location.hash==='#sfs-review'){history.replaceState(null,'',PATH);setTimeout(begin,50)}
+document.querySelectorAll('[data-sfs-start]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();begin()})});
 })();
 </script>

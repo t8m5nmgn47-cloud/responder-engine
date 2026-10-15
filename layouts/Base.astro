@@ -130,7 +130,7 @@ const jsonld = {
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
-    {d.draft_note && <p class="draft">{d.draft_note}{hasReview && path !== '/review/' && <Fragment> <a class="draft-link" href="/review/">Chiefs: review checklist &rarr;</a></Fragment>}{feedback && <Fragment> Tap &ldquo;Review this site&rdquo; and we&rsquo;ll walk you through it.</Fragment>}</p>}
+    {d.draft_note && <p class="draft">{d.draft_note}{feedback && hasReview && <Fragment> <a class="draft-link" href="#sfs-review" data-sfs-start>Chiefs: review this site &rarr;</a></Fragment>}{!feedback && hasReview && path !== '/review/' && <Fragment> <a class="draft-link" href="/review/">Chiefs: review checklist &rarr;</a></Fragment>}</p>}
     <div class="bar">
       <div class="wrap">
         <span><b class="em">Emergency: 911</b></span>

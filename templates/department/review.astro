@@ -25,15 +25,17 @@ const pageName = (p: string) => {
   <section class="section tight rv">
     <div class="wrap">
       <p class="kicker">Draft site review</p>
-      <h1>Review checklist for {d.name}</h1>
-      {guided && <p class="lede rv-intro"><b>The easy way:</b> on any page of the draft site, tap the red <b>&ldquo;Review this site&rdquo;</b> button. It walks you through these {items.length} questions one at a time, showing each one on the page, and sends your answers for you. This printed list is the same set of questions.</p>}
+      <h1>{guided ? `Review the new site for ${d.name}` : `Review checklist for ${d.name}`}</h1>
+      {guided && <p class="lede rv-intro">We&rsquo;ll walk you through {items.length} quick questions, one at a time, right on the site. Tap <b>Looks right</b> or <b>Needs a change</b>, fix any wording by tapping the text, and send when you&rsquo;re done. It takes about ten minutes and you can pause anytime.</p>}
       {r.intro && <p class="lede rv-intro">{r.intro}</p>}
       <div class="rv-acts">
-        <button class="btn red" type="button" onclick="window.print()">Print this checklist</button>
+        {guided && <a class="btn red" href="/#sfs-review">Start the review &rarr;</a>}
+        {!guided && <button class="btn red" type="button" onclick="window.print()">Print this checklist</button>}
         <a class="btn" href={mailto}>Reply by email</a>
+        {guided && <button class="small rv-print" type="button" onclick="window.print()">Prefer paper? Print this list</button>}
         {contact.name && <span class="small">Questions: {contact.name}{contact.email && <Fragment>, <a href={`mailto:${contact.email}`}>{contact.email}</a></Fragment>}</span>}
       </div>
-      <p class="small rv-note">{items.length} items. Write on this page, or copy the numbered questions into an email to <a href={mailto}>{replyTo}</a>. The draft site is at <a href={site || '/'}>{site || 'this address'}</a>.</p>
+      <p class="small rv-note">{guided ? <Fragment>The {items.length} questions are listed below for reference. The draft site is at <a href={site || '/'}>{site || 'this address'}</a>.</Fragment> : <Fragment>{items.length} items. Write on this page, or copy the numbered questions into an email to <a href={mailto}>{replyTo}</a>. The draft site is at <a href={site || '/'}>{site || 'this address'}</a>.</Fragment>}</p>
 
       <ol class="rv-list">
         {items.map((it, i) => (
@@ -48,7 +50,8 @@ const pageName = (p: string) => {
       </ol>
 
       <div class="rv-acts rv-end">
-        <button class="btn red" type="button" onclick="window.print()">Print this checklist</button>
+        {guided && <a class="btn red" href="/#sfs-review">Start the review &rarr;</a>}
+        {!guided && <button class="btn red" type="button" onclick="window.print()">Print this checklist</button>}
         <a class="btn" href={mailto}>Reply by email</a>
       </div>
     </div>
@@ -56,6 +59,7 @@ const pageName = (p: string) => {
   <style is:global>
     .rv h1{font-size:clamp(2rem,1.5rem + 2vw,3rem);margin-top:.5rem}
     .rv-intro{max-width:64ch;margin-top:1rem}
+    .rv-print{background:none;border:0;padding:0;color:inherit;text-decoration:underline;cursor:pointer;font:inherit;font-size:.9rem}
     .rv-acts{display:flex;flex-wrap:wrap;gap:.75rem 1.25rem;align-items:center;margin-top:1.5rem}
     .rv-note{max-width:64ch;margin-top:1rem;color:var(--ink-lo)}
     .rv-note a,.rv-row a{text-decoration:underline;text-underline-offset:.2em}
