@@ -5,6 +5,7 @@ import { copy } from '../../components/copy.js';
 const cp = copy(d);
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 const s = d.seasonal;
+const hz = (d.hazards || []) as any[]; // 0.5.2: optional local-hazard sections (hurricanes, floods, wildfire), opt-in via dept.json
 ---
 <Base title="Safety" description={`Fire safety for ${cp.place} homes: request a free smoke alarm check, make a home escape plan you can print, learn what happens when you call 911, and this season's message from the department.`}>
   <section class="phero two">
@@ -62,6 +63,14 @@ const s = d.seasonal;
     </div>
   </section>
 
+  {hz.map((h) => (
+  <section class="section band" id={h.id || 'hazard'}>
+    <div class="wrap">
+      <div class="head" data-reveal><p class="kicker">{h.kicker}</p><h2>{h.title}</h2>{h.lede && <p class="small" style="max-width:62ch">{h.lede}</p>}</div>
+      {h.steps && <div class="facts three" data-reveal-group>{h.steps.map((st: any) => <div class="fact"><h3>{st.h}</h3><p>{st.p}</p></div>)}</div>}
+      {h.links && <p class="small" style="margin-top:1.25rem">{h.links.map((l: any, i: number) => <Fragment>{i > 0 && ' · '}<a href={l.href} rel="noopener">{l.label}</a></Fragment>)}</p>}
+    </div>
+  </section>))}
   <section class="section tight">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">Around the house</p><h2>The short list</h2></div>
