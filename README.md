@@ -129,6 +129,8 @@ Every field the `department` template reads. Paths are relative to the JSON root
 | `seasonal.start`, `.end`, `.kicker`, `.title`, `.text`, `.link`, `.link_label` | string | home and safety seasonal message (shown between `start` and `end`) |
 | `support.intro`, `.ways[] {t, d}`, `.what_it_buys` (string[][]), `.what_it_buys_note` | | support |
 | `hero_photo.src`, `.alt`, `.caption` | string | home, join, about hero images |
+| `hero_patch_scale` | number (0.3.2, optional) | multiplies the home-hero patch size (1.2 = 20% larger) |
+| `copy.hero_cta1`, `.hero_cta1_href`, `.hero_cta2`, `.hero_cta2_href` | string (0.3.2, optional) | the two hero buttons (defaults: Join the department → /join/, Free smoke alarm check → /safety/#alarm) |
 | `hero_bg` | `{src, position?}` (0.3.1, optional) | the home hero's full-bleed background photo (else `/photos/structure-fire.jpg`); a `-800.jpg` sibling is used on phones; `position` is a CSS background-position such as `center 40%` |
 | `tasks` | `{label, href, icon?}[]` (0.3) | "I want to" quicklinks: tiles under the home hero (first 6) and an "I want to…" `<details>` menu in the header listing all of them. `href` may be a page, an anchor, an external URL or a `tel:` link; `icon` is an optional short glyph/emoji, rendered `aria-hidden`. Hidden when absent. |
 | `programs` | `{title, summary, href, photo?}[]` (0.3) | teaser cards on the community page (`/community/#programs`) and, when there are 3 or more, a "What we do" row of the first 3 on the home page. Hidden when absent. |

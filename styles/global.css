@@ -264,8 +264,8 @@ h3,.h3{font:700 1.2rem/1.2 var(--display);letter-spacing:.03em;text-transform:up
 .hero-x .wrap{max-width:none;width:100%;padding:0 clamp(1rem,4.5vw,6rem)}
 .hero-x::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(22,22,24,.92) 0%,rgba(22,22,24,.82) 28%,rgba(22,22,24,.45) 52%,rgba(22,22,24,.12) 75%,rgba(22,22,24,.05) 100%),linear-gradient(0deg,rgba(22,22,24,.95) 0%,rgba(22,22,24,.45) 40%,rgba(22,22,24,.1) 100%)}
 .hero-x .hx{max-width:44rem}
-.hero-x .hpatch{display:block;width:140px;height:auto;margin-bottom:1.5rem;filter:drop-shadow(0 6px 18px rgba(0,0,0,.55))}
-@media (max-width:48rem){.hero-x .hpatch{width:96px;margin-bottom:1.1rem}}
+.hero-x .hpatch{display:block;width:calc(140px * var(--hpatch-scale,1));height:auto;margin-bottom:1.5rem;filter:drop-shadow(0 6px 18px rgba(0,0,0,.55))}
+@media (max-width:48rem){.hero-x .hpatch{width:calc(96px * var(--hpatch-scale,1));margin-bottom:1.1rem}}
 .hero-x .kicker{color:var(--brass)}
 .hero-x h1{color:#fff;margin-top:.9rem;font-size:clamp(3.25rem,2rem + 6vw,7.5rem);max-width:10ch;text-shadow:0 2px 24px rgba(0,0,0,.5)}
 .hero-x .lede{color:#fff;margin-top:1.25rem;max-width:44ch;font-size:clamp(1.15rem,1rem + .6vw,1.45rem);text-shadow:0 1px 12px rgba(0,0,0,.6)}
