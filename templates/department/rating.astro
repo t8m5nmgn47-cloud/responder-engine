@@ -34,6 +34,36 @@ const navLabel = ip.nav || 'What our rating saves you';
 const title = ip.title || `Class ${cls}: the rating that lowers your insurance bill.`;
 const meta = ip.meta || `${d.name} holds a Class ${cls} fire protection rating. Here is what that is worth to every home and business in the district, in dollars.`;
 const sections = { 'Fire department': 50, 'Water supply': 40, '911 center': 10 };
+// 0.9.1: the work behind the rating. `iso_page.work` overrides any of these; `hours_member`/`hours_dept` (0 hides the figure).
+const work: any = ip.work || {};
+const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+// Each item: label, months it lands in (1-12), kind: 'drill' (every month) | 'test' | 'drive' | 'inspect'
+const yearItems: { label: string; months: number[]; kind: string; note?: string }[] = work.year || [
+  { label: 'Training night, every week', months: [1,2,3,4,5,6,7,8,9,10,11,12], kind: 'drill', note: 'Company drill. ISO credits up to 16 hours a month per member; the state requires 36 hours a year just to stay rated.' },
+  { label: 'Pump service test, every engine and tanker', months: [3], kind: 'test', note: 'Run at rated capacity and watched for pressure drop. A pump that fails is a pump that doesn\'t count.' },
+  { label: 'Hose test, every length', months: [5], kind: 'test', note: 'Each section pressurized, tagged and logged.' },
+  { label: 'Ground ladder test', months: [5], kind: 'test' },
+  { label: 'SCBA flow and fit tests, turnout gear inspection', months: [2,8], kind: 'test', note: 'Every member, every air pack, every set of gear.' },
+  { label: 'Dry hydrant flush and flow check', months: [4,9], kind: 'test', note: 'The ponds are the water system. Each rated source is flowed and recorded.' },
+  { label: 'Tanker shuttle drill', months: [6,10], kind: 'test', note: 'Fill, haul, dump, repeat, against the clock. This is the 40 water-supply points.' },
+  { label: 'Officer and driver training', months: [1,7], kind: 'drive' },
+  { label: 'Preschool visits, smoke alarm checks, pre-plans', months: [10], kind: 'drive', note: 'Fire Prevention Week. The bonus points.' },
+  { label: 'Run reports, training logs, certifications filed', months: [12], kind: 'drive', note: 'Everything above exists only if it was written down.' },
+];
+const hoursMember = Number(ip.hours_member ?? 0);
+const hoursDept = Number(ip.hours_dept ?? 0);
+const inspect: any[] = work.inspection || [
+  { t: 'The records', d: 'The inspector pulls a year of training logs, every certification, every pump and hose test card, every run report. Nothing he can\'t see on paper counts.' },
+  { t: 'The trucks', d: 'Every compartment opened, hose and nozzles and ladders counted against the schedule, pumps run.' },
+  { t: 'The water', d: 'A timed shuttle or draft: sustain the required flow for two hours straight while he holds the stopwatch. Fall short and the class moves for the whole district.' },
+  { t: 'The verdict', d: 'A letter from the State Fire Marshal with the class, and a new date on the calendar. It is re-inspected, so it is kept, never owned.' },
+];
+// Comparison by department type: iso_page.peers [{class, kind:'municipal'|'rural', label?}]; the department itself is added from `cls`.
+const peers: any[] = ip.peers || [];
+const stateStats: any[] = ip.state_stats || [];
+// dots sharing a class are spread sideways so none hides another; the department's own dot is drawn last
+const spread = (list: any[]) => { const by: Record<string, any[]> = {}; list.forEach((q) => { const k = String(q.class).replace(/\D/g, ''); (by[k] = by[k] || []).push(q); });
+  return Object.values(by).flatMap((g) => g.sort((a, b) => (a.us ? 1 : 0) - (b.us ? 1 : 0)).map((q, i) => ({ ...q, off: (i - (g.length - 1) / 2) * 1.5 }))); };
 ---
 <Base title={ip.page_title || 'Our rating'} description={meta}>
   <section class="phero rhero">
@@ -98,11 +128,44 @@ const sections = { 'Fire department': 50, 'Water supply': 40, '911 center': 10 }
 
   {homes > 0 && <section class="section tight">
     <div class="wrap">
-      <div class="stats" data-reveal-group>
+      <div class="stats fit" data-reveal-group>
         <div class="stat"><div class="v" data-count>{homes.toLocaleString('en-US')}</div><div class="k">{ip.homes_label || 'Homes in the district'}</div></div>
         <div class="stat"><div class="v">{usd(Math.round(saved(worst) * homes / 1e5) / 10)}M</div><div class="k">Kept in the community every year, at a {usd(base)} premium</div></div>
         <div class="stat"><div class="v">{usd(Math.round(saved(worst) * homes * years / 1e6))}M</div><div class="k">Over {years} years</div></div>
       </div>
+    </div>
+  </section>}
+
+  <section class="section band work" id="what-it-takes">
+    <div class="wrap">
+      <div class="head" data-reveal><p class="kicker">{work.kicker || 'What it takes'}</p><h2>{work.title || `A year of keeping a ${cls}`}</h2></div>
+      <p class="lede" style="max-width:62ch">{work.intro || `Nobody is paid for the rating. It is earned on Tuesday nights and Saturday mornings by people who have already worked a shift somewhere else, and it has to be earned again every year.`}</p>
+      <figure class="yearstrip" aria-label="A calendar year of the tests, drills and paperwork that keep the rating.">
+        <div class="ys-head"><span class="ys-label"></span>{months.map((m) => <span class="ys-m">{m}</span>)}</div>
+        <ol class="ys-rows">{yearItems.map((it) => <li class={`ys-row ${it.kind}`}><span class="ys-label">{it.label}{it.note && <span class="ys-note">{it.note}</span>}</span>{months.map((m, i) => <span class={`ys-cell${it.months.includes(i + 1) ? ' on' : ''}`} aria-hidden="true"></span>)}</li>)}</ol>
+      </figure>
+      {(hoursMember > 0 || hoursDept > 0) && <div class="stats fit" data-reveal-group style="margin-top:1.75rem">
+        {hoursMember > 0 && <div class="stat"><div class="v" data-count>{hoursMember}</div><div class="k">{work.hours_member_label || 'Hours a year, one active member, before a single call'}</div></div>}
+        {hoursDept > 0 && <div class="stat"><div class="v" data-count>{hoursDept.toLocaleString('en-US')}</div><div class="k">{work.hours_dept_label || 'Unpaid hours a year across the department'}</div></div>}
+        <div class="stat"><div class="v">{usd(saved(worst))}</div><div class="k">Saved on one {usd(base)} policy, every year</div></div>
+      </div>}
+      <div class="head" data-reveal style="margin-top:2.5rem"><p class="kicker">{work.inspect_kicker || 'Inspection day'}</p><h2>{work.inspect_title || 'Then the state comes to check'}</h2></div>
+      <ol class="insp" data-reveal-group>{inspect.map((x, i) => <li><span class="n">{i + 1}</span><h3>{x.t}</h3><p>{x.d}</p></li>)}</ol>
+      <p class="small" style="margin-top:1.25rem;max-width:64ch">{work.note || `The equation is simple and nobody says it out loud: the hours above are what the savings below are made of. Take away the hours and the district is a ${worst || '9'}.`}</p>
+    </div>
+  </section>
+
+  {(peers.length > 0 || stateStats.length > 0) && <section class="section tight peers">
+    <div class="wrap">
+      <div class="head" data-reveal><p class="kicker">{ip.peers_kicker || 'For comparison'}</p><h2>{ip.peers_title || 'Where a volunteer district usually lands'}</h2></div>
+      {peers.length > 0 && <figure class="peerladder" aria-label={`Protection classes of nearby departments by type. ${cp.place} is a ${cls}.`}>
+        <div class="pl-scale">{ladder.map((c) => <span class={c === cls ? 'us' : ''}>{c}</span>)}</div>
+        <div class="pl-rows">
+          {['municipal', 'rural'].map((kind) => <div class="pl-row"><span class="pl-k">{kind === 'municipal' ? (ip.peers_municipal_label || 'Town departments, paid staff, hydrants') : (ip.peers_rural_label || 'Rural departments, volunteer or combination')}</span><span class="pl-track">{spread([...peers.filter((q) => q.kind === kind), ...(kind === (ip.kind || 'rural') ? [{ class: cls, us: true }] : [])]).map((q) => <span class={`pl-dot${q.us ? ' us' : ''}`} style={`--at:calc(${(ladder.indexOf(String(q.class).replace(/\D/g, '')) + .5) / 10 * 100}% + ${q.off}rem)`} title={q.label || `Class ${q.class}`}><i>{q.class}</i></span>)}</span></div>)}
+        </div>
+        <p class="small" style="margin-top:.75rem">{ip.peers_note || `Each dot is a department in the county, by the class it holds inside five road miles of its stations. ${cp.place} is the red one.`}</p>
+      </figure>}
+      {stateStats.length > 0 && <div class="stats fit" data-reveal-group style="margin-top:1.5rem">{stateStats.map((st) => <div class="stat"><div class="v">{st.v}</div><div class="k">{st.k}</div></div>)}</div>}
     </div>
   </section>}
 
@@ -238,6 +301,38 @@ const sections = { 'Fire department': 50, 'Water supply': 40, '911 center': 10 }
     .saved{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:.5rem 1.5rem;background:var(--char);color:#fff;padding:1rem 1.25rem}
     .saved .sk{font:700 .8rem/1.3 var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--brass)}
     .saved .sv{font:700 clamp(1.6rem,1.3rem + 1vw,2.2rem)/1 var(--display);font-variant-numeric:tabular-nums}
+    .stats.fit{grid-template-columns:repeat(auto-fit,minmax(12rem,1fr))}
+    .work .lede{margin-top:1rem}
+    .yearstrip{margin-top:1.75rem;overflow-x:auto}
+    .ys-head,.ys-row{display:grid;grid-template-columns:minmax(14rem,1.6fr) repeat(12,minmax(1.6rem,1fr));gap:3px;align-items:center}
+    .ys-head{margin-bottom:.4rem}
+    .ys-m{font:700 .7rem/1 var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-lo);text-align:center}
+    .ys-rows{display:grid;gap:3px;list-style:none;padding:0}
+    .ys-row .ys-label{font-size:.9rem;font-weight:600;color:var(--ink-hi);padding:.45rem .6rem .45rem 0;line-height:1.25}
+    .ys-note{display:block;font-weight:400;font-size:.8rem;color:var(--ink-lo);margin-top:.15rem}
+    .ys-cell{display:block;height:100%;min-height:1.6rem;background:var(--card);border:1px solid var(--rule-2);border-radius:2px}
+    .ys-row.drill .ys-cell.on{background:#8e8a82}
+    .ys-row.test .ys-cell.on{background:var(--red)}
+    .ys-row.drive .ys-cell.on{background:var(--char)}
+    .insp{display:grid;gap:1rem;grid-template-columns:1fr;list-style:none;padding:0;margin-top:1.25rem;counter-reset:none}
+    @media (min-width:52rem){.insp{grid-template-columns:repeat(2,1fr)}}
+    @media (min-width:72rem){.insp{grid-template-columns:repeat(4,1fr)}}
+    .insp li{position:relative;background:var(--card);border:1px solid var(--rule);border-top:4px solid var(--char);padding:1.1rem 1.2rem 1.2rem}
+    .insp .n{font:700 2.2rem/1 var(--display);color:var(--red)}
+    .insp h3{font-size:1.3rem;margin-top:.4rem}
+    .insp p{font-size:.92rem;margin-top:.4rem;color:var(--ink)}
+    .peerladder{margin-top:1.5rem;background:var(--card);border:1px solid var(--rule);padding:1.25rem 1.4rem}
+    .pl-scale{display:grid;grid-template-columns:repeat(10,1fr);margin-left:14rem}
+    .pl-scale span{font:700 .85rem/1 var(--display);color:var(--ink-lo);text-align:center;padding-bottom:.5rem;border-bottom:1px solid var(--rule)}
+    .pl-scale span.us{color:var(--red)}
+    .pl-rows{display:grid;gap:.5rem;margin-top:.75rem}
+    .pl-row{display:grid;grid-template-columns:14rem 1fr;align-items:center;gap:0}
+    .pl-k{font:600 .85rem/1.2 var(--sans);color:var(--ink);padding-right:1rem}
+    .pl-track{position:relative;height:2.4rem;background:var(--bg-2);border-radius:2px}
+    .pl-dot{position:absolute;left:var(--at);top:50%;transform:translate(-50%,-50%);width:1.7rem;height:1.7rem;border-radius:50%;background:#4a4a4e;border:2px solid #fff;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+    .pl-dot i{font:700 .7rem/1 var(--display);color:#fff;font-style:normal}
+    .pl-dot.us{background:var(--red);width:2.1rem;height:2.1rem;z-index:2}
+    @media (max-width:52rem){.pl-scale{margin-left:0}.pl-row{grid-template-columns:1fr}.pl-k{padding-bottom:.3rem}}
     .miles .ring{color:rgba(243,239,230,.5)}
     .miles .ring svg{width:100%;height:auto;display:block}
     .miles .st{font:600 13px/1 var(--sans);fill:#f3efe6}
