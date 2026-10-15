@@ -36,7 +36,8 @@ const nav = [
   ...((d as any).weather ? [{ href: '/weather/', label: cp.weather_nav }] : []),
   { href: '/community/', label: 'Community' },
   { href: '/news/', label: 'News & events' },
-  ...((d as any).store ? [{ href: '/shop/', label: cp.shop_nav }] : []),
+  ...((d as any).iso_page && (d as any).iso_page.nav_main ? [{ href: '/rating/', label: (d as any).iso_page.nav_main === true ? `ISO Class ${(d as any).iso_page.rating || (((d as any).iso_rating || {}).class || '')}` : (d as any).iso_page.nav_main }] : []),
+  ...((d as any).store && (d as any).store.nav !== false ? [{ href: '/shop/', label: cp.shop_nav }] : []),
   { href: '/join/', label: 'Join', cta: true },
 ];
 const more = [
@@ -44,7 +45,8 @@ const more = [
   { href: '/youth/', label: 'Junior program' },
   { href: '/memorial/', label: 'Memorial' },
   { href: '/support/', label: 'Support the department' },
-  ...((d as any).iso_page ? [{ href: '/rating/', label: (d as any).iso_page.nav || 'What our rating saves you' }] : []),
+  ...((d as any).iso_page && !(d as any).iso_page.nav_main ? [{ href: '/rating/', label: (d as any).iso_page.nav || 'What our rating saves you' }] : []),
+  ...((d as any).store && (d as any).store.nav === false ? [{ href: '/shop/', label: cp.shop_nav }] : []),
   { href: '/contact/', label: 'Contact' },
   { href: '/accessibility/', label: 'Accessibility' },
 ];
