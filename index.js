@@ -36,6 +36,7 @@ const TEMPLATES = {
     ['/news', 'news.astro'],
     ['/responses', 'responses.astro'],
     ['/safety', 'safety.astro'],
+    ['/weather', 'weather.astro'],
     ['/support', 'support.astro'],
     ['/youth', 'youth.astro'],
   ],

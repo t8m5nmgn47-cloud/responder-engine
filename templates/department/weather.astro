@@ -1,0 +1,182 @@
+---
+// Weather & alerts (0.6.0). Opt-in: dept.json `weather` = { lat, lon, place, county_label, tropical?: true,
+// tropical_feed?: url, fire?: { rule?, permit_url?, permit_label? }, links?: [{href,label}] }.
+// Live data loads in the visitor's browser from api.weather.gov (NWS, no key, CORS). The National Hurricane
+// Center feed has no CORS, so `tropical_feed` points at a small mirror (default: sitesforservice.org/api/nhc).
+// Without `weather` the page says where to find official alerts and nothing else; it is not in the nav.
+import Base from '../../layouts/Base.astro';
+import d from '@content/dept.json';
+import { copy } from '../../components/copy.js';
+const cp = copy(d);
+const w = (d as any).weather as any;
+const hz = ((d as any).hazards || []) as any[];
+const fire = (w && w.fire) || {};
+const links = (w && w.links) || [];
+const tropical = !!(w && w.tropical);
+const feed = (w && w.tropical_feed) || 'https://sitesforservice.org/api/nhc';
+const place = (w && w.place) || cp.place;
+const county = (w && w.county_label) || place;
+const cfg = w ? JSON.stringify({ lat: w.lat, lon: w.lon, tropical, feed, county }) : '';
+---
+<Base title="Weather & alerts" description={`Live National Weather Service alerts, the 7-day forecast and fire weather for ${place}, with what to do before a storm.`}>
+  <section class="phero">
+    <div class="wrap">
+      <p class="kicker">Weather &amp; alerts</p>
+      <h1 style="margin-top:.75rem">What's coming for {place}.</h1>
+      <p class="lede">Alerts and the forecast straight from the National Weather Service, updated while you're here. For emergencies call 911. Sign up for county alerts so a warning reaches your phone.</p>
+    </div>
+  </section>
+
+  {w ? (
+  <>
+  <section class="section tight" id="alerts" data-wx={cfg}>
+    <div class="wrap">
+      <div class="head" data-reveal><p class="kicker">Right now</p><h2>Active alerts for {county}</h2></div>
+      <div id="wx-alerts" class="wx-alerts" aria-live="polite">
+        <p class="wx-wait">Checking the National Weather Service&hellip;</p>
+      </div>
+      <p class="small" id="wx-alerts-upd"></p>
+    </div>
+  </section>
+
+  {tropical && (
+  <section class="section band" id="tropical" hidden>
+    <div class="wrap">
+      <div class="head" data-reveal><p class="kicker">Tropics</p><h2>Active Atlantic storms</h2><p class="small" style="max-width:62ch">From the National Hurricane Center. A storm on this list is not necessarily headed here; open the NHC cone for the forecast track.</p></div>
+      <div id="wx-storms" class="facts three"></div>
+      <p class="small" id="wx-storms-upd"></p>
+    </div>
+  </section>)}
+
+  <section class="section" id="forecast">
+    <div class="wrap">
+      <div class="head" data-reveal><p class="kicker">Next 7 days</p><h2>Forecast</h2></div>
+      <div id="wx-forecast" class="wx-fc"><p class="wx-wait">Loading the forecast&hellip;</p></div>
+      <p class="small" id="wx-forecast-upd"></p>
+    </div>
+  </section>
+
+  <section class="section band" id="fire">
+    <div class="wrap">
+      <div class="head" data-reveal><p class="kicker">Fire weather</p><h2>Can I burn today?</h2></div>
+      <div class="facts three">
+        <div class="fact" id="wx-fire"><h3>Fire weather today</h3><p class="wx-wait">Checking for red flag warnings&hellip;</p></div>
+        <div class="fact"><h3>The rule here</h3><p>{fire.rule || cp.burn_rule_short}</p>{fire.permit_url && <p class="small" style="margin-top:.5rem"><a href={fire.permit_url} rel="noopener">{fire.permit_label || 'Burn permits'}</a></p>}</div>
+        <div class="fact"><h3>Before you light it</h3><p>A permit, a calm day, a hose or bucket within reach, and someone watching it until it's out. If the alert box above shows a red flag warning, don't burn.</p></div>
+      </div>
+    </div>
+  </section>
+  </>
+  ) : (
+  <section class="section tight">
+    <div class="wrap">
+      <div class="head"><p class="kicker">Official sources</p><h2>Where to look</h2></div>
+      <p class="lede">Alerts and forecasts for our area are at <a href="https://www.weather.gov/" rel="noopener">weather.gov</a>, and county alerts come from your county emergency management office.</p>
+    </div>
+  </section>
+  )}
+
+  {hz.map((h) => (
+  <section class="section" id={h.id || 'hazard'}>
+    <div class="wrap">
+      <div class="head" data-reveal><p class="kicker">{h.kicker}</p><h2>{h.title}</h2>{h.lede && <p class="small" style="max-width:62ch">{h.lede}</p>}</div>
+      {h.steps && <div class="facts three" data-reveal-group>{h.steps.map((st: any) => <div class="fact"><h3>{st.h}</h3><p>{st.p}</p></div>)}</div>}
+      {h.links && <p class="small" style="margin-top:1.25rem">{h.links.map((l: any, i: number) => <Fragment>{i > 0 && ' · '}<a href={l.href} rel="noopener">{l.label}</a></Fragment>)}</p>}
+    </div>
+  </section>))}
+
+  <section class="section tight band">
+    <div class="wrap">
+      <div class="head" data-reveal><p class="kicker">Sources</p><h2>Where this comes from</h2></div>
+      <p style="max-width:62ch">Alerts and the forecast are the National Weather Service's, loaded live from <a href="https://www.weather.gov/" rel="noopener">weather.gov</a>{tropical && <Fragment>; storm information is the <a href="https://www.nhc.noaa.gov/" rel="noopener">National Hurricane Center</a>'s</Fragment>}. This page mirrors them; it isn't the warning system. If a feed is down, go to the source.</p>
+      {links.length > 0 && <p class="small" style="margin-top:1rem">{links.map((l: any, i: number) => <Fragment>{i > 0 && ' · '}<a href={l.href} rel="noopener">{l.label}</a></Fragment>)}</p>}
+    </div>
+  </section>
+
+  <style is:global>
+    .wx-wait{color:var(--ink-lo)}
+    .wx-alerts{display:grid;gap:.75rem}
+    .wx-none{display:flex;align-items:center;gap:.75rem;padding:1rem 1.1rem;background:#e7efe3;border-left:6px solid #2d6a3f;font-weight:600}
+    .wx-none::before,.wx-al::before{content:"";width:.75rem;height:.75rem;border-radius:50%;flex:none;background:#2d6a3f}
+    .wx-al{display:grid;grid-template-columns:auto 1fr;gap:.25rem .75rem;align-items:start;padding:1rem 1.1rem;background:#fbefd3;border-left:6px solid #c98a2b}
+    .wx-al::before{background:#c98a2b;margin-top:.45rem}
+    .wx-al.sev-extreme,.wx-al.sev-severe{background:#f6d9d6;border-left-color:var(--red)}
+    .wx-al.sev-extreme::before,.wx-al.sev-severe::before{background:var(--red)}
+    .wx-al h3{margin:0;font:700 1.25rem/1.15 var(--display);letter-spacing:.02em;text-transform:uppercase}
+    .wx-al p{margin:.1rem 0 0;grid-column:2}
+    .wx-al .wx-when{font-size:.85rem;color:var(--ink-lo)}
+    .wx-al details{grid-column:2;margin-top:.35rem}.wx-al summary{cursor:pointer;font-weight:600}
+    .wx-al details p{white-space:pre-line;font-size:.95rem}
+    .wx-fc{display:grid;gap:.75rem;grid-template-columns:repeat(auto-fit,minmax(8.25rem,1fr))}
+    .wx-day{padding:1rem;border:1px solid var(--rule);background:var(--paper,#fff);display:grid;gap:.35rem;align-content:start}
+    .wx-day h3{margin:0;font:700 1rem/1.2 var(--display);letter-spacing:.08em;text-transform:uppercase}
+    .wx-day img{width:3.25rem;height:3.25rem;border-radius:.5rem}
+    .wx-day .t{font:800 1.9rem/1 var(--display)}
+    .wx-day .t small{font:600 .95rem/1 var(--sans);color:var(--ink-lo);margin-left:.25rem}
+    .wx-day p{margin:0;font-size:.9rem}
+    .wx-day .w{font-size:.8rem;color:var(--ink-lo)}
+    .wx-storm{border-top:4px solid var(--red)}
+    .wx-storm h3 span{display:block;font:600 .8rem/1.3 var(--sans);letter-spacing:.14em;color:var(--ink-lo)}
+    #wx-fire.rf{background:#f6d9d6;outline:3px solid var(--red);outline-offset:-3px;padding:1rem}
+    #wx-fire.ok{background:#e7efe3;padding:1rem}
+  </style>
+
+  <script>
+    (function () {
+      const root = document.querySelector('[data-wx]') as HTMLElement | null;
+      if (!root) return;
+      const cfg = JSON.parse(root.getAttribute('data-wx') || '{}');
+      const $ = (id: string) => document.getElementById(id);
+      const esc = (s: string) => String(s || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] as string));
+      const fmt = (iso: string) => { try { return new Date(iso).toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }); } catch { return iso; } };
+      const now = () => new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      const H = { headers: { Accept: 'application/geo+json' } };
+
+      // 1. Alerts for the point (county + zone alerts both come back for a point)
+      fetch(`https://api.weather.gov/alerts/active?point=${cfg.lat},${cfg.lon}`, H).then((r) => r.json()).then((j) => {
+        const box = $('wx-alerts')!; const feats = (j.features || []) as any[];
+        const fire = $('wx-fire')!;
+        if (!feats.length) {
+          box.innerHTML = `<p class="wx-none">No active alerts for ${esc(cfg.county)}.</p>`;
+        } else {
+          box.innerHTML = feats.map((f) => {
+            const p = f.properties || {}; const sev = String(p.severity || '').toLowerCase();
+            return `<article class="wx-al sev-${esc(sev)}"><h3>${esc(p.event)}</h3><p class="wx-when">${p.ends ? 'Until ' + esc(fmt(p.ends)) : p.expires ? 'Until ' + esc(fmt(p.expires)) : ''}${p.senderName ? ' · ' + esc(p.senderName) : ''}</p><p>${esc(p.headline || '')}</p>${p.description ? `<details><summary>Details</summary><p>${esc(p.description)}</p>${p.instruction ? `<p><b>What to do:</b> ${esc(p.instruction)}</p>` : ''}</details>` : ''}</article>`;
+          }).join('');
+        }
+        const rf = feats.find((f) => /red flag|fire weather/i.test(f.properties && f.properties.event));
+        if (rf) { fire.className = 'fact rf'; fire.innerHTML = `<h3>${esc(rf.properties.event)}</h3><p>${esc(rf.properties.headline || 'Conditions are dangerous for outdoor burning. Don\'t burn.')}</p>`; }
+        else { fire.className = 'fact ok'; fire.innerHTML = `<h3>No red flag warning</h3><p>The Weather Service has no fire-weather alert for us right now. The forecast below shows wind and humidity; a dry, windy day is still a bad day to burn.</p>`; }
+        $('wx-alerts-upd')!.textContent = `Checked ${now()} · National Weather Service`;
+      }).catch(() => { $('wx-alerts')!.innerHTML = `<p class="wx-wait">Couldn't reach the Weather Service. Alerts are at <a href="https://www.weather.gov/" rel="noopener">weather.gov</a>.</p>`; $('wx-fire')!.innerHTML = `<h3>Fire weather today</h3><p>Couldn't check. See <a href="https://www.weather.gov/" rel="noopener">weather.gov</a>.</p>`; });
+
+      // 2. Forecast: points -> gridpoint forecast
+      fetch(`https://api.weather.gov/points/${cfg.lat},${cfg.lon}`, H).then((r) => r.json()).then((j) => fetch(j.properties.forecast, H)).then((r) => r.json()).then((j) => {
+        const periods = (j.properties && j.properties.periods || []) as any[];
+        const days = periods.filter((p) => p.isDaytime).slice(0, 7);
+        const nightFor = (i: number) => periods[periods.indexOf(days[i]) + 1];
+        $('wx-forecast')!.innerHTML = days.map((p, i) => {
+          const n = nightFor(i);
+          return `<div class="wx-day"><h3>${esc(p.name)}</h3>${p.icon ? `<img src="${esc(p.icon.replace('size=medium', 'size=small'))}" alt="" loading="lazy">` : ''}<div class="t">${p.temperature}°${n ? `<small>/ ${n.temperature}°</small>` : ''}</div><p>${esc(p.shortForecast)}</p><p class="w">Wind ${esc(p.windSpeed)} ${esc(p.windDirection)}${p.probabilityOfPrecipitation && p.probabilityOfPrecipitation.value ? ` · ${p.probabilityOfPrecipitation.value}% rain` : ''}</p></div>`;
+        }).join('');
+        $('wx-forecast-upd')!.textContent = `Forecast issued ${fmt(j.properties.updated || j.properties.generatedAt)} · National Weather Service`;
+      }).catch(() => { $('wx-forecast')!.innerHTML = `<p class="wx-wait">Couldn't load the forecast. It's at <a href="https://forecast.weather.gov/MapClick.php?lat=${cfg.lat}&lon=${cfg.lon}" rel="noopener">weather.gov</a>.</p>`; });
+
+      // 3. Tropics (Atlantic basin only), via the mirror
+      if (cfg.tropical) {
+        fetch(cfg.feed).then((r) => r.json()).then((j) => {
+          const storms = ((j.activeStorms || []) as any[]).filter((s) => /^al/i.test(s.id || ''));
+          const sec = $('tropical')!;
+          if (!storms.length) { sec.hidden = true; return; }
+          const label = (c: string) => ({ TD: 'Tropical depression', TS: 'Tropical storm', HU: 'Hurricane', MH: 'Major hurricane', PTC: 'Potential tropical cyclone', STD: 'Subtropical depression', STS: 'Subtropical storm' } as any)[c] || c;
+          $('wx-storms')!.innerHTML = storms.map((s) => {
+            const adv = s.publicAdvisory || {}; const cone = s.forecastGraphics || {};
+            return `<div class="fact wx-storm"><h3><span>${esc(label(s.classification))}</span>${esc(s.name)}</h3><p>Winds ${esc(s.intensity)} mph${s.movementDir !== undefined ? ` · moving ${esc(s.movementDir)}° at ${esc(s.movementSpeed)} mph` : ''}${s.lastUpdate ? ` · as of ${esc(fmt(s.lastUpdate))}` : ''}</p><p class="small" style="margin-top:.5rem">${cone.url ? `<a href="${esc(cone.url)}" rel="noopener">Forecast cone</a> · ` : ''}${adv.url ? `<a href="${esc(adv.url)}" rel="noopener">Public advisory</a>` : `<a href="https://www.nhc.noaa.gov/" rel="noopener">NHC</a>`}</p></div>`;
+          }).join('');
+          sec.hidden = false;
+          $('wx-storms-upd')!.textContent = `Checked ${now()} · National Hurricane Center`;
+        }).catch(() => { /* stay hidden */ });
+      }
+    })();
+  </script>
+</Base>
