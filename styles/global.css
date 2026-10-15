@@ -189,7 +189,7 @@ h3,.h3{font:700 1.2rem/1.2 var(--display);letter-spacing:.03em;text-transform:up
 
 /* ---------- stats ---------- */
 .stats{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);grid-template-columns:repeat(2,1fr)}
-@media (min-width:44rem){.stats{grid-template-columns:repeat(4,1fr)}}
+@media (min-width:44rem){.stats{grid-template-columns:repeat(auto-fit,minmax(11rem,1fr))}} /* 0.10.3: fits 3 or 4 tiles */
 .stat{background:var(--card);padding:1.25rem 1.25rem 1.1rem;min-width:0}
 .stat .v{font:700 clamp(2rem,1.6rem + 1.6vw,3rem)/1 var(--display);color:var(--ink-hi);font-variant-numeric:tabular-nums}
 .stat .k{margin-top:.35rem;font-size:.85rem;color:var(--ink-lo);text-transform:uppercase;letter-spacing:.08em;font-weight:600}

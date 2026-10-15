@@ -54,7 +54,7 @@ const st: any = (d as any).store || {};
 const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st.featured.title, photo: (st.featured.photos && st.featured.photos[0] && st.featured.photos[0].src) || st.featured.photo, alt: st.featured.photos && st.featured.photos[0] && st.featured.photos[0].alt }] : []), ...(st.items || [])].slice(0, 3) : [];
 ---
 <Base title="Home" description={cp.home_meta}>
-  <section class="hero-x" aria-label="Welcome" style={[d.hero_bg ? `--hero-bg:url(${d.hero_bg.src});--hero-bg-800:url(${d.hero_bg.src.replace(/\.jpg$/, "-800.jpg")});--hero-pos:${d.hero_bg.position || "center 40%"}` : "", d.hero_patch_scale ? `--hpatch-scale:${d.hero_patch_scale}` : ""].filter(Boolean).join(";") || undefined}>
+  <section class="hero-x" aria-label="Welcome" style={[d.hero_bg ? `--hero-bg:url(${d.hero_bg.src});--hero-bg-800:url(${d.hero_bg.src.replace(/\.jpg$/, "-800.jpg")});--hero-pos:${d.hero_bg.position || "center 40%"}` : "--hero-bg:none;--hero-bg-800:none", d.hero_patch_scale ? `--hpatch-scale:${d.hero_patch_scale}` : ""].filter(Boolean).join(";") || undefined}>
     <div class="wrap">
       <div class={`hx${compact ? " compact" : ""}`}>
         {patch && <img class="hpatch" src={patch} alt={`${d.name} patch`} width="140" height="161" loading="eager" />}
@@ -88,7 +88,7 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
   <section class="statband" aria-label="The department by the numbers">
     <div class="wrap">
       <div class="stats" data-reveal-group>
-        <div class="stat"><div class="v" data-count>{d.stats.members}</div><div class="k">{cp.members_label}</div></div>
+        {d.stats.members > 0 && <div class="stat"><div class="v" data-count>{d.stats.members}</div><div class="k">{cp.members_label}</div></div>}
         {d.stats.calls_2024 > 0 && <div class="stat"><div class="v" data-count>{d.stats.calls_2024}</div><div class="k">Calls in 2024</div></div>}
         {d.district.area_sq_mi > 0 && <div class="stat"><div class="v" data-count>{d.district.area_sq_mi}</div><div class="k">Square miles protected</div></div>}
         {!(d.stats.calls_2024 > 0) && <div class="stat"><div class="v">24/7</div><div class="k">{cp.stat_247}</div></div>}
@@ -248,6 +248,9 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
     .mapgrid{display:grid;gap:2rem;grid-template-columns:1fr;align-items:center}
     @media (min-width:60rem){.mapgrid{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr)}}
     .seasonal{display:flex;flex-wrap:wrap;gap:1.5rem 3rem;align-items:center;justify-content:space-between}
+    /* 0.10.3: a long headline no longer pushes the button onto its own row; the text block yields room for it */
+    .seasonal>div:first-child{flex:1 1 30rem;min-width:0;max-width:46rem}
+    .seasonal>div:last-child{flex:0 0 auto}
     .seasonal h2{font-size:clamp(1.6rem,1.3rem + 1.2vw,2.4rem)}
     .seasonal h2{font-size:clamp(2rem,1.5rem + 1.8vw,3rem)}
     .hero-x .hx.compact h1{font-size:clamp(3rem,1.8rem + 5vw,6.25rem);max-width:12ch}

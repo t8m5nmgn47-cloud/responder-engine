@@ -3,6 +3,18 @@
 One entry per tag. Read the newest entry before building a department; read the README section it points to before
 touching the engine. Department repos pin a tag (`github:t8m5nmgn47-cloud/responder-engine#v0.10.2`).
 
+## v0.10.3 — 2026-10-15
+
+Found by the Hegins Valley build (first photo-free, patch-free department).
+
+- The home members stat tile renders only when `stats.members > 0`; the stat grid fits three or four tiles.
+- A home page with no `hero_bg` sets `--hero-bg:none` so the hero no longer requests `/photos/structure-fire.jpg`
+  (the `url()` fallback stays in the CSS for older content, so vite still prints a harmless "didn't resolve" warning).
+- `"patch": false` also drops the favicon and apple-touch-icon links.
+- The apparatus page's reserved rig slots follow the 0.10.2 rule (only when some rig has a photo); the 0.10.2 change
+  missed that template, so a photo-free roster still requested `/patch.svg`.
+- Support and seasonal bands: a long headline no longer pushes the button onto its own row.
+
 ## v0.10.2 — 2026-10-15
 
 - Photos are truly optional: every template renders a department with `photos: {}`, no `hero_photo`/`hero_bg`, and no

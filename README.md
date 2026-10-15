@@ -164,6 +164,7 @@ Every field the `department` template reads. Paths are relative to the JSON root
 | `copy.support_h2`, `copy.support_h2b` | (0.10.2, optional) | the home support headline's two halves (default "The rigs are paid for." / "The rest is us."). |
 | `phones.fax` | (0.10.2) | an empty or missing fax hides the fax line in the footer and on the contact page. |
 | (0.10.2) long names | | `short` over 18 characters adds `brand-long` to the header (smaller name, may wrap to two lines, tighter nav); over 26 adds `brand-xlong`. Fixed in the same release: the header rail had zero side gutter at exactly the container width (1366 showed Join flush against the edge), and a nine-item nav between 1025 and 1344px hid its links without showing the Menu button. |
+| (0.10.3) | | `stats.members` of 0 hides the members tile; no `hero_bg` means a plain charcoal hero (no fallback photo request); `"patch": false` also drops favicon links; apparatus page reserved slots follow the photo-free rule; long support/seasonal headlines keep the button beside the text. |
 | `photos.<key>.src`, `.alt` | string | keys used: `chief_engine`, `structure`, `glow`, `community`, `members_dog`, `dog_window`, `squad`. Pages derive the responsive 800px variant with `src.replace('.jpg', '-800.jpg')`, so every photo needs a `-800.jpg` sibling in `public/photos/`. |
 
 Present in Paw Paw's data but not read by any template: `short`, `email`, `phones.emergency`, `stats.apparatus`,
@@ -246,7 +247,7 @@ state rather than two editing at once. `HANDOFF.md` at the repo root is the fix:
 "Current state" block last. The short version:
 
 1. `git pull`, read `HANDOFF.md` and the top of `CHANGELOG.md`; `git describe --tags` must match `package.json`.
-2. **Tags are the contract.** Department `package.json` pins a tag (`#v0.10.2`), never a branch. Need an engine
+2. **Tags are the contract.** Department `package.json` pins a tag (`#v0.10.3`), never a branch. Need an engine
    change? Change the engine, bump, CHANGELOG entry, tag, push, re-pin. No private patches of an old copy.
 3. **No history rewrites on main.** `git pull` before `git push`; merge if diverged, never rebase or force.
 4. **Every release gets a `CHANGELOG.md` entry and a tag.**
