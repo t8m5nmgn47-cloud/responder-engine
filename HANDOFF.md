@@ -24,13 +24,18 @@ before it finishes. `CHANGELOG.md` is the history; this file is the present.
 - `sightline-studio` branch `hegins-valley-fire` (= `8c31d23`, contains everything from `crains-creek-review-fixes`):
   - `sources/hegins-valley-fire` + `sites/hegins-valley-fire`: Hegins Valley first draft on 0.10.3, photo-free,
     `"patch": false`, station-number stat tile removed (Station 13 is in the header tagline), rig ids `13-10`/`13-50`
-    (kind no longer doubled). Verified: 13 pages at 1366 and 390, zero HTTP errors, no broken images. Not deployed:
-    needs a new Vercel project (`cd sites/hegins-valley-fire && npx -y vercel@latest deploy --prod --yes`), then the
-    review link to Nicholas Morgan (president@hvfr.org). review.json has 25 questions. No PA rate factors yet, so no
-    rating page.
+    (kind no longer doubled). Verified: 13 pages at 1366 and 390, zero HTTP errors, no broken images.
+    2026-10-15 (Kris's Mac session): DEPLOYED to https://hegins-valley-fire.vercel.app (own Vercel project, linked in
+    `sites/hegins-valley-fire/.vercel`); committed on `main` as `9237a65`. incidents.json now holds the old site's
+    full dispatch log (71 calls, Sept 2022 to Apr 2023; roads only, codes decoded, Sta. 13 units vs mutual_aid);
+    `responses.kinds` rewritten from the counts; Rescue 13-50 year 1999. Scrape + parser live in
+    `sightline-studio/_incoming/hegins-scrape/` (parse_incidents.py). Old site has no photos and a blank history page.
+    `npm run sync` rm-rf's `sites/hegins-valley-fire`, so back up `.vercel` and `.gitignore` before it and restore after.
+    Still needs: the review link to Nicholas Morgan (president@hvfr.org); review.json has 25 questions. No PA rate
+    factors yet, so no rating page.
   - `sources/crains-creek-fire` + `sites/crains-creek-fire`: re-pinned to 0.10.3, HTML identical to the live deploy.
-  Kris: merge `hegins-valley-fire` to main (it supersedes `crains-creek-review-fixes`), deploy Crains from
-  `sites/crains-creek-fire`, create and deploy the Hegins Vercel project.
+  Done 2026-10-15: Crains redeployed from `sites/crains-creek-fire`, Hegins Vercel project created and deployed. The
+  `hegins-valley-fire` branch is now just main plus a capture/revert pair (`66acb12`/`30a5f26`); nothing to merge.
 - Crains review page: 28 open items for Chief Mackey; shop stays in the footer until Stripe links and photos exist.
 - Station Ops (operation-charity repo, ADR + SO1): the other account's session; nothing in the engine depends on it.
 - Known gaps: Facebook and map embeds render blank in headless screenshots (both load in real browsers). Hegins
