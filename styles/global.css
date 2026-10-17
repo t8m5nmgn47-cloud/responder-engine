@@ -414,6 +414,8 @@ h3,.h3{font:700 1.2rem/1.2 var(--display);letter-spacing:.03em;text-transform:up
 .task .ti{font-size:1.35rem;width:1.8rem}
 .task .tl{min-width:0}
 @media (max-width:40rem){.task{min-height:3.9rem;padding:.7rem .8rem;font-size:.95rem}}
+/* 0.12.0: on a phone, room for one long word ("Non-emergency") without spilling out of the tile */
+@media (max-width:26rem){.task{gap:.45rem;padding:.7rem .6rem}.task .ti{width:1.3rem;font-size:1.15rem}.task .tl{letter-spacing:.02em;overflow-wrap:anywhere}}
 
 /* ---------- v0.3: program cards ---------- */
 .pcards{display:grid;gap:1rem;grid-template-columns:1fr}
