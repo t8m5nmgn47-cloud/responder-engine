@@ -85,7 +85,7 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
   {k === "tasks" && tasks.length > 0 && <nav class="tasksband cut" aria-label="I want to">
     <div class="wrap">
       <h2 class="sr">I want to</h2>
-      <ul class="tasks">{tasks.map((t) => <li><a class="task" href={t.href}>{t.icon && <span class="ti" aria-hidden="true">{t.icon}</span>}<span class="tl">{t.label}</span></a></li>)}</ul>
+      <ul class="tasks">{tasks.map((t) => <li><a class="task" href={t.href}>{(t.icon || tasks.some((x) => x.icon)) && <span class="ti" aria-hidden="true">{t.icon || ""}</span>}<span class="tl">{t.label}</span></a></li>)}</ul>
     </div>
   </nav>}
 
