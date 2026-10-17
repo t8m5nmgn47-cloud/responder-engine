@@ -15,33 +15,39 @@ before it finishes. `CHANGELOG.md` is the history; this file is the present.
    at the images. A clean build and a passing structural check say nothing about how the page looks; today's
    two header bugs were both invisible until a screenshot.
 
-## Current state (2026-10-15, written by the cloud session after engine 0.10.3 and the Hegins rebuild)
+## Current state (2026-10-16, written by Kris's Mac session after engine 0.10.5 and the Thomasville build)
 
-- Engine: `main` = `8386263`, version 0.10.3 (fixes the three Hegins gaps plus a seasonal/support band wrap).
-  Tags `v0.10.2` (= `1a155e3`) and `v0.10.3` (= `8386263`) are NOT on GitHub; the cloud proxy refuses tag pushes.
-  Kris: `cd ~/responder-engine && git pull && git tag v0.10.2 1a155e3; git tag v0.10.3 8386263; git push origin v0.10.2 v0.10.3`.
-  Department sources pin the SHA (`#8386263`) so they install without the tag.
-- `sightline-studio` branch `hegins-valley-fire` (= `8c31d23`, contains everything from `crains-creek-review-fixes`):
-  - `sources/hegins-valley-fire` + `sites/hegins-valley-fire`: Hegins Valley first draft on 0.10.3, photo-free,
-    `"patch": false`, station-number stat tile removed (Station 13 is in the header tagline), rig ids `13-10`/`13-50`
-    (kind no longer doubled). Verified: 13 pages at 1366 and 390, zero HTTP errors, no broken images.
-    2026-10-15 (Kris's Mac session): DEPLOYED to https://hegins-valley-fire.vercel.app (own Vercel project, linked in
-    `sites/hegins-valley-fire/.vercel`); committed on `main` as `9237a65`. incidents.json now holds the old site's
-    full dispatch log (71 calls, Sept 2022 to Apr 2023; roads only, codes decoded, Sta. 13 units vs mutual_aid);
-    `responses.kinds` rewritten from the counts; Rescue 13-50 year 1999. Scrape + parser live in
-    `sightline-studio/_incoming/hegins-scrape/` (parse_incidents.py). Old site has no photos and a blank history page.
-    `npm run sync` rm-rf's `sites/hegins-valley-fire`, so back up `.vercel` and `.gitignore` before it and restore after.
-    Still needs: the review link to Nicholas Morgan (president@hvfr.org); review.json has 25 questions. No PA rate
-    factors yet, so no rating page.
-  - `sources/crains-creek-fire` + `sites/crains-creek-fire`: re-pinned to 0.10.3, HTML identical to the live deploy.
-  Done 2026-10-15: Crains redeployed from `sites/crains-creek-fire`, Hegins Vercel project created and deployed. The
-  `hegins-valley-fire` branch is now just main plus a capture/revert pair (`66acb12`/`30a5f26`); nothing to merge.
+- Engine: `main` = `24861e5`, version 0.10.5, tags `v0.10.4` (= `8d42cb4`) and `v0.10.5` (= `24861e5`) pushed from
+  Kris's Mac (tag pushes work there; `v0.10.2`/`v0.10.3` are on GitHub too now). 0.10.4/0.10.5 make `founded`,
+  `address.street`/`zip` and `lodd[].joined` optional and fix two live Hegins bugs (empty `tel:+1` link after a
+  chief with no phone; "0 members, career and volunteer" on about). Verified: Crains byte-identical (normalized) on
+  0.10.3 vs 0.10.5; Hegins differs only in those two fixes. A root `.gitignore` now keeps `node_modules/` out
+  (a stray root `node_modules` exists on the Mac; `example/` has content but no package.json, so it can't build).
+- `sightline-studio` main (= `70f4c13`, pushed):
+  - `sources/thomasville-fire` + `sites/thomasville-fire`: Thomasville Volunteer Fire Department (Thomasville,
+    Oregon County, MO), first draft on 0.10.5 (pinned `#v0.10.5`), photo-free, patch-free. Request from Fire Chief
+    Tyler Trantham (tvillefire@yahoo.com, 417-293-3218) on 2026-10-16; he asked for recruiting, resident info,
+    memorial or history, donations. Built from the department's Facebook page (read in Kris's signed-in Chrome),
+    Ozark Radio News, MO DPS/DFS, the Governor's release, KY3 and Firehouse. LODD: Firefighter William "Bill" Nix,
+    2025-01-16 (memorial page; review item 1 asks the chief and family before anything about Bill goes public).
+    No street address or ZIP on file (Facebook lists Birch Tree, MO 65438); membership dues go to the Community
+    Center mailbox, 134 Old St., Birch Tree. Verified with Playwright (system Chrome, `channel: 'chrome'`) at 1366
+    and 390: 15 pages, no horizontal overflow, no local HTTP errors. Screenshots in `_incoming/thomasville-shots/`
+    (git-excluded). NOT DEPLOYED yet and no Vercel project; when Kris approves: `cd sites/thomasville-fire &&
+    npx vercel link --yes --project thomasville-fire && npx vercel deploy --prod --yes`. Then email the chief the
+    review link. review.json has 20 questions.
+  - Uncommitted on the Mac, not from this session: `sources/crains-creek-fire/site.config.json` and 20 files in
+    `sites/crains-creek-fire` (one-line changes each; likely the "Crains Creek Fire-Rescue" header name). Left alone.
+  - Hegins Valley: still on 0.10.3; a rebuild on 0.10.5 picks up the two fixes above. Its `copy.last_team` is `""`,
+    which prints "notifies , trained volunteers" on the memorial page: delete that key (the default names
+    Pennsylvania's LAST). Still needs the review link to Nicholas Morgan (president@hvfr.org).
 - Crains review page: 28 open items for Chief Mackey; shop stays in the footer until Stripe links and photos exist.
 - Station Ops (operation-charity repo, ADR + SO1): the other account's session; nothing in the engine depends on it.
-- Known gaps: Facebook and map embeds render blank in headless screenshots (both load in real browsers). Hegins
-  apparatus page is two cards on a wide grid; fine for a two-truck roster, revisit if the company lists more units.
-  vite prints "didn't resolve" for `/patch.svg` and `/photos/structure-fire.jpg` on photo-free builds; harmless
-  (CSS fallbacks that are never requested).
+- Known gaps: Facebook and map embeds render blank in headless screenshots (both load in real browsers). The
+  escape-plan page's own `<head>` still links `/favicon.png` and `/patch.svg` when `"patch": false` (two 404s on
+  that one page). Headless Chrome via `--window-size=390,…` misrenders (tall viewport, clipped width); use
+  Playwright with a 390x844 viewport and `fullPage` instead. vite prints "didn't resolve" for `/patch.svg` and
+  `/photos/structure-fire.jpg` on photo-free builds; harmless.
 
 ## End-of-session
 
