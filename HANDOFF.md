@@ -53,6 +53,18 @@ before it finishes. `CHANGELOG.md` is the history; this file is the present.
     https://hegins-valley-fire.vercel.app. Changes: the two 0.10.4 fixes, `last_team` blank removed, three drafted patches at `/patch-options/`
     from `sources/hegins-valley-fire/patch.json` (EST 2015 = the merger; review item 1 asks), patch-wall line in the
     review intro. 16 pages checked at 1366 and 390. Still needs the review link to Nicholas Morgan.
+- Intake (sightline-studio main `bc13721`, live 2026-10-17): sitesforservice.org/questionnaire (files in
+  `first-responders/brief/`, questions in `questions.json`), offered on the request form's thank-you and emailed in an
+  automatic reply from hello@ (`api/responder-request.js`, `api/_mail.js`). Answers save as they type into
+  fire_sites.requests.brief; the first Send emails hello@ a summary. Admin request detail shows the answers and has
+  "Copy questionnaire link"; the Compose "Reply to a site request" template fills in that link. No email template
+  asks for a call or meeting any more; the auto-reply opens with "Hello,".
+  MAIL IS NOT CONNECTED until Kris installs `tools/gmail-sender/Code.gs` as an Apps Script web app and sets
+  GMAIL_WEBHOOK_URL and GMAIL_WEBHOOK_SECRET in Vercel (README in that folder). Until then requests still save and
+  Slack says "auto-reply not sent".
+  fire-sites-api is v16 (Supabase project lbaalfejyappdbedejtc, deploy from ~/fire-functions with
+  `--no-verify-jwt`); ~/fire-functions is not its own git repo, so v15 is backed up at
+  ~/fire-functions/index.ts.v15-backup-2026-10-17. Request 9 is a Claude test row, marked spam.
 - Crains review page: 28 open items for Chief Mackey; shop stays in the footer until Stripe links and photos exist.
 - Station Ops (operation-charity repo, ADR + SO1): the other account's session; nothing in the engine depends on it.
 - Known gaps: Facebook and map embeds render blank in headless screenshots (both load in real browsers). The
