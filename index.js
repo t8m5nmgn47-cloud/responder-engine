@@ -88,7 +88,10 @@ export default function engine(options = {}) {
         // Optional rating page (0.9.0): when dept.json has `iso_page` the template gets /rating.
         let hasRating = false;
         try { hasRating = !!JSON.parse(fs.readFileSync(path.join(contentDir, 'dept.json'), 'utf8')).iso_page; } catch {}
-        const all = [...routes, ...(hasReview ? [['/review', 'review.astro']] : []), ...(hasStore ? [['/shop', 'shop.astro']] : []), ...(hasRating ? [['/rating', 'rating.astro']] : [])];
+        // Optional patch options (0.11.0): when dept.json has `patch_options` the template gets /patch-options.
+        let hasPatchOptions = false;
+        try { const po = JSON.parse(fs.readFileSync(path.join(contentDir, 'dept.json'), 'utf8')).patch_options; hasPatchOptions = Array.isArray(po) && po.length > 0; } catch {}
+        const all = [...routes, ...(hasReview ? [['/review', 'review.astro']] : []), ...(hasStore ? [['/shop', 'shop.astro']] : []), ...(hasRating ? [['/rating', 'rating.astro']] : []), ...(hasPatchOptions ? [['/patch-options', 'patch-options.astro']] : [])];
         for (const [pattern, file] of all) {
           injectRoute({
             pattern,

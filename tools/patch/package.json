@@ -1,0 +1,11 @@
+{
+  "name": "responder-engine-patch-tool",
+  "private": true,
+  "type": "module",
+  "description": "Patch import and patch builder for department sites. Not part of the published engine; department installs never pull these dependencies.",
+  "dependencies": {
+    "@fontsource/barlow-condensed": "^5.0.0",
+    "opentype.js": "^1.3.4",
+    "sharp": "^0.34.0"
+  }
+}

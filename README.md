@@ -166,6 +166,7 @@ Every field the `department` template reads. Paths are relative to the JSON root
 | (0.10.2) long names | | `short` over 18 characters adds `brand-long` to the header (smaller name, may wrap to two lines, tighter nav); over 26 adds `brand-xlong`. Fixed in the same release: the header rail had zero side gutter at exactly the container width (1366 showed Join flush against the edge), and a nine-item nav between 1025 and 1344px hid its links without showing the Menu button. |
 | (0.10.3) | | `stats.members` of 0 hides the members tile; no `hero_bg` means a plain charcoal hero (no fallback photo request); `"patch": false` also drops favicon links; apparatus page reserved slots follow the photo-free rule; long support/seasonal headlines keep the button beside the text. |
 | (0.10.4) optional facts | | `founded` 0 or missing hides every founding-year mention (home kicker and years tile, about heading via `copy.history_title`, JSON-LD, header tagline); the home stat band needs two tiles; `address.street`/`zip` may be empty; `lodd[].joined` may be a bare year or empty; a chief with no `phone` gets no phone link. |
+| `patch_options` | `{id, src, label, note?}[]` (0.11.0, optional) | adds a noindex `/patch-options/` page showing drafted patches (from `tools/patch`) for the chief to pick; `patch_options_intro` and `patch_options_note` override its lede and footnote. Link it from a review item (`"where": ["/patch-options/"]`). |
 | `photos.<key>.src`, `.alt` | string | keys used: `chief_engine`, `structure`, `glow`, `community`, `members_dog`, `dog_window`, `squad`. Pages derive the responsive 800px variant with `src.replace('.jpg', '-800.jpg')`, so every photo needs a `-800.jpg` sibling in `public/photos/`. |
 
 Present in Paw Paw's data but not read by any template: `short`, `email`, `phones.emergency`, `stats.apparatus`,
@@ -207,6 +208,23 @@ Paw Paw has none, so its output is unchanged.
 | `contact.name`, `.email` | string | "Questions: …" line beside the buttons |
 | `reply_to`, `subject` | string, optional | the "Reply by email" mailto (defaults `hello@sitesforservice.org`, "<short name> review") |
 | `items[]` | `{id, question, why, where: string[], current, status}` | one numbered block each: the question in bold, "Why we ask", "Where it appears" as links (page paths, with optional `#anchor`), "What the draft shows now", and a "Your answer" line to write on. `status` is for the editors (`open` / `done`) and is not rendered. |
+
+### Patches (0.11.0): `tools/patch`
+
+Every department gets a patch on the site one of two ways. The tool lives in `tools/patch` with its own dependencies
+(sharp, opentype.js, Barlow Condensed), so department installs never pull them: `cd tools/patch && npm install` once.
+
+- **They have art** (a Facebook logo, an old site header, a photo of the patch):
+  `node tools/patch/patch.mjs import <image> --out <source>/public` cuts away a plain background, trims, and writes
+  `patch.svg`, `favicon.png` and `apple-touch-icon.png`. Then drop `"patch": false` from `site.config.json`.
+- **They have none:** write `<source>/patch.json` with the department's own facts (`name`, `kind`, `est`, `station`,
+  `state`, `motif`: `river|pines|ridges|plains|none`, optional `colors`), then
+  `node tools/patch/patch.mjs options --config <source>/patch.json --out <source>/public/patch-options` draws a round
+  badge, a Maltese cross and a shield (text as outlines, so they render identically everywhere). Add the returned
+  list to `dept.json` as `patch_options` and a review item pointing at `/patch-options/`. When the chief picks,
+  `node tools/patch/patch.mjs build --config <source>/patch.json --style badge|cross|shield --out <source>/public`.
+- Every word on a draft comes from `patch.json`; nothing is invented, and a draft is never called the department's
+  official patch. Sites for Service asks each department for one real patch for its wall, in the first email.
 
 ### `public/`
 

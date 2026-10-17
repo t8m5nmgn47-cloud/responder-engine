@@ -3,6 +3,16 @@
 One entry per tag. Read the newest entry before building a department; read the README section it points to before
 touching the engine. Department repos pin a tag (`github:t8m5nmgn47-cloud/responder-engine#v0.10.2`).
 
+## v0.11.0 — 2026-10-16
+
+- `tools/patch` (not part of the published package): `import` turns a department's existing art into `patch.svg` +
+  icons with the background cut away; `options` draws original drafts (round badge, Maltese cross, shield; river,
+  pines, ridgeline or plains scene; department colors) from `patch.json` facts with text as outlines; `build` writes
+  the chosen style as the site's patch. See README "Patches".
+- `patch_options` in `dept.json` adds a noindex `/patch-options/` page for the chief to pick from; the review
+  checklist names it "Patch options".
+- Verified: Crains Creek builds byte-identical (normalized) to 0.10.5; Hegins Valley gains only `/patch-options/`.
+
 ## v0.10.5 — 2026-10-16
 
 - Finishes 0.10.4's optional street: the community page's "Didn't find it?" card, the home map caption (when

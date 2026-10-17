@@ -1,0 +1,46 @@
+---
+// Patch options (0.11.0). Rendered at /patch-options/ only when dept.json has `patch_options`.
+// For a department with no usable patch file: the drafts drawn by tools/patch (`patch.mjs options`), shown so the
+// chief and members can pick one, ask for changes, or send their own. noindex; the guided review still runs here.
+import Base from '../../layouts/Base.astro';
+import d from '@content/dept.json';
+import { copy } from '../../components/copy.js';
+const cp = copy(d);
+const po: any[] = ((d as any).patch_options || []).filter((o: any) => o && o.src);
+const intro = (d as any).patch_options_intro || `We couldn't find a patch file to use on the site, so we drew ${po.length === 1 ? 'a starting point' : `${num(po.length)} starting points`} from the department's own facts: its name, the year it started and the place it serves. They're drafts, not the department's official patch. Pick the one you like, tell us what to change, or send us your own design.`;
+const note = (d as any).patch_options_note || 'Once you choose one, it goes on the site in place of the empty space beside the name, and you can use the same file for shirts, truck decals or an embroidered patch.';
+const num = (n: number) => ['no', 'one', 'two', 'three', 'four', 'five', 'six'].at(n) || String(n);
+const letter = (o: any, i: number) => String(o.id || String.fromCharCode(97 + i)).toUpperCase();
+---
+<Base title="Patch options" description={`Draft patch designs for ${d.name} to choose from.`} noindex>
+  <section class="section tight po">
+    <div class="wrap">
+      <p class="kicker">Draft patches</p>
+      <h1>Patch options for {cp.short}</h1>
+      <p class="lede po-intro">{intro}</p>
+      <ol class="po-grid">
+        {po.map((o, i) => (
+          <li class="po-card" id={`option-${letter(o, i).toLowerCase()}`}>
+            <div class="po-art"><img src={o.src} alt={`Draft patch option ${letter(o, i)}: ${o.label || 'a patch design'} for ${d.name}`} width="400" height="400" loading="lazy" /></div>
+            <p class="po-name"><span class="po-letter">Option {letter(o, i)}</span>{o.label && <span class="po-label">{o.label}</span>}</p>
+            {o.note && <p class="small po-note">{o.note}</p>}
+          </li>
+        ))}
+      </ol>
+      <p class="small po-foot">{note}</p>
+    </div>
+  </section>
+  <style>
+    .po h1{margin-top:.75rem}
+    .po-intro{max-width:62ch;margin-top:1.25rem}
+    .po-grid{list-style:none;margin:2.5rem 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),1fr));gap:1.5rem}
+    .po-card{background:var(--bg-2);border-top:4px solid var(--red);padding:1.5rem 1.5rem 1.25rem}
+    .po-art{aspect-ratio:1;display:flex;align-items:center;justify-content:center}
+    .po-art img{width:100%;height:100%;object-fit:contain;display:block}
+    .po-name{margin:1rem 0 0;display:flex;flex-direction:column;gap:.15rem}
+    .po-letter{font:700 1.35rem/1.1 var(--display);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-hi)}
+    .po-label{color:var(--ink-lo)}
+    .po-note{margin-top:.5rem}
+    .po-foot{margin-top:2rem;max-width:62ch}
+  </style>
+</Base>

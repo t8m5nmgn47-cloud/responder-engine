@@ -16,7 +16,7 @@ const mailto = `mailto:${replyTo}?subject=${encodeURIComponent(subject)}`;
 const site = ((siteConfig as any).domain || d.url || '').replace(/\/$/, '');
 const guided = !!((siteConfig as any).feedback && (siteConfig as any).feedback.site);
 const pageName = (p: string) => {
-  const map: Record<string, string> = { '/': 'Home', '/about/': 'About', '/apparatus/': 'Apparatus', '/responses/': 'Responses', '/safety/': 'Safety', '/community/': 'Community', '/news/': 'News & events', '/join/': 'Join', '/members/': 'Members', '/youth/': 'Junior program', '/memorial/': 'Memorial', '/support/': 'Support', '/contact/': 'Contact', '/accessibility/': 'Accessibility', '/escape-plan/': 'Escape plan' };
+  const map: Record<string, string> = { '/': 'Home', '/about/': 'About', '/apparatus/': 'Apparatus', '/responses/': 'Responses', '/safety/': 'Safety', '/community/': 'Community', '/news/': 'News & events', '/join/': 'Join', '/members/': 'Members', '/youth/': 'Junior program', '/memorial/': 'Memorial', '/patch-options/': 'Patch options', '/support/': 'Support', '/contact/': 'Contact', '/accessibility/': 'Accessibility', '/escape-plan/': 'Escape plan' };
   const base = p.replace(/#.*$/, '');
   return map[base] ? `${map[base]}${p.includes('#') ? ' (' + p.slice(p.indexOf('#') + 1) + ')' : ''}` : p;
 };
