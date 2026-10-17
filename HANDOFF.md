@@ -23,16 +23,21 @@ before it finishes. `CHANGELOG.md` is the history; this file is the present.
   chief with no phone; "0 members, career and volunteer" on about). Verified: Crains byte-identical (normalized) on
   0.10.3 vs 0.10.5; Hegins differs only in those two fixes. A root `.gitignore` now keeps `node_modules/` out
   (a stray root `node_modules` exists on the Mac; `example/` has content but no package.json, so it can't build).
-- `sightline-studio` main (= `70f4c13`, pushed):
+- `sightline-studio` main (= `01a2ded`, pushed):
   - `sources/thomasville-fire` + `sites/thomasville-fire`: Thomasville Volunteer Fire Department (Thomasville,
-    Oregon County, MO), first draft on 0.10.5 (pinned `#v0.10.5`), photo-free, patch-free. Request from Fire Chief
+    Oregon County, MO), first draft on 0.10.5 (pinned `#v0.10.5`). Request from Fire Chief
     Tyler Trantham (tvillefire@yahoo.com, 417-293-3218) on 2026-10-16; he asked for recruiting, resident info,
     memorial or history, donations. Built from the department's Facebook page (read in Kris's signed-in Chrome),
     Ozark Radio News, MO DPS/DFS, the Governor's release, KY3 and Firehouse. LODD: Firefighter William "Bill" Nix,
     2025-01-16 (memorial page; review item 1 asks the chief and family before anything about Bill goes public).
     No street address or ZIP on file (Facebook lists Birch Tree, MO 65438); membership dues go to the Community
     Center mailbox, 134 Old St., Birch Tree. Verified with Playwright (system Chrome, `channel: 'chrome'`) at 1366
-    and 390: 15 pages, no horizontal overflow, no local HTTP errors. Screenshots in `_incoming/thomasville-shots/`
+    and 390: 15 pages, no horizontal overflow, no broken images, no local HTTP errors. Photos: Kris asked to use the
+    department's own Facebook photos so the chief sees a real-looking site (he'll get originals from them); 10 in
+    `public/photos/` (station, engine bay, Tanker T205 with its unit number visible, an engine, fire scenes) and
+    `patch.svg`/favicons from the department's logo with the cream background cut out. Raw downloads and the
+    contact sheet are in `_incoming/thomasville-fb/` (git-excluded). The memorial page stays photo-free until the
+    chief and Bill's family weigh in (review items 1-2). Screenshots in `_incoming/thomasville-shots/`
     (git-excluded). NOT DEPLOYED yet and no Vercel project; when Kris approves: `cd sites/thomasville-fire &&
     npx vercel link --yes --project thomasville-fire && npx vercel deploy --prod --yes`. Then email the chief the
     review link. review.json has 20 questions.
