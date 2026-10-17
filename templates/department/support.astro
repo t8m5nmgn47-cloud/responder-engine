@@ -15,7 +15,7 @@ const ipWorst = (ipg && ipg.split) || '9';
 const ipSave = ipg && ipF[ipCls] && ipF[ipWorst] ? Math.round((ipBase * ipF[ipWorst][0] / ipF[ipCls][0] - ipBase) / 50) * 50 : 0;
 const usd = (n: number) => '$' + n.toLocaleString('en-US');
 ---
-<Base title="Support the department" description={`How to support the ${d.name}: give, sponsor, or show up. What the community's support pays for.`}>
+<Base title="Support the department" description={`How to support the ${d.name}, and what the community's support pays for.`}>
   <section class={sp ? "phero two" : "phero"}><div class="wrap"><div><p class="kicker">Support</p><h1 style="margin-top:.75rem">{cp.support_h1}</h1><p class="lede">{s.intro}</p></div>{sp && <figure class="hphoto"><img src={sp.src} alt={sp.alt} width="1100" height="400" fetchpriority="high" style="aspect-ratio:auto" />{sp.caption && <figcaption>{sp.caption}</figcaption>}</figure>}</div></section>
   <section class="section band"><div class="wrap">
     <div class="doors three" data-reveal-group>{s.ways.map((w) => <div class="door"><h3>{w.t}</h3><p>{w.d}</p></div>)}</div>

@@ -7,8 +7,15 @@ const cp = copy(d);
 const ah = pick(d, 'about_hero') as { src: string; alt: string; caption: string } | null;
 const sp = pick(d, 'station') as { src: string } | null;
 const oph = pick(d, 'members_hero');
+// 0.12.0: never the same photo twice on one page. The history aside takes `photos.history` (else `glow`) when the
+// hero already shows about_hero, and the station band drops its photo when the hero already shows it.
+const hp = pick(d, 'history', 'glow') as { src: string; alt: string; caption?: string } | null;
+const asideP = hp && (!ah || hp.src !== ah.src) ? hp : null;
+const stationP = sp && (!ah || sp.src !== ah.src) ? sp : null;
+const boardRows = d.district.board.filter((b) => b.name);
 import DistrictMap from '../../components/DistrictMap.astro';
 const iso = (d as any).iso_rating as { class: string; year?: number; note?: string } | undefined;
+const govRows = boardRows.length > 0 || d.district.contract.length > 0 || !!(iso && iso.class);
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 ---
 <Base title="About" description={cp.about_meta}>
@@ -26,7 +33,7 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
   <section class="section">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">History</p><h2>{d.founded ? `${d.founded} to now` : cp.history_title}</h2></div>
-      <div class="split"><div class="prose">{d.history.map((p) => <p>{p}</p>)}</div><aside class="aside">{ah && <figure class="aside-photo"><img src={p800(ah)} alt={ah.alt} loading="lazy" width="800" height="1000" /><figcaption>{ah.caption || ah.alt}</figcaption></figure>}{(d.founded > 0 || d.stats.members > 0) && <div class="aside-card"><p class="kicker">By the numbers</p>{d.founded > 0 && <p class="big">{new Date().getFullYear() - d.founded} <b>years</b></p>}{d.stats.members > 0 && <p>{d.stats.members} members, answering from {cp.station_label}.</p>}</div>}</aside></div>
+      <div class="split"><div class="prose">{d.history.map((p) => <p>{p}</p>)}</div><aside class="aside">{asideP && <figure class="aside-photo"><img src={p800(asideP)} alt={asideP.alt} loading="lazy" width="800" height="1000" /><figcaption>{asideP.caption || asideP.alt}</figcaption></figure>}{(d.founded > 0 || d.stats.members > 0) && <div class="aside-card"><p class="kicker">By the numbers</p>{d.founded > 0 && <p class="big">{new Date().getFullYear() - d.founded} <b>years</b></p>}{d.stats.members > 0 && <p>{d.stats.members} members, answering from {cp.station_label}.</p>}</div>}</aside></div>
     </div>
   </section>
 
@@ -42,20 +49,20 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
     </div>
   </section>
 
-  <section class="section">
+  {(d.district.board_note || govRows || cp.map) && <section class="section">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">Governance</p><h2>{cp.board_title}</h2></div>
-      <div class="prose"><p>{d.district.board_note}</p></div>
-      <dl class="rows" style="margin-top:1.5rem;max-width:48rem">
+      {d.district.board_note && <div class="prose"><p>{d.district.board_note}</p></div>}
+      {govRows && <dl class="rows" style="margin-top:1.5rem;max-width:48rem">
         {d.district.board.filter((b) => b.name).map((b) => <div class="row"><dt>{b.for}</dt><dd>{b.name}</dd></div>)}
         {d.district.contract.length > 0 && <div class="row"><dt>By contract</dt><dd>{d.district.contract.join(', ')}</dd></div>}
         {iso && iso.class && <div class="row"><dt>ISO rating</dt><dd>Public Protection Classification {iso.class}{iso.year && `, rated ${iso.year}`}.{iso.note && ` ${iso.note}`}</dd></div>}
-      </dl>
-      <p class="small" style="margin-top:1rem">{cp.board_source_note}</p>
+      </dl>}
+      {cp.board_source_note && <p class="small" style="margin-top:1rem">{cp.board_source_note}</p>}
       {cp.map && <div style="margin-top:2rem;max-width:48rem"><DistrictMap /></div>}
-      {cp.map && <p class="small" style="margin-top:.5rem">{cp.map_note}</p>}
+      {cp.map && cp.map_note && <p class="small" style="margin-top:.5rem">{cp.map_note}</p>}
     </div>
-  </section>
+  </section>}
 
   <section class="section charband">
     <div class="wrap">
@@ -64,7 +71,7 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
         {d.station.opened > 0 && <p>The station at {d.address.street} opened in {d.station.opened}: {d.station.size}, {d.station.cost}, {d.station.approved.toLowerCase()}.</p>}
         <p>{d.station.history}</p>
       </div>
-      {sp && <figure class="hphoto" style="margin-top:2rem"><img src={sp.src} alt={cp.station_photo_alt} width="1100" height="400" loading="lazy" style="aspect-ratio:auto" />{cp.station_photo_caption && <figcaption style="color:rgba(243,239,230,.7)">{cp.station_photo_caption}</figcaption>}</figure>}
+      {stationP && <figure class="hphoto" style="margin-top:2rem"><img src={stationP.src} alt={cp.station_photo_alt} width="1100" height="400" loading="lazy" style="aspect-ratio:auto" />{cp.station_photo_caption && <figcaption style="color:rgba(243,239,230,.7)">{cp.station_photo_caption}</figcaption>}</figure>}
     </div>
   </section>
 
