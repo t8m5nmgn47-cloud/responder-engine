@@ -7,9 +7,9 @@ import d from '@content/dept.json';
 import { copy } from '../../components/copy.js';
 const cp = copy(d);
 const po: any[] = ((d as any).patch_options || []).filter((o: any) => o && o.src);
+const num = (n: number) => ['no', 'one', 'two', 'three', 'four', 'five', 'six'].at(n) || String(n);
 const intro = (d as any).patch_options_intro || `We couldn't find a patch file to use on the site, so we drew ${po.length === 1 ? 'a starting point' : `${num(po.length)} starting points`} from the department's own facts: its name, the year it started and the place it serves. They're drafts, not the department's official patch. Pick the one you like, tell us what to change, or send us your own design.`;
 const note = (d as any).patch_options_note || 'Once you choose one, it goes on the site in place of the empty space beside the name, and you can use the same file for shirts, truck decals or an embroidered patch.';
-const num = (n: number) => ['no', 'one', 'two', 'three', 'four', 'five', 'six'].at(n) || String(n);
 const letter = (o: any, i: number) => String(o.id || String.fromCharCode(97 + i)).toUpperCase();
 ---
 <Base title="Patch options" description={`Draft patch designs for ${d.name} to choose from.`} noindex>

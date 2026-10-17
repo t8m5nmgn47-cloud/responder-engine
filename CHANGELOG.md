@@ -3,6 +3,11 @@
 One entry per tag. Read the newest entry before building a department; read the README section it points to before
 touching the engine. Department repos pin a tag (`github:t8m5nmgn47-cloud/responder-engine#v0.10.2`).
 
+## v0.11.1 — 2026-10-16
+
+- Fixed: `/patch-options/` failed to build in 0.11.0 (a helper was used before it was defined). Found by the Hegins
+  Valley rebuild before anything was published.
+
 ## v0.11.0 — 2026-10-16
 
 - `tools/patch` (not part of the published package): `import` turns a department's existing art into `patch.svg` +
