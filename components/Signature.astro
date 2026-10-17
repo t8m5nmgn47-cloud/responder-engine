@@ -1,0 +1,47 @@
+---
+// 0.12.0: the department's own story, the one thing on the home page no other department could say.
+// dept.json `signature` = { kicker?, title, paragraphs: [], facts?: [{value, label}], photo?: {src, alt, caption?, position?},
+//   link?: {href, label}, sources?: [{label, url}] }. Every sentence must trace to a source in `sources` or to the
+// department itself; the review page asks the department whether the story is theirs to tell and told right.
+interface Props { sig: any }
+const { sig } = Astro.props;
+const facts: { value: string; label: string }[] = sig.facts || [];
+const sources: { label: string; url: string }[] = sig.sources || [];
+const ph = sig.photo && sig.photo.src ? sig.photo : null;
+const p800 = (src: string) => (src.endsWith('.jpg') ? src.replace(/\.jpg$/, '-800.jpg') : src);
+---
+<section class="section sig" aria-labelledby="sig-h">
+  <div class="wrap">
+    <div class={`siggrid${ph ? '' : ' solo'}`}>
+      <div class="sigtext">
+        {sig.kicker && <p class="kicker">{sig.kicker}</p>}
+        <h2 id="sig-h" data-reveal>{sig.title}</h2>
+        {(sig.paragraphs || []).map((p: string) => <p class="sigp">{p}</p>)}
+        {facts.length > 0 && <dl class="sigfacts" data-reveal-group>{facts.map((f) => <div><dt>{f.label}</dt><dd>{f.value}</dd></div>)}</dl>}
+        {sig.link && sig.link.href && <p class="sigact"><a class="btn red" href={sig.link.href}>{sig.link.label || 'Read more'}</a></p>}
+        {sources.length > 0 && <p class="small sigsrc">Sources: {sources.map((s, i) => <>{i > 0 && ', '}<a href={s.url} rel="noopener">{s.label}</a></>)}</p>}
+      </div>
+      {ph && <figure class="sigpic"><img src={p800(ph.src)} alt={ph.alt} width="800" height="1000" loading="lazy" style={ph.position ? `object-position:${ph.position}` : undefined} />{ph.caption && <figcaption>{ph.caption}</figcaption>}</figure>}
+    </div>
+  </div>
+</section>
+<style is:global>
+  .sig{background:var(--card);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+  .siggrid{display:grid;gap:2.25rem;grid-template-columns:1fr;align-items:center}
+  @media (min-width:60rem){.siggrid{grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);gap:4rem}}
+  .siggrid.solo .sigtext{max-width:52rem}
+  .sig h2{font-size:clamp(2.3rem,1.5rem + 2.8vw,3.9rem);line-height:.96;margin-top:.7rem;max-width:16ch;text-wrap:balance}
+  .sig .sigp{margin-top:1.1rem;max-width:58ch;font-size:1.06rem;line-height:1.6}
+  .sig .sigp:first-of-type{margin-top:1.4rem}
+  .sigfacts{display:grid;grid-template-columns:repeat(auto-fit,minmax(10rem,1fr));gap:1.25rem 1.75rem;margin:2rem 0 0;padding-top:1.4rem;border-top:4px solid var(--red)}
+  .sigfacts>div{display:flex;flex-direction:column-reverse;justify-content:flex-end;gap:.4rem;min-width:0}
+  .sigfacts dd{margin:0;font:700 clamp(2.1rem,1.6rem + 1.7vw,3rem)/1 var(--display);color:var(--red);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+  .sigfacts dt{font-size:.92rem;line-height:1.4;color:var(--ink-lo);max-width:26ch}
+  .sigact{margin-top:1.75rem}
+  .sigsrc{margin-top:1.1rem;color:var(--ink-lo);max-width:62ch}
+  .sigsrc a{color:inherit}
+  .sigpic{margin:0}
+  .sigpic img{display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;border:4px solid #fff;border-radius:2px;box-shadow:0 14px 34px rgba(0,0,0,.2)}
+  @media (max-width:59.99rem){.sigpic img{aspect-ratio:4/3}}
+  .sigpic figcaption{font-size:.85rem;color:var(--ink-lo);margin-top:.6rem}
+</style>

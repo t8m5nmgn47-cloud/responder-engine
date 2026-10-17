@@ -1,32 +1,36 @@
 ---
+// 0.12.0: routed only when dept.json has `youth` = { lede, facts?: [{title,text}], note? } (components/sections.js).
+// Every line about the program is the department's; the template only lays it out.
 import Base from '../../layouts/Base.astro';
 import d from '@content/dept.json';
 import { copy } from '../../components/copy.js';
 import { pick, p800 } from '../../components/photos.js';
 const cp = copy(d);
+const y: any = (d as any).youth || {};
+const facts: { title: string; text: string }[] = y.facts || [];
+const note: string = y.note ?? cp.youth_note;
 const yph = pick(d, 'squad', 'structure');
+const phone = (d.phones && d.phones.station) || '';
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 ---
-<Base title="Junior program" description={`The ${d.name}'s junior firefighter program: how younger members train alongside the department, what they do and don't do, and how to ask about joining.`}>
+<Base title="Junior program" description={`The ${d.name}'s junior firefighter program, and how to ask about joining it.`}>
   <section class={yph ? "phero two" : "phero"} style={yph ? `--pbg:url(${yph.src})` : undefined}>
     <div class="wrap">
       <div>
         <p class="kicker">Junior program</p>
-        <h1 style="margin-top:.75rem">Start before you're old enough.</h1>
-        <p class="lede">{cp.juniors_lede}</p>
-        <div class="acts"><a class="btn red" href="/join/#apply">Ask about joining</a><a class="btn" href={tel(d.phones.station)}>Call the station</a></div>
+        <h1 style="margin-top:.75rem">{y.title || 'Start before you\'re old enough.'}</h1>
+        <p class="lede">{y.lede || cp.juniors_lede}</p>
+        <div class="acts"><a class="btn red" href="/join/#apply">Ask about joining</a>{phone && <a class="btn" href={tel(phone)}>Call the station</a>}</div>
       </div>
-      {yph && <figure class="hphoto"><img src={p800(yph)} alt={yph.alt} width="800" height="600" fetchpriority="high" /><figcaption>{cp.squad_caption}</figcaption></figure>}
+      {yph && <figure class="hphoto"><img src={p800(yph)} alt={yph.alt} width="800" height="600" fetchpriority="high" />{cp.squad_caption && <figcaption>{cp.squad_caption}</figcaption>}</figure>}
     </div>
   </section>
-  <section class="section band">
+  {(facts.length > 0 || note) && <section class="section band">
     <div class="wrap">
-      <div class="facts three">
-        <div class="fact"><h3>What juniors do</h3><p>Train on training nights: hose, ladders, tools, radio, first aid. Help at the station, at open houses and parades, and with Fire Prevention Week. Learn how a fire department actually works.</p></div>
-        <div class="fact"><h3>What juniors don't do</h3><p>Go inside a burning building, ride to calls without a supervising officer, or do anything the department's insurer and {cp.state_name} law reserve for certified adults. The rules exist to bring them home.</p></div>
-        <div class="fact"><h3>Who it's for</h3><p>Students in the district with a parent's permission and grades that hold up. The department sets the age and the details; ask the chief's officers. If you're in school in {cp.schools} and this sounds like you, call.</p></div>
-      </div>
-      {cp.youth_note && <p class="small" style="margin-top:1.5rem;max-width:62ch" set:html={cp.youth_note} />}
+      {facts.length > 0 && <div class={`facts${facts.length >= 3 ? ' three' : ''}`}>
+        {facts.map((f) => <div class="fact"><h3>{f.title}</h3><p>{f.text}</p></div>)}
+      </div>}
+      {note && <p class="small" style="margin-top:1.5rem;max-width:62ch">{note}</p>}
     </div>
-  </section>
+  </section>}
 </Base>

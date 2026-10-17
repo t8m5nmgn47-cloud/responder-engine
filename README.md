@@ -169,8 +169,43 @@ Every field the `department` template reads. Paths are relative to the JSON root
 | `patch_options` | `{id, src, label, note?}[]` (0.11.0, optional) | adds a noindex `/patch-options/` page showing drafted patches (from `tools/patch`) for the chief to pick; `patch_options_intro` and `patch_options_note` override its lede and footnote. Link it from a review item (`"where": ["/patch-options/"]`). |
 | `photos.<key>.src`, `.alt` | string | keys used: `chief_engine`, `structure`, `glow`, `community`, `members_dog`, `dog_window`, `squad`. Pages derive the responsive 800px variant with `src.replace('.jpg', '-800.jpg')`, so every photo needs a `-800.jpg` sibling in `public/photos/`. |
 
-Present in Paw Paw's data but not read by any template: `short`, `email`, `phones.emergency`, `stats.apparatus`,
+Present in Paw Paw's data but not read by any template: `short`, `phones.emergency`, `stats.apparatus`,
 `photos.extrication`, `photos.dog_cab`, `lodd[].sources`.
+
+#### Nothing untrue (0.12.0)
+
+The rule: every sentence about a department is the department's own (from `dept.json`, with a source) or plain
+wording true of any volunteer department. A part with nothing true to say is left out, never filled in. Until 0.11.1
+the templates and `copy.js` defaults spoke Paw Paw's facts for everyone (a Knox Box program, station tours, weekly
+training nights, an issued air pack and pager, free smoke-alarm installs, an aerial). Those are now data:
+
+| field | type | used for |
+|---|---|---|
+| `join` | `{requirements?: [{title,text}], benefits?: {kicker?, title?, paragraphs[], issued_title?, issued?[]}, steps?: [{title,text}], steps_note?, visit?: {kicker?, title, text, cta?, href?}, reply_note?, next?[]}` | the join page. Each part is its own section and is left out when missing; with no `join` at all the page is the hero, the form and the NVFC link. The form now mails `email` (it had no address before) and says so. |
+| `community.facts` | `{title, text}[]` | the community page's fact tiles, followed by a "Burning" tile from `copy.burn_rule`. Replaces the fixed Knox Box / hydrants / station tours / Fire Prevention Week / incident reports tiles. |
+| `youth` | `{title?, lede, facts?: [{title,text}], note?}` | `/youth/` and its nav link exist only with this. |
+| `safety.alarm_checks` | `{title?, text, expect?: []}` | the safety page's smoke-alarm request form, and the escape-plan sheet's footer line, only for a department that runs the program. |
+| `signature` | `{kicker?, title, paragraphs[], facts?: [{value,label}], photo?: {src, alt, caption?, position?}, link?: {href,label}, sources?: [{label,url}]}` | the home page's story band (`components/Signature.astro`): the one thing no other department could say. Every sentence traces to `sources` or the department; add a review item asking whether it's theirs to tell. |
+| `home.order` | string[] | home section order. Keys: `tasks notices stats groupband signature feature seasonal pager district rigs programs doors news shop facebook iso support`; any left out follow in that default order (`home.hide` still drops one). |
+| `theme` | `{accent?, accent_deep?, charcoal?, gold?, cream?, source?}` | the department's own colors (`components/theme.js`): `accent` replaces the engine red, `charcoal` the dark of the header/footer/page heads, `gold` the brass line, `cream` the page background. Each is checked for contrast (white on accent and accent on cream 4.5:1, cream text on charcoal 7:1, gold on charcoal 4.5:1) and nudged darker or lighter until it passes; anything moved is logged at build. Put where the colors came from in `source`. |
+| `email` | string | contact row, footer, community "Ask a person" card, join and smoke-alarm forms. |
+| `review.json` `reviewer` | string | who the review widget addresses ("Chief" by default; "President Morgan" for a department whose reviewer isn't the chief). |
+| `copy.leaders_title`, `.contact_lede`, `.responses_h1`, `.pager_title`, `.facebook_note` | string | the about page's leadership heading (default: the one person's title, else "Officers"), the contact lede, the responses page H1 and home heading, the Facebook band's line. |
+
+Pages that now exist only with content: `/members/` (captains, an honor guard or `copy.honorary`), `/responses/` (a
+call log or calls by year in `incidents.json`), `/youth/` (`youth`), `/memorial/` (`lodd` or `memorial`). Their nav
+links, the home memorial door (Support takes its place) and the members page's memorial card follow. The safety
+page's seasonal box now shows only between `seasonal.start` and `seasonal.end`, like the home band. The home "24/7"
+tile needs `copy.stat_247`. The memorial page's "for every department" paragraph gives the NFFF LAST line
+(866-736-5868, the default for `michigan_last.nfff`) without promising a 24-hour answer or a named team in every
+state.
+
+Copy defaults changed (all overridable): no Paw Paw facts anywhere; empty strings hide what they would have filled
+(`mission`, `honorary`, captions, `territory_long`, `support_blurb`, `responses_list_note`, …); `state_name` comes from
+`address.state` when not given.
+
+To check a built site: `SRC=<site>/content SITE=<site>/dist node tools/provenance-audit.mjs <name>` lists every line of text
+that does not come from the department's own files, so each can be read once for "true for everyone?".
 
 ### `content/status.json`
 

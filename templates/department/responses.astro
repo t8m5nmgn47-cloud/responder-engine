@@ -15,16 +15,16 @@ const blankNum = (s: string) => !s || /^\s*$/.test(s) || /^\d{2}-0{3,}$/.test(s)
 const rs: any = (d as any).responses || {};
 const kinds: { title: string; text: string }[] = rs.kinds || [];
 ---
-<Base title="Responses" description={`Recent responses by the ${d.name}: what we were called to, when, where in general, which rigs went, and how many volunteers turned out. Plus calls by year.`}>
+<Base title="Responses" description={`Recent responses by the ${d.name}: what we were called to, when, where in general${inc.incidents.some((r) => r.units && r.units.length) ? ', which trucks went' : ''}${inc.incidents.some((r) => r.members > 0) ? ', and how many volunteers turned out' : ''}.${years.length ? ' Plus calls by year.' : ''}`}>
   <section class={rp ? "phero two" : "phero"} style={rp ? `--pbg:url(${rp.src})` : undefined}>
     <div class="wrap">
       <div>
         <p class="kicker">Responses</p>
-        <h1 style="margin-top:.75rem">What the pager said.</h1>
+        <h1 style="margin-top:.75rem">{(d as any).copy?.responses_h1 ?? 'Every call, in plain words.'}</h1>
         <p class="lede">{cp.responses_lede}</p>
       </div>
       <div>
-        {rp && <figure class="hphoto side"><img src={p800(rp)} alt={rp.alt} width="800" height="1067" fetchpriority="high" /><figcaption>{cp.responses_caption}</figcaption></figure>}
+        {rp && <figure class="hphoto side"><img src={p800(rp)} alt={rp.alt} width="800" height="1067" fetchpriority="high" />{cp.responses_caption && <figcaption>{cp.responses_caption}</figcaption>}</figure>}
         {d.stats.calls_2024 > 0 && <div class="stats" data-reveal-group style="grid-template-columns:repeat(2,1fr);margin-top:1.25rem">
           <div class="stat"><div class="v" data-count>{d.stats.calls_2024}</div><div class="k">Calls in 2024</div></div>
           <div class="stat"><div class="v" data-count>{Math.round(d.stats.calls_2024 / 365 * 7)}</div><div class="k">Calls in a typical week</div></div>
@@ -59,7 +59,7 @@ const kinds: { title: string; text: string }[] = rs.kinds || [];
           </li>
         ))}
       </ol>
-      <p class="small" style="margin-top:1.5rem;max-width:62ch">{cp.responses_list_note}</p>
+      {cp.responses_list_note && <p class="small" style="margin-top:1.5rem;max-width:62ch">{cp.responses_list_note}</p>}
       {rs.list_link && <p style="margin-top:1.25rem"><a class="btn" href={rs.list_link.href} rel="noopener">{rs.list_link.label}</a></p>}
       </div><aside class="aside">{rp && <figure class="aside-photo"><img src={p800(rp)} alt={rp.alt} loading="lazy" width="800" height="1000" /></figure>}{rs.report && <div class="aside-card"><p class="kicker">After a call</p><h3>Need an incident report?</h3><p>{cp.incident_reports}</p></div>}</aside></div>
     </div>

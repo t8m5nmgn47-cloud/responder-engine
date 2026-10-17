@@ -16,7 +16,7 @@ const src = fb && canonical ? `https://www.facebook.com/plugins/page.php?href=${
         <div class="head" data-reveal>
           <p class="kicker">Follow us</p>
           <h2 id="fb-h">The department on Facebook</h2>
-          <p class="small" style="max-width:40ch">Day-to-day updates, photos from calls and events, and reminders about burning conditions are posted there first.</p>
+          <p class="small" style="max-width:40ch">{((d as any).copy || {}).facebook_note ?? 'News, photos and notices from the department.'}</p>
           <p><a class="btn" href={fb} rel="noopener">Open our Facebook page</a></p>
         </div>
         {src && <div class="fbwrap">

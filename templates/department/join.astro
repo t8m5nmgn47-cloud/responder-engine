@@ -5,115 +5,122 @@ import { copy } from '../../components/copy.js';
 import { pick, p800 } from '../../components/photos.js';
 const cp = copy(d);
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
+const phone = (d.phones && d.phones.station) || '';
 const jph = pick(d, 'members_dog', 'squad');
 // Optional career / paid-position block (0.3.4): `careers {kicker?, title, text, cta?, href?}` renders a #career section.
 const careers = (d as any).careers as { kicker?: string; title: string; text: string; cta?: string; href?: string } | undefined;
+// 0.12.0: everything this page says about the department comes from dept.json `join`; a part that is missing is left
+// out rather than filled with someone else's rules. `join` = { requirements?: [{title,text}],
+// benefits?: {kicker?, title?, paragraphs: [], issued_title?, issued?: []}, steps?: [{title,text}], steps_note?,
+// visit?: {kicker?, title, text, cta?, href?}, reply_note?, next?: [] }.
+type Item = { title: string; text: string };
+const j: any = (d as any).join || {};
+const reqs: Item[] = j.requirements || [];
+const ben: any = j.benefits && (j.benefits.paragraphs || []).length ? j.benefits : null;
+const steps: Item[] = j.steps || [];
+const stepsNote: string = j.steps_note ?? cp.join_steps_note;
+const visit: any = j.visit && j.visit.title ? j.visit : null;
+const next: string[] = j.next || [];
+const email: string = (d as any).email || '';
+const replyNote: string = j.reply_note || (email ? `Sending opens your email program with this filled in, addressed to the department at ${email}.` : '');
+const parts = [reqs.length && 'what it takes', ben && 'what you get', steps.length && 'the steps', 'and how to reach us'].filter(Boolean) as string[];
+const desc = `How to join the ${d.name} as a volunteer: ${parts.length > 1 ? parts.join(', ') : 'how to reach us'}.`;
 ---
-<Base title="Join" description={`Become a volunteer firefighter with the ${d.name}. Training, gear and a pager are provided; what it takes, what you get, and how to start.`}>
+<Base title="Join" description={desc}>
   <section class={jph ? "phero two" : "phero"} style={jph ? `--pbg:url(${jph.src})` : undefined}>
     <div class="wrap">
       <div>
         <p class="kicker">Join the department</p>
         <h1 style="margin-top:.75rem">You don't have to be a hero. You have to show up.</h1>
         <p class="lede">{cp.join_lede}</p>
-        <div class="acts"><a class="btn red" href="#apply">Start here</a><a class="btn" href={tel(d.phones.station)}>Call the station</a></div>
+        <div class="acts"><a class="btn red" href="#apply">Start here</a>{phone && <a class="btn" href={tel(phone)}>Call the station</a>}</div>
       </div>
-      {jph && <figure class="hphoto"><img src={p800(jph)} alt={jph.alt} width="800" height="600" fetchpriority="high" /><figcaption>{cp.join_caption}</figcaption></figure>}
+      {jph && <figure class="hphoto"><img src={p800(jph)} alt={jph.alt} width="800" height="600" fetchpriority="high" />{cp.join_caption && <figcaption>{cp.join_caption}</figcaption>}</figure>}
     </div>
   </section>
 
-  <section class="section band">
+  {reqs.length > 0 && <section class="section band">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">Plain terms</p><h2>What it takes</h2></div>
       <div class="facts three">
-        <div class="fact"><h3>Live in the district</h3><p>{cp.live_here}</p></div>
-        <div class="fact"><h3>Eighteen or older</h3><p>With a valid driver's license and a clean enough record to be trusted in people's homes. Younger members can join the junior program and train alongside the department.</p></div>
-        <div class="fact"><h3>Training</h3><p>{cp.cert_text}</p></div>
-        <div class="fact"><h3>Time</h3><p>A weekly training night, calls when you can make them, and a few community events a year. Nobody makes every call. Everybody makes the ones they can.</p></div>
-        <div class="fact"><h3>Fitness</h3><p>A physical and the ability to do the work in gear. You will get stronger doing it.</p></div>
-        <div class="fact"><h3>Temperament</h3><p>Calm when it's loud. Willing to learn from people who have done it for forty years. Able to laugh at the station and keep your mouth shut about what you saw at the call.</p></div>
+        {reqs.map((r) => <div class="fact"><h3>{r.title}</h3><p>{r.text}</p></div>)}
       </div>
     </div>
-  </section>
+  </section>}
 
-  <section class="section">
+  {ben && <section class="section">
     <div class="wrap">
-      <div class="head" data-reveal><p class="kicker">What you get</p><h2>More than you'd guess</h2></div>
+      <div class="head" data-reveal><p class="kicker">{ben.kicker || 'What you get'}</p><h2>{ben.title || 'What the department gives you'}</h2></div>
       <div class="split"><div><div class="prose">
-        <p>Turnout gear, a helmet, an air pack and a pager, all issued, all yours to use. State certification that is recognized anywhere in {cp.state_name} and most places beyond it. Vehicle extrication, water supply, aerial operations, wildland, hazardous materials awareness: skills most people never get the chance to learn. {cp.heritage}</p>
-        <p>And the part nobody can quite explain until you've had it: {cp.join_people}, for the rest of your life.</p>
-      </div></div><aside class="aside"><div class="aside-card"><p class="kicker">Issued to you</p><ul><li>Turnout coat and pants, helmet, hood, gloves, boots</li><li>Air pack and mask, fit-tested to you</li><li>A pager, and the training to answer it</li><li>State certification that goes where you go</li></ul></div></aside></div>
+        {ben.paragraphs.map((p: string) => <p>{p}</p>)}
+      </div></div>{(ben.issued || []).length > 0 && <aside class="aside"><div class="aside-card"><p class="kicker">{ben.issued_title || 'Issued to you'}</p><ul>{ben.issued.map((i: string) => <li>{i}</li>)}</ul></div></aside>}</div>
     </div>
-  </section>
+  </section>}
 
-  <section class="section">
+  {steps.length > 0 && <section class="section">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">The road in</p><h2>From first call to first call</h2></div>
       <div class="split"><div>
       <ol class="steps2">
-        <li><h3>Call, or send the form.</h3><p>A chief's officer calls you back and answers your questions. If you're not sure, say so; most people aren't.</p></li>
-        <li><h3>Come to a training night.</h3><p>Stand in the bay, meet the crew, climb on the rigs. No commitment.</p></li>
-        <li><h3>Apply.</h3><p>An application, a background check, a physical, a driving record. The department walks you through it.</p></li>
-        <li><h3>Probation and gear.</h3><p>You're issued turnout gear and a pager and start training with the department while you wait for the next state class.</p></li>
-        <li><h3>{cp.cert_short}.</h3><p>{cp.cert_step}</p></li>
-        <li><h3>Your first call.</h3><p>The tones go off, you drive to the station, and you're on the rig. Everyone remembers theirs.</p></li>
+        {steps.map((s) => <li><h3>{s.title}</h3><p>{s.text}</p></li>)}
       </ol>
-      <p class="small" style="margin-top:1.5rem;max-width:62ch">{cp.join_steps_note ? cp.join_steps_note + ' ' : ''}The National Volunteer Fire Council's <a href="https://makemeafirefighter.org" rel="noopener">Make Me A Firefighter</a> site answers the general questions, and lists departments near you.</p>
-      </div><aside class="aside">{jph && <figure class="aside-photo"><img src={p800(jph)} alt={jph.alt} loading="lazy" width="800" height="1000" /><figcaption>{jph.alt}</figcaption></figure>}<div class="aside-card light"><p class="kicker">Not sure yet?</p><h3>Come stand in the bay first.</h3><p>Training night is the no-commitment way in. Call the station and ask when the next one is.</p><a class="btn red" href={tel(d.phones.station)}>{d.phones.station}</a></div></aside></div>
+      <p class="small" style="margin-top:1.5rem;max-width:62ch">{stepsNote ? stepsNote + ' ' : ''}The National Volunteer Fire Council's <a href="https://makemeafirefighter.org" rel="noopener">Make Me A Firefighter</a> site answers the general questions, and lists departments near you.</p>
+      </div>{jph && <aside class="aside"><figure class="aside-photo"><img src={p800(jph)} alt={jph.alt} loading="lazy" width="800" height="1000" /><figcaption>{jph.alt}</figcaption></figure></aside>}</div>
     </div>
-  </section>
+  </section>}
 
-  <section class="section charband">
+  {visit && <section class="section charband">
     <div class="wrap">
-      <div class="head" data-reveal><p class="kicker">Not sure yet?</p><h2>Come to a training night</h2></div>
+      <div class="head" data-reveal><p class="kicker">{visit.kicker || 'Not sure yet?'}</p><h2>{visit.title}</h2></div>
       <div class="prose" style="max-width:60ch">
-        <p>The easiest way to find out is to stand in the bay on a training night, meet the crew, climb on a rig, and ask every question you have. No paperwork, no commitment. Call the station at <a href={tel(d.phones.station)}>{d.phones.station}</a> and ask when the next one is, or send the form below and we'll call you.</p>
+        <p>{visit.text}{phone && <> Call the station at <a href={tel(phone)}>{phone}</a>, or send the form below.</>}</p>
+        {visit.href && <p style="margin-top:1.4rem"><a class="btn light" href={visit.href} rel="noopener">{visit.cta || 'Learn more'}</a></p>}
       </div>
     </div>
-  </section>
+  </section>}
 
   {careers && <section class="section band" id="career">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">{careers.kicker || 'Career positions'}</p><h2>{careers.title}</h2></div>
       <div class="prose" style="max-width:62ch">
         <p>{careers.text}</p>
-        <p style="margin-top:1.25rem"><a class="btn red" href={careers.href || tel(d.phones.station)}>{careers.cta || 'Call the station'}</a></p>
+        <p style="margin-top:1.25rem"><a class="btn red" href={careers.href || tel(phone)}>{careers.cta || 'Call the station'}</a></p>
       </div>
     </div>
   </section>}
 
   <section class="section" id="apply">
     <div class="wrap">
-      <div class="head"><p class="kicker">Apply</p><h2>Tell us who you are</h2><p class="small" style="max-width:60ch">This goes to the chief's officers. Someone will call you, usually within the week.</p></div>
+      <div class="head"><p class="kicker">Apply</p><h2>Tell us who you are</h2>{replyNote && <p class="small" style="max-width:60ch">{replyNote}</p>}</div>
       <div class="split"><div>
-      <form class="jf" id="jf" novalidate data-site={d.name} data-short={cp.short}>
-        <div class="f"><label for="j-name">Your name *</label><input id="j-name" name="name" required></div>
-        <div class="f"><label for="j-phone">Phone *</label><input id="j-phone" name="phone" type="tel" required></div>
-        <div class="f"><label for="j-email">Email</label><input id="j-email" name="email" type="email"></div>
+      <form class="jf" id="jf" novalidate data-site={d.name} data-short={cp.short} data-to={email}>
+        <div class="f"><label for="j-name">Your name *</label><input id="j-name" name="name" autocomplete="name" required></div>
+        <div class="f"><label for="j-phone">Phone *</label><input id="j-phone" name="phone" type="tel" autocomplete="tel" required></div>
+        <div class="f"><label for="j-email">Email</label><input id="j-email" name="email" type="email" autocomplete="email"></div>
         <div class="f"><label for="j-age">Age *</label><input id="j-age" name="age" type="number" min="14" max="99" required></div>
-        <div class="f wide"><label for="j-addr">{cp.join_address_label} *</label><input id="j-addr" name="address" required placeholder={cp.address_placeholder}></div>
+        <div class="f wide"><label for="j-addr">{cp.join_address_label} *</label><input id="j-addr" name="address" required placeholder={cp.address_placeholder || undefined}></div>
         <div class="f wide"><label for="j-why">Anything you want us to know</label><textarea id="j-why" name="about" rows="4" placeholder="Experience, availability, questions"></textarea></div>
         <div class="bar2"><button class="btn red" type="submit">Send</button><p class="small" id="j-status" aria-live="polite"></p></div>
-        <details class="fb" id="j-fb" hidden><summary>If your email program didn't open, copy this and send it, or call the station.</summary><textarea readonly rows="9"></textarea></details>
+        <details class="fb" id="j-fb" hidden><summary>If your email program didn't open, copy this and send it{phone ? ', or call the station' : ''}.</summary><textarea readonly rows="9"></textarea></details>
       </form>
-      </div><aside class="aside"><div class="aside-card"><p class="kicker">What happens next</p><ul><li>A chief's officer calls you back, usually within the week.</li><li>You come to a training night and meet the crew.</li><li>If it feels right, the application, background check and physical.</li><li>Gear issued; training starts while you wait for the state class.</li></ul><p>Questions first? <a href={tel(d.phones.station)}>{d.phones.station}</a>.</p></div></aside></div>
+      </div>{(next.length > 0 || phone) && <aside class="aside"><div class="aside-card">{next.length > 0 ? <><p class="kicker">What happens next</p><ul>{next.map((n) => <li>{n}</li>)}</ul></> : <p class="kicker">Questions first?</p>}{phone && <p>{next.length > 0 ? 'Questions first? ' : 'Call the station: '}<a href={tel(phone)}>{phone}</a>.</p>}</div></aside>}</div>
     </div>
   </section>
 
   <script>
     const f = document.getElementById('jf') as HTMLFormElement;
     const st = document.getElementById('j-status')!; const fb = document.getElementById('j-fb') as HTMLDetailsElement;
-    const to = ''; // the department's email address goes here
+    const to = f.dataset.to || ''; // dept.json `email` (0.12.0); without one the visitor copies the text instead
     const SITE = f.dataset.site || 'the department'; const SHORT = f.dataset.short || SITE;
     f.addEventListener('submit', (e) => {
       e.preventDefault(); if (!f.reportValidity()) return;
       const lines: string[] = [];
       f.querySelectorAll<HTMLElement>('.f').forEach((w) => { const l = w.querySelector('label')!.textContent!.replace(/\s*\*$/, '').trim(); const el = w.querySelector('input,textarea') as HTMLInputElement; if (el.value.trim()) lines.push(`${l}: ${el.value.trim()}`); });
       const body = lines.join('\n') + '\n\nSent from the ' + SITE + ' website.';
-      const ta = fb.querySelector('textarea') as HTMLTextAreaElement; ta.value = `Subject: ${SHORT} volunteer inquiry\n\n${body}`;
+      const ta = fb.querySelector('textarea') as HTMLTextAreaElement; ta.value = `To: ${to || '(the department)'}\nSubject: ${SHORT} volunteer inquiry\n\n${body}`;
       fb.hidden = false; fb.open = true;
       if (to) { st.textContent = 'Opening your email program…'; location.href = `mailto:${to}?subject=${encodeURIComponent(SHORT + ' volunteer inquiry')}&body=${encodeURIComponent(body)}`; }
-      else st.textContent = 'The department has not yet set an email address for this form. Copy the text below and send it, or call the station.';
+      else st.textContent = 'This form has no email address yet. Copy the text below and send it, or call the station.';
     });
   </script>
   <style is:global>

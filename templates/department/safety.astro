@@ -8,29 +8,36 @@ const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 const sph = pick(d, 'structure', 'squad');
 const s = d.seasonal;
 const hz = (d.hazards || []) as any[]; // 0.5.2: optional local-hazard sections (hurricanes, floods, wildfire), opt-in via dept.json
+// 0.12.0: the seasonal box shows only between seasonal.start and seasonal.end (it used to show all year), and the
+// smoke alarm request form only when the department runs that program: dept.json `safety.alarm_checks` =
+// { text, expect?: [], title? }. Until 0.11.1 every site offered free alarm installs with 10-year batteries.
+const today = new Date().toISOString().slice(0, 10);
+const inSeason = !!(s && s.title && (!s.start || s.start <= today) && (!s.end || today <= s.end));
+const alarm: any = ((d as any).safety || {}).alarm_checks || null;
+const phone = (d.phones && d.phones.station) || '';
 ---
-<Base title="Safety" description={`Fire safety for ${cp.place} homes: request a free smoke alarm check, make a home escape plan you can print, learn what happens when you call 911, and this season's message from the department.`}>
-  <section class="phero two">
+<Base title="Safety" description={`Fire safety for ${cp.place || 'district'} homes: ${alarm ? 'request a smoke alarm check, ' : ''}make a home escape plan you can print, and learn what happens when you call 911.`}>
+  <section class={inSeason ? "phero two" : "phero"}>
     <div class="wrap">
       <div>
         <p class="kicker">Safety</p>
         <h1 style="margin-top:.75rem">The best call is the one we never get.</h1>
         <p class="lede">A working smoke alarm, two ways out, and a plan everyone in the house knows. That's most of it. Here's the rest.</p>
       </div>
-      <div class="season">
+      {inSeason && <div class="season">
         <p class="kicker">{s.kicker}</p>
         <h2 style="margin-top:.5rem;font-size:1.8rem">{s.title}</h2>
         <p style="margin-top:.6rem">{s.text}</p>
-        <p class="small" style="margin-top:.6rem"><a href={s.link} rel="noopener">{s.link_label}</a></p>
-      </div>
+        {s.link && <p class="small" style="margin-top:.6rem"><a href={s.link} rel="noopener">{s.link_label || 'Learn more'}</a></p>}
+      </div>}
     </div>
   </section>
 
-  <section class="section band" id="alarm">
+  {alarm && <section class="section band" id="alarm">
     <div class="wrap">
-      <div class="head" data-reveal><p class="kicker">Free</p><h2>Request a smoke alarm check</h2><p class="small" style="max-width:62ch">A member will come to your home, test every alarm, replace dead batteries, and install an alarm where one is missing, at no charge. We make a point of it for older residents and anyone who can't get up a ladder.</p></div>
+      <div class="head" data-reveal><p class="kicker">Smoke alarms</p><h2>{alarm.title || 'Request a smoke alarm check'}</h2><p class="small" style="max-width:62ch">{alarm.text}</p></div>
       <div class="split"><div>
-      <form class="jf" id="sf" novalidate data-site={d.name}>
+      <form class="jf" id="sf" novalidate data-site={d.name} data-to={(d as any).email || ''}>
         <div class="f"><label for="s-name">Your name *</label><input id="s-name" name="name" required></div>
         <div class="f"><label for="s-phone">Phone *</label><input id="s-phone" name="phone" type="tel" required></div>
         <div class="f wide"><label for="s-addr">Address *</label><input id="s-addr" name="address" required></div>
@@ -39,9 +46,9 @@ const hz = (d.hazards || []) as any[]; // 0.5.2: optional local-hazard sections 
         <div class="bar2"><button class="btn red" type="submit">Request a visit</button><p class="small" id="s-status" aria-live="polite"></p></div>
         <details class="fb" id="s-fb" hidden><summary>If your email program didn't open, copy this and send it, or call the station.</summary><textarea readonly rows="8"></textarea></details>
       </form>
-      </div><aside class="aside"><div class="aside-card"><p class="kicker">What to expect</p><h3>A member, a ladder, a few minutes.</h3><ul><li>Every alarm tested; dead batteries replaced on the spot.</li><li>An alarm installed where one is missing, with a 10-year battery.</li><li>A quick look at your two ways out.</li><li>No charge, no sales pitch.</li></ul><p>Rather talk to a person? <a href={tel(d.phones.station)}>{d.phones.station}</a>.</p></div></aside></div>
+      </div><aside class="aside"><div class="aside-card">{(alarm.expect || []).length > 0 && <><p class="kicker">What to expect</p><ul>{alarm.expect.map((x: string) => <li>{x}</li>)}</ul></>}{phone && <p>Rather talk to a person? <a href={tel(phone)}>{phone}</a>.</p>}</div></aside></div>
     </div>
-  </section>
+  </section>}
 
   <section class="section" id="911">
     <div class="wrap">
@@ -55,7 +62,7 @@ const hz = (d.hazards || []) as any[]; // 0.5.2: optional local-hazard sections 
         <li><h3>We stay until it's done.</h3><p>Fire out, patients handed to {cp.ems}, scene safe, and then back to the station to wash hoses and fill air bottles so the next call starts clean.</p></li>
       </ol>
       <p class="small" style="margin-top:1.5rem;max-width:62ch">The honest version of "how long will it take": longer than in a city, and shorter the more volunteers we have within a few minutes of the station. If that bothers you, <a href="/join/">join</a>.</p>
-      </div><aside class="aside">{sph && <figure class="aside-photo"><img src={p800(sph)} alt={sph.alt} loading="lazy" width="800" height="1000" /><figcaption>{sph.alt}</figcaption></figure>}<div class="aside-card light"><p class="kicker">The minutes that matter</p><h3>More members close to the station means a faster first rig.</h3><p>Every volunteer who lives within a few minutes of Station {d.radio} shortens the gap between your call and our arrival.</p><a class="btn red" href="/join/">Join the department</a></div></aside></div>
+      </div><aside class="aside">{sph && <figure class="aside-photo"><img src={p800(sph)} alt={sph.alt} loading="lazy" width="800" height="1000" /><figcaption>{sph.alt}</figcaption></figure>}<div class="aside-card light"><p class="kicker">The minutes that matter</p><h3>More members close to the station means a faster first rig.</h3><p>Every volunteer who lives within a few minutes of the station shortens the gap between your call and our arrival.</p><a class="btn red" href="/join/">Join the department</a></div></aside></div>
     </div>
   </section>
 
@@ -92,8 +99,8 @@ const hz = (d.hazards || []) as any[]; // 0.5.2: optional local-hazard sections 
   </section>
 
   <script>
-    const f = document.getElementById('sf') as HTMLFormElement; const st = document.getElementById('s-status')!; const fb = document.getElementById('s-fb') as HTMLDetailsElement; const to = '';
-    f.addEventListener('submit', (e) => { e.preventDefault(); if (!f.reportValidity()) return;
+    const f = document.getElementById('sf') as HTMLFormElement | null; const st = document.getElementById('s-status')!; const fb = document.getElementById('s-fb') as HTMLDetailsElement; const to = (f && f.dataset.to) || '';
+    if (f) f.addEventListener('submit', (e) => { e.preventDefault(); if (!f.reportValidity()) return;
       const lines: string[] = []; f.querySelectorAll<HTMLElement>('.f').forEach((w) => { const l = w.querySelector('label')!.textContent!.replace(/\s*\*$/, '').trim(); const el = w.querySelector('input,textarea') as HTMLInputElement; if (el.value.trim()) lines.push(`${l}: ${el.value.trim()}`); });
       const body = lines.join('\n') + '\n\nSmoke alarm check request from the ' + (f.dataset.site || 'department') + ' website.';
       (fb.querySelector('textarea') as HTMLTextAreaElement).value = `Subject: Smoke alarm check request\n\n${body}`; fb.hidden = false; fb.open = true;

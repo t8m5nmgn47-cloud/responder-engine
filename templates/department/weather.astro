@@ -23,7 +23,7 @@ const cfg = w ? JSON.stringify({ lat: w.lat, lon: w.lon, tropical, feed, county 
     <div class="wrap">
       <p class="kicker">Weather &amp; alerts</p>
       <h1 style="margin-top:.75rem">What's coming for {place}.</h1>
-      <p class="lede">Alerts and the forecast straight from the National Weather Service, updated while you're here. For emergencies call 911. Sign up for county alerts so a warning reaches your phone.</p>
+      <p class="lede">Alerts and the forecast straight from the National Weather Service, updated while you're here. For emergencies call 911.</p>
     </div>
   </section>
 
@@ -62,7 +62,7 @@ const cfg = w ? JSON.stringify({ lat: w.lat, lon: w.lon, tropical, feed, county 
       <div class="facts three">
         <div class="fact" id="wx-fire"><h3>Fire weather today</h3><p class="wx-wait">Checking for red flag warnings&hellip;</p></div>
         <div class="fact"><h3>The rule here</h3><p>{fire.rule || cp.burn_rule_short}</p>{fire.permit_url && <p class="small" style="margin-top:.5rem"><a href={fire.permit_url} rel="noopener">{fire.permit_label || 'Burn permits'}</a></p>}</div>
-        <div class="fact"><h3>Before you light it</h3><p>A permit, a calm day, a hose or bucket within reach, and someone watching it until it's out. If the alert box above shows a red flag warning, don't burn.</p></div>
+        <div class="fact"><h3>Before you light it</h3><p>{fire.permit_url ? 'A permit, a' : 'A'} calm day, a hose or bucket within reach, and someone watching it until it's out. If the alert box above shows a red flag warning, don't burn.</p></div>
       </div>
     </div>
   </section>

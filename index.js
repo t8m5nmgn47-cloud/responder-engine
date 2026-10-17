@@ -15,6 +15,7 @@
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import fs from 'node:fs';
+import { youthOn, memorialOn, membersOn, responsesOn } from './components/sections.js';
 
 const PKG = '@sightline/responder-engine';
 
@@ -31,14 +32,10 @@ const TEMPLATES = {
     ['/contact', 'contact.astro'],
     ['/escape-plan', 'escape-plan.astro'],
     ['/join', 'join.astro'],
-    ['/members', 'members.astro'],
-    ['/memorial', 'memorial.astro'],
     ['/news', 'news.astro'],
-    ['/responses', 'responses.astro'],
     ['/safety', 'safety.astro'],
     ['/weather', 'weather.astro'],
     ['/support', 'support.astro'],
-    ['/youth', 'youth.astro'],
   ],
 };
 
@@ -91,7 +88,12 @@ export default function engine(options = {}) {
         // Optional patch options (0.11.0): when dept.json has `patch_options` the template gets /patch-options.
         let hasPatchOptions = false;
         try { const po = JSON.parse(fs.readFileSync(path.join(contentDir, 'dept.json'), 'utf8')).patch_options; hasPatchOptions = Array.isArray(po) && po.length > 0; } catch {}
-        const all = [...routes, ...(hasReview ? [['/review', 'review.astro']] : []), ...(hasStore ? [['/shop', 'shop.astro']] : []), ...(hasRating ? [['/rating', 'rating.astro']] : []), ...(hasPatchOptions ? [['/patch-options', 'patch-options.astro']] : [])];
+        // 0.12.0: /youth and /memorial only when dept.json has a junior program (`youth`) or names to remember.
+        // /members only with captains, an honor guard or honorary members; /responses only with a call log.
+        let dept = {}, incs = {};
+        try { dept = JSON.parse(fs.readFileSync(path.join(contentDir, 'dept.json'), 'utf8')); } catch {}
+        try { incs = JSON.parse(fs.readFileSync(path.join(contentDir, 'incidents.json'), 'utf8')); } catch {}
+        const all = [...routes, ...(membersOn(dept) ? [['/members', 'members.astro']] : []), ...(responsesOn(incs) ? [['/responses', 'responses.astro']] : []), ...(youthOn(dept) ? [['/youth', 'youth.astro']] : []), ...(memorialOn(dept) ? [['/memorial', 'memorial.astro']] : []), ...(hasReview ? [['/review', 'review.astro']] : []), ...(hasStore ? [['/shop', 'shop.astro']] : []), ...(hasRating ? [['/rating', 'rating.astro']] : []), ...(hasPatchOptions ? [['/patch-options', 'patch-options.astro']] : [])];
         for (const [pattern, file] of all) {
           injectRoute({
             pattern,

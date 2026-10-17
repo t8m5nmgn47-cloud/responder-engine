@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import d from '@content/dept.json';
 import { copy } from '../../components/copy.js';
 import { pick, p800 } from '../../components/photos.js';
+import { memorialOn } from '../../components/sections.js';
 const cp = copy(d);
 const mh = pick(d, 'members_hero') as { src: string; alt: string; caption: string } | null;
 ---
@@ -35,12 +36,12 @@ const mh = pick(d, 'members_hero') as { src: string; alt: string; caption: strin
     </div>
   </section>}
 
-  <section class="section tight band">
+  {(cp.honorary || memorialOn(d)) && <section class="section tight band">
     <div class="wrap">
-      <div class="head" data-reveal><p class="kicker">Honorary members and awards</p><h2>Those who served before</h2></div>
+      <div class="head" data-reveal><p class="kicker">{cp.honorary ? 'Honorary members and awards' : 'Memorial'}</p><h2>Those who served before</h2></div>
       <div class="split"><div class="prose">
-        <p>{cp.honorary}</p>
-      </div><aside class="aside"><div class="aside-card"><p class="kicker">Memorial</p><h3>The members we have lost.</h3><p>Their names are kept on the memorial page.</p><a class="btn light" href="/memorial/">Memorial</a></div></aside></div>
+        {cp.honorary && <p>{cp.honorary}</p>}
+      </div>{memorialOn(d) && <aside class="aside"><div class="aside-card"><p class="kicker">Memorial</p><h3>The members we have lost.</h3><p>Their names are kept on the memorial page.</p><a class="btn light" href="/memorial/">Memorial</a></div></aside>}</div>
     </div>
-  </section>
+  </section>}
 </Base>

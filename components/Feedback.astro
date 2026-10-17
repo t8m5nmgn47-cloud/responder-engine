@@ -2,8 +2,9 @@
 // "Review this site" widget (0.5.0). Rendered by Base.astro only when site.config.json has `feedback: { site }`.
 // Guided review (one review.json question at a time, highlighted on the page) + free markup mode with in-place
 // text edits, photo requests and notes. Zero dependencies, no external hosts; answers live in localStorage until sent.
-interface Props { site: string; endpoint: string; siteName: string; items?: any[] }
-const { site, endpoint, siteName, items = [] } = Astro.props;
+interface Props { site: string; endpoint: string; siteName: string; items?: any[]; reviewer?: string }
+// 0.12.0: `reviewer` (review.json) is who the widget addresses: "Chief" by default, "President Morgan" where that's who reviews.
+const { site, endpoint, siteName, items = [], reviewer = 'Chief' } = Astro.props;
 const qs = (items || []).map((it: any) => ({ id: it.id, q: it.question, cur: it.current || '', page: it.page || '/', sel: it.selector || '' }));
 const n = qs.length;
 ---
@@ -17,7 +18,7 @@ const n = qs.length;
   <p id="sfs-live" class="sfs-sr" aria-live="polite"></p>
   <div id="sfs-hl" hidden aria-hidden="true"></div>
   <div id="sfs-wel" class="sfs-card" hidden role="dialog" aria-modal="true" aria-labelledby="sfs-wel-h">
-    <h2 id="sfs-wel-h">Chief, let&rsquo;s check this site together.</h2>
+    <h2 id="sfs-wel-h">{reviewer}, let&rsquo;s check this site together.</h2>
     <p>{n} quick questions, then tap anything else you want changed. About 10 minutes. Your answers save as you go.</p>
     <label for="sfs-name">Your name (optional)</label><input id="sfs-name" type="text" autocomplete="name" />
     <button type="button" id="sfs-start" class="sfs-big sfs-pri">Start</button>
@@ -72,7 +73,7 @@ const n = qs.length;
       <button type="button" id="sfs-send" class="sfs-big sfs-pri">Send to Sites for Service</button>
       <p id="sfs-status" role="status"></p><a id="sfs-mail" hidden href="#">Email instead</a>
     </div>
-    <div id="sfs-ok-s" hidden><h2>Sent. Thank you, Chief.</h2><p>We&rsquo;ll make these changes and send you the updated site.</p><button type="button" id="sfs-reset" class="sfs-lnk">Start over</button></div>
+    <div id="sfs-ok-s" hidden><h2>Sent. Thank you, {reviewer}.</h2><p>We&rsquo;ll make these changes and send you the updated site.</p><button type="button" id="sfs-reset" class="sfs-lnk">Start over</button></div>
   </aside>
   <div id="sfs-pins" aria-hidden="true"></div>
 </div>

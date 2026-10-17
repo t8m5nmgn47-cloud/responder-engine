@@ -38,6 +38,6 @@ h1 small{display:block;font:600 9pt/1.3 "Source Sans 3",sans-serif;letter-spacin
     <div><h2>During</h2><ul><li>Get low under smoke. Feel doors with the back of your hand.</li><li>Close doors behind you.</li><li>Once out, stay out. Call 911 from outside.</li><li>Never go back in for anything.</li></ul></div>
     <div class="box"><b>Practiced on</b></div>
   </div>
-  <div class="foot"><span>{d.name} · {[d.address.street, d.address.city].filter(Boolean).join(', ')} · Non-emergency {d.phones.station} · Emergency 911</span><span>Free smoke alarm checks: {d.url.replace('https://','')}/safety/</span></div>
+  <div class="foot"><span>{d.name} · {[d.address.street, d.address.city].filter(Boolean).join(', ')} · Non-emergency {d.phones.station} · Emergency 911</span>{((d as any).safety || {}).alarm_checks ? <span>Smoke alarm checks: {d.url.replace('https://','')}/safety/</span> : <span>Fire safety: {d.url.replace('https://','')}/safety/</span>}</div>
 </div>
 </body></html>

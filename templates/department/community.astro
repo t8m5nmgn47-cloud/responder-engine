@@ -9,6 +9,11 @@ import ProgramCards from '../../components/ProgramCards.astro';
 const programs: any[] = (d as any).programs || [];
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 const cph = pick(d, 'community');
+// 0.12.0: the facts grid is the department's own (dept.json `community.facts` [{title,text}]) plus burning, whose
+// default wording is advice that holds anywhere. Until 0.11.1 it always claimed a Knox Box program, station tours,
+// a Fire Prevention Week school visit and an incident report process.
+const facts: { title: string; text: string }[] = [...(((d as any).community || {}).facts || []), ...(cp.burn_rule ? [{ title: 'Burning', text: cp.burn_rule }] : [])];
+const phone = (d.phones && d.phones.station) || '';
 ---
 <Base title="Community" description={cp.community_meta}>
   <section class={cph ? "phero two" : "phero"} style={cph ? `--pbg:url(${cph.src})` : undefined}>
@@ -18,22 +23,17 @@ const cph = pick(d, 'community');
         <h1 style="margin-top:.75rem">Before, during, and after.</h1>
         <p class="lede">The practical things: how to keep a fire from starting, how to help us when one does, and what to do the morning after.</p>
       </div>
-      {cph && <figure class="hphoto side"><img src={p800(cph)} alt={cph.alt} width="800" height="1067" fetchpriority="high" /><figcaption>{cp.community_caption}</figcaption></figure>}
+      {cph && <figure class="hphoto side"><img src={p800(cph)} alt={cph.alt} width="800" height="1067" fetchpriority="high" />{cp.community_caption && <figcaption>{cp.community_caption}</figcaption>}</figure>}
     </div>
   </section>
 
-  <section class="section tight">
+  {facts.length > 0 && <section class="section tight">
     <div class="wrap">
-      <div class="facts three">
-        <div class="fact"><h3>Knox Box</h3><p>{cp.knox_box}</p></div>
-        <div class="fact"><h3>Fire hydrants</h3><p>Keep three feet clear on every side. Don't park in front of one, don't paint it, don't open it. If a hydrant is damaged or buried, call the station.</p></div>
-        <div class="fact"><h3>Station tours</h3><p>{cp.station_tours}</p></div>
-        <div class="fact"><h3>Fire Prevention Week</h3><p>Every October the department visits the schools in the district with the message that has saved more lives than any truck: working smoke alarms, two ways out, a meeting place.</p></div>
-        <div class="fact"><h3>Burning</h3><p>{cp.burn_rule}</p></div>
-        <div class="fact"><h3>Incident reports</h3><p>{cp.incident_reports}</p></div>
+      <div class={`facts${facts.length >= 3 ? ' three' : ''}`}>
+        {facts.map((f) => <div class="fact"><h3>{f.title}</h3><p>{f.text}</p></div>)}
       </div>
     </div>
-  </section>
+  </section>}
 
   {programs.length > 0 && <section class="section band" id="programs">
     <div class="wrap">
@@ -48,18 +48,18 @@ const cph = pick(d, 'community');
       <div class="split"><div class="prose">
         <p>Call your insurance company first; they will tell you what to do and will often arrange cleanup and a place to stay. Don't go back into the building until we have told you it's safe, and don't reconnect gas, electric or water until the utility or an electrician has checked them. The Red Cross can help with immediate needs. Gather what documents you can: insurance, identification, bank, medical.</p>
         <p>You may notice we opened windows, cut holes in the roof, or opened walls. Ventilation lets heat and smoke out so firefighters can get in, and fire hides in walls and ceilings; we open them to make sure it's out. It looks like damage. It's how the rest of the house survived.</p>
-      </div><aside class="aside"><div class="aside-card"><p class="kicker">First three calls</p><ul><li>Your insurance company. They arrange cleanup and a place to stay.</li><li>The utility, before gas, power or water goes back on.</li><li>The station, <a href={tel(d.phones.station)}>{d.phones.station}</a>, for the incident report your insurer will ask for.</li></ul></div><div class="aside-card light"><p class="kicker">Red Cross</p><h3>Help the same night.</h3><p>The American Red Cross answers house fires around the clock with shelter, clothing and meals. 1-800-RED-CROSS.</p></div></aside></div>
+      </div><aside class="aside"><div class="aside-card"><p class="kicker">First three calls</p><ul><li>Your insurance company. They arrange cleanup and a place to stay.</li><li>The utility, before gas, power or water goes back on.</li>{phone && <li>The station, <a href={tel(phone)}>{phone}</a>, {cp.incident_reports ? 'for the incident report your insurer will ask for' : 'with any question about the fire'}.</li>}</ul></div><div class="aside-card light"><p class="kicker">Red Cross</p><h3>Help the same night.</h3><p>The American Red Cross answers house fires around the clock with shelter, clothing and meals. 1-800-RED-CROSS.</p></div></aside></div>
     </div>
   </section>
 
-  <section class="section">
+  {(d.faq || []).length > 0 && <section class="section">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">Common questions</p><h2>Things people ask us</h2></div>
       <div class="split"><div class="faq" style="max-width:62ch">
         {d.faq.map((f) => <details><summary>{f.q}</summary><p>{f.a}</p></details>)}
-      </div><aside class="aside"><div class="aside-card"><p class="kicker">Didn't find it?</p><h3>Ask a person.</h3><p>Station, non-emergency: <a href={tel(d.phones.station)}>{d.phones.station}</a>. Someone picks up or calls you back.</p><p>{[d.address.street, d.address.city].filter(Boolean).join(', ')}</p><a class="btn light" href="/contact/">Contact and directions</a></div></aside></div>
+      </div><aside class="aside"><div class="aside-card"><p class="kicker">Didn't find it?</p><h3>Ask a person.</h3>{phone && <p>Station, non-emergency: <a href={tel(phone)}>{phone}</a>.</p>}{(d as any).email && <p>Email: <a href={`mailto:${(d as any).email}`}>{(d as any).email}</a></p>}<p>{[d.address.street, d.address.city].filter(Boolean).join(', ')}</p><a class="btn light" href="/contact/">Contact and directions</a></div></aside></div>
     </div>
-  </section>
+  </section>}
 
   <FacebookFeed />
 </Base>

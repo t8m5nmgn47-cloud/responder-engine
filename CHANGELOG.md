@@ -3,6 +3,31 @@
 One entry per tag. Read the newest entry before building a department; read the README section it points to before
 touching the engine. Department repos pin a tag (`github:t8m5nmgn47-cloud/responder-engine#v0.10.2`).
 
+## v0.12.0 — 2026-10-17 — nothing untrue
+
+The template stops speaking for departments. Found by reading every line on the Thomasville, Hegins Valley and
+Crains Creek drafts that did not come from their own data: all three told residents about a Knox Box program,
+station tours, weekly training nights, an issued air pack and pager, an aerial, free smoke-alarm installs with
+10-year batteries and a Spanish site "planned". README "Nothing untrue (0.12.0)" has the fields.
+
+- Breaking (content): `copy.js` defaults are now neutral or empty; Paw Paw's wording moved into
+  `example/content/dept.json` (with `join`, `community`, `youth`, `safety` blocks) so the example renders as before.
+  A department on 0.11 that relied on a default will lose that sentence, which is the point; run the provenance
+  audit after upgrading.
+- `join`, `community.facts`, `youth`, `safety.alarm_checks`: department data replaces hardcoded sentences. The join
+  form now mails `email`.
+- `/members/`, `/responses/`, `/youth/`, `/memorial/` are routed (and linked) only when there is something on them.
+- New: `signature` home story band, `home.order`, `theme` colors with contrast guards (incl. `charcoal`), `email` on
+  contact/footer/community, `review.json` `reviewer`.
+- Fixed: "within a few minutes of Station Station 13"; "honored at the the Pennsylvania…"; an empty NFFF number
+  printed `tel:+1` and a broken sentence on the memorial page; "Chief since" for a president; "career and volunteer"
+  on every about page; the safety page's seasonal box showed all year; the footer printed "in , Pennsylvania" without
+  a county; a hard-coded "Chief's officers" heading; "News and events are kept in two plain data files the
+  department edits"; contact page's "Station tours" row repeated the station number.
+- Verified: Thomasville rebuilt with its own join/community/signature/theme content, 14 pages at 1366 and 390, no
+  overflow (the printable escape-plan sheet is fixed-width by design), no broken images, no console errors. Hegins
+  Valley and Crains Creek build clean; their content passes follow.
+
 ## v0.11.1 — 2026-10-16
 
 - Fixed: `/patch-options/` failed to build in 0.11.0 (a helper was used before it was defined). Found by the Hegins

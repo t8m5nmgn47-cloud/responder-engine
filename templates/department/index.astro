@@ -9,6 +9,8 @@ import inc from '@content/incidents.json';
 import ev from '@content/events.json';
 import FacebookFeed from '../../components/FacebookFeed.astro';
 import ProgramCards from '../../components/ProgramCards.astro';
+import Signature from '../../components/Signature.astro';
+import { memorialOn, responsesOn } from '../../components/sections.js';
 import siteConfig from '@siteconfig';
 const patch: string = (siteConfig as any).patch === false ? '' : ((siteConfig as any).patch || '/patch.svg'); // 0.10.2: patch:false omits it
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
@@ -35,6 +37,12 @@ const s = d.seasonal;
 const inSeason = s && s.start <= today && today <= s.end;
 // 0.7.0: `home.hide` lists home sections to leave out: groupband | feature | seasonal | pager | district | rigs | programs | doors | news | facebook | support
 const hide = new Set<string>(((d as any).home && (d as any).home.hide) || []);
+// 0.12.0: `home.order` lists section keys in the order the department wants them; any it leaves out follow in the
+// default order (use home.hide to drop one). `signature` is the department's own story band (components/Signature.astro).
+const DEFAULT_ORDER = ['tasks', 'notices', 'stats', 'groupband', 'signature', 'feature', 'seasonal', 'pager', 'district', 'rigs', 'programs', 'doors', 'news', 'shop', 'facebook', 'iso', 'support'];
+const wanted: string[] = (((d as any).home && (d as any).home.order) || []).filter((k: string) => DEFAULT_ORDER.includes(k));
+const order = [...wanted, ...DEFAULT_ORDER.filter((k) => !wanted.includes(k))];
+const sig: any = (d as any).signature && (d as any).signature.title ? (d as any).signature : null;
 // 0.7.0: seasonal.photo {src, alt, position?} turns the seasonal band into text + photo; seasonal.link/link_label become its first button
 const sPhoto = s && (s as any).photo;
 // 0.7.0: district.map_embed {query, zoom?, note?} embeds a map of the station address when there is no drawn DistrictMap
@@ -52,7 +60,9 @@ const ipSave = ipg.home && ipF[ipCls] && ipF[ipWorst] ? Math.round((ipBase * ipF
 // 0.8.0: `store.home` (true) shows the featured edition and up to three items on the home page
 const st: any = (d as any).store || {};
 // 0.10.4: `founded` is optional (0 or missing hides "Since" and the years tile); the stat band needs two tiles to show
-const statTiles = [d.stats.members > 0, d.stats.calls_2024 > 0, d.district.area_sq_mi > 0, !(d.stats.calls_2024 > 0), d.founded > 0].filter(Boolean).length;
+// 0.12.0: the 24/7 tile only when the department says so (copy.stat_247); it used to fill in whenever calls were missing.
+const tile247 = !(d.stats.calls_2024 > 0) && !!cp.stat_247;
+const statTiles = [d.stats.members > 0, d.stats.calls_2024 > 0, d.district.area_sq_mi > 0, tile247, d.founded > 0].filter(Boolean).length;
 const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st.featured.title, photo: (st.featured.photos && st.featured.photos[0] && st.featured.photos[0].src) || st.featured.photo, alt: st.featured.photos && st.featured.photos[0] && st.featured.photos[0].alt }] : []), ...(st.items || [])].slice(0, 3) : [];
 ---
 <Base title="Home" description={cp.home_meta}>
@@ -71,14 +81,15 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
     </div>
   </section>
 
-  {tasks.length > 0 && <nav class="tasksband cut" aria-label="I want to">
+  {order.map((k) => <>
+  {k === "tasks" && tasks.length > 0 && <nav class="tasksband cut" aria-label="I want to">
     <div class="wrap">
       <h2 class="sr">I want to</h2>
       <ul class="tasks">{tasks.map((t) => <li><a class="task" href={t.href}>{t.icon && <span class="ti" aria-hidden="true">{t.icon}</span>}<span class="tl">{t.label}</span></a></li>)}</ul>
     </div>
   </nav>}
 
-  {notices.length > 0 && <section class="section tight nowband" aria-label="Right now">
+  {k === "notices" && notices.length > 0 && <section class="section tight nowband" aria-label="Right now">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">Right now</p><h2 class="sr">Current notices</h2></div>
       <div class="nows" data-reveal-group>
@@ -87,22 +98,24 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
     </div>
   </section>}
 
-  {statTiles >= 2 && <section class="statband" aria-label="The department by the numbers">
+  {k === "stats" && statTiles >= 2 && <section class="statband" aria-label="The department by the numbers">
     <div class="wrap">
       <div class="stats" data-reveal-group>
         {d.stats.members > 0 && <div class="stat"><div class="v" data-count>{d.stats.members}</div><div class="k">{cp.members_label}</div></div>}
         {d.stats.calls_2024 > 0 && <div class="stat"><div class="v" data-count>{d.stats.calls_2024}</div><div class="k">Calls in 2024</div></div>}
         {d.district.area_sq_mi > 0 && <div class="stat"><div class="v" data-count>{d.district.area_sq_mi}</div><div class="k">Square miles protected</div></div>}
-        {!(d.stats.calls_2024 > 0) && <div class="stat"><div class="v">24/7</div><div class="k">{cp.stat_247}</div></div>}
+        {tile247 && <div class="stat"><div class="v">24/7</div><div class="k">{cp.stat_247}</div></div>}
         {d.founded > 0 && <div class="stat"><div class="v" data-count data-since={d.founded}>{new Date().getFullYear() - d.founded}</div><div class="k">Years of service</div></div>}
       </div>
     </div>
   </section>}
 
-  {!hide.has("groupband") && heroPhoto && <figure class="groupband"><img src={heroPhoto.src} alt={heroPhoto.alt} width="1100" height="400" loading="eager" /><figcaption><div class="wrap">{heroPhoto.caption}</div></figcaption></figure>}
+  {k === "groupband" && !hide.has("groupband") && heroPhoto && <figure class="groupband"><img src={heroPhoto.src} alt={heroPhoto.alt} width="1100" height="400" loading="eager" /><figcaption><div class="wrap">{heroPhoto.caption}</div></figcaption></figure>}
 
 
-  {cp.feature && !hide.has("feature") && <section class="section feat">
+  {k === "signature" && sig && !hide.has("signature") && <Signature sig={sig} />}
+
+  {k === "feature" && cp.feature && !hide.has("feature") && <section class="section feat">
     <div class="wrap">
       <div class={`featgrid${featPhoto ? "" : " solo"}`} data-reveal-group>
         {featPhoto ? <img src={p800(featPhoto)} alt={featPhoto.alt} width="800" height="1067" loading="lazy" style={featAspect ? `aspect-ratio:${featAspect}` : undefined} />
@@ -116,15 +129,15 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
       </div>
     </div>
   </section>}
-  {inSeason && !hide.has("seasonal") && (sPhoto
+  {k === "seasonal" && inSeason && !hide.has("seasonal") && (sPhoto
     ? <section class="section charband seasonband"><div class="wrap"><div class="seasongrid"><div><p class="kicker">{s.kicker}</p><h2>{s.title}</h2><p>{s.text}</p><div class="acts">{s.link && <a class="btn light" href={s.link} rel="noopener">{s.link_label || "Learn more"}</a>}<a class={`btn light${s.link ? " ghost" : ""}`} href="/safety/">Fire safety at home</a></div></div><div class="seasonpic"><img src={sPhoto.src.replace(".jpg","-800.jpg")} alt={sPhoto.alt || ""} width="800" height="1067" loading="lazy" style={sPhoto.position ? `object-position:${sPhoto.position}` : undefined} /></div></div></div></section>
     : <section class="section tight charband"><div class="wrap"><div class="seasonal"><div><p class="kicker">{s.kicker}</p><h2 style="margin-top:.4rem">{s.title}</h2><p style="margin-top:.6rem;max-width:60ch">{s.text}</p></div><div><a class="btn light" href="/safety/">Fire safety at home</a></div></div></div></section>)}
 
-  {!hide.has("pager") && <section class="section">
+  {k === "pager" && !hide.has("pager") && responsesOn(inc) && <section class="section">
     <div class="wrap">
       <div class="two">
         <div>
-          <div class="head" data-reveal><p class="kicker">Recent responses</p><h2>What the pager said</h2></div>
+          <div class="head" data-reveal><p class="kicker">Recent responses</p><h2>{(d as any).copy?.pager_title ?? "Latest calls"}</h2></div>
           <ol class="mini">
             {runs.map((r) => <li>{r.n && !/^\d{2}-0{3,}$/.test(r.n) && <span class="mn">{r.n}</span>}<span class="md">{fmt(r.date)}</span><span class="mt"><b>{r.type}</b> · {r.location}</span></li>)}
           </ol>
@@ -140,7 +153,7 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
     </div>
   </section>}
 
-  {!hide.has("district") && <section class="section band">
+  {k === "district" && !hide.has("district") && (cp.territory_long || cp.map || mapEmbed) && <section class="section band">
     <div class="wrap">
       <div class="mapgrid">
         <div>
@@ -156,7 +169,7 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
     </div>
   </section>}
 
-  {!hide.has("rigs") && <section class="section charband cut up">
+  {k === "rigs" && !hide.has("rigs") && d.apparatus.length > 0 && <section class="section charband cut up">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">On the floor</p><h2>{cp.rigs_title}</h2></div>
       <div class="rigs" data-reveal-group>
@@ -169,7 +182,7 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
     </div>
   </section>}
 
-  {programs.length >= 3 && !hide.has("programs") && <section class="section">
+  {k === "programs" && programs.length >= 3 && !hide.has("programs") && <section class="section">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">What we do</p><h2>Beyond the fire calls</h2></div>
       <ProgramCards limit={3} />
@@ -177,24 +190,24 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
     </div>
   </section>}
 
-  {!hide.has("doors") && <section class="section band">
+  {k === "doors" && !hide.has("doors") && <section class="section band">
     <div class="wrap">
       <div class={`doors three pdoors${doorA || doorB || doorC ? "" : " nophoto"}`} data-reveal-group>
         <a class="door" href="/safety/#911"><span class="tag">Safety</span>{doorA && <img src={p800(doorA)} alt={doorA.alt} loading="lazy" width="800" height="600" />}<h3>What happens when you call 911</h3><p>{cp.call_door}</p><span class="go">How it works</span></a>
         <a class="door" href="/community/"><span class="tag">Community</span>{doorB && <img src={p800(doorB)} alt={doorB.alt} loading="lazy" width="800" height="1067" />}<h3>For residents</h3><p>{cp.community_door}</p><span class="go">Community</span></a>
-        <a class="door" href="/memorial/"><span class="tag char">Memorial</span>{doorC && <img src={p800(doorC)} alt={doorC.alt} loading="lazy" width="800" height="1067" />}<h3>In memory</h3><p>{cp.memorial_door}</p><span class="go">Memorial</span></a>
+        {memorialOn(d) ? <a class="door" href="/memorial/"><span class="tag char">Memorial</span>{doorC && <img src={p800(doorC)} alt={doorC.alt} loading="lazy" width="800" height="1067" />}<h3>In memory</h3><p>{cp.memorial_door}</p><span class="go">Memorial</span></a> : <a class="door" href="/support/"><span class="tag char">Support</span>{doorC && <img src={p800(doorC)} alt={doorC.alt} loading="lazy" width="800" height="1067" />}<h3>Support the department</h3><p>{cp.support_blurb || "What your support pays for, and how to give."}</p><span class="go">Support</span></a>}
       </div>
     </div>
   </section>}
 
-  {!hide.has("news") && <section class="section tight">
+  {k === "news" && !hide.has("news") && d.news.length > 0 && <section class="section tight">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">Latest</p><h2>News from the station</h2></div>
       <div class="ncards" data-reveal-group>{latest.map((n) => <a class={`ncard${n.photo ? '' : ' nophoto'}`} href="/news/"><span class={`tag${(n as any).tag === 'Awards' ? ' gold' : ''}`}>{(n as any).tag || 'Department'}</span>{n.photo && <img src={n.photo.replace(".jpg","-800.jpg")} alt={n.alt || ""} loading="lazy" />}<div class="in"><time datetime={n.date}>{fmt(n.date)}, {n.date.slice(0,4)}</time><h3>{n.title}</h3><p>{n.text}</p></div></a>)}</div>
     </div>
   </section>}
 
-  {shopHome.length > 0 && <section class="section tight">
+  {k === "shop" && shopHome.length > 0 && <section class="section tight">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">{st.home_kicker || "Shop"}</p><h2>{st.home_title || "Wear the patch"}</h2></div>
       <div class="shophome" data-reveal-group>{shopHome.map((p) => <a class="shopcard" href="/shop/">{p.photo ? <img src={p.photo} alt={p.alt || p.name} loading="lazy" width="800" height="800" /> : <span class="reserved" role="img" aria-label={`Reserved for a photograph of ${p.name}`}></span>}<span class="in"><span class="h3">{p.name}</span>{p.price && <span class="pr">{p.price}</span>}</span></a>)}</div>
@@ -202,9 +215,9 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
     </div>
   </section>}
 
-  {!hide.has("facebook") && <FacebookFeed />}
+  {k === "facebook" && !hide.has("facebook") && <FacebookFeed />}
 
-  {ipg.home && ipSave > 0 && <section class="section tight isoband" aria-label="Insurance rating">
+  {k === "iso" && ipg.home && ipSave > 0 && <section class="section tight isoband" aria-label="Insurance rating">
     <div class="wrap">
       <div class="isogrid" data-reveal-group>
         <div class="isonum" aria-hidden="true"><span class="n">{ipCls}</span><span class="l">ISO class</span></div>
@@ -218,14 +231,15 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
     </div>
   </section>}
 
-  {!hide.has("support") && <section class="section redband cut up">
+  {k === "support" && !hide.has("support") && <section class="section redband cut up">
     <div class="wrap">
       <div class="seasonal">
-        <div><p class="kicker">Support</p><h2 style="margin-top:.4rem">{cp.support_h2} <span>{cp.support_h2b}</span></h2><p style="margin-top:.6rem;max-width:56ch">{cp.support_blurb}</p></div>
+        <div><p class="kicker">Support</p><h2 style="margin-top:.4rem">{cp.support_h2}{cp.support_h2b && <> <span>{cp.support_h2b}</span></>}</h2>{cp.support_blurb && <p style="margin-top:.6rem;max-width:56ch">{cp.support_blurb}</p>}</div>
         <div><a class="btn light" href="/support/">Support the department</a></div>
       </div>
     </div>
   </section>}
+  </>)}
 
   <script>(function(){var y=new Date().getFullYear();document.querySelectorAll("[data-since]").forEach(function(e){e.textContent=String(y-Number(e.getAttribute("data-since")))})})();</script>
 
@@ -296,7 +310,7 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
     .nowband .head .kicker::after{background:var(--brass)}
     .nows{display:grid;gap:1rem;grid-template-columns:1fr;margin-top:1.25rem}
     @media (min-width:52rem){.nows{grid-template-columns:1fr 1fr}}
-    .now{position:relative;display:flex;flex-direction:column;gap:.5rem;background:#2a2a2c;border:1px solid rgba(255,255,255,.08);border-top:4px solid var(--red);padding:1.25rem 1.4rem 1.4rem;text-decoration:none;color:var(--char-ink);min-width:0;transition:transform .2s var(--ease),border-color .2s}
+    .now{position:relative;display:flex;flex-direction:column;gap:.5rem;background:var(--char-2,#2a2a2c);border:1px solid rgba(255,255,255,.08);border-top:4px solid var(--red);padding:1.25rem 1.4rem 1.4rem;text-decoration:none;color:var(--char-ink);min-width:0;transition:transform .2s var(--ease),border-color .2s}
     .now .tag{align-self:flex-start}
     .now .nd{font:700 .8rem/1.3 var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--brass)}
     .now h3{font-size:1.6rem;line-height:1.05;color:#fff}

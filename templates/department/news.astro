@@ -16,7 +16,7 @@ const ics = (e: any) => `data:text/calendar;charset=utf8,${encodeURIComponent(['
   <section class="section tight band">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">Upcoming</p><h2>Events</h2></div>
-      {upcoming.length ? <div class="news">{upcoming.map((e) => <div class="item"><time datetime={e.date}>{short(e.date)}{e.end && e.end !== e.date ? ` to ${short(e.end)}` : ''}{e.time && <><br />{e.time}</>}</time><div><h3>{e.title}</h3><p><b>{e.where}</b>{e.text && <> · {e.text}</>}</p><a class="src" href={ics(e)} download={`${e.title.replace(/[^a-z0-9]+/gi,'-').toLowerCase()}.ics`}>Add to calendar</a>{(e as any).agenda_url && <> · <a class="src" href={(e as any).agenda_url} rel="noopener">Agenda</a></>}</div></div>)}</div> : <p class="small">Nothing scheduled right now. Training nights continue weekly; call the station for the next one.</p>}
+      {upcoming.length ? <div class="news">{upcoming.map((e) => <div class="item"><time datetime={e.date}>{short(e.date)}{e.end && e.end !== e.date ? ` to ${short(e.end)}` : ''}{e.time && <><br />{e.time}</>}</time><div><h3>{e.title}</h3><p><b>{e.where}</b>{e.text && <> · {e.text}</>}</p><a class="src" href={ics(e)} download={`${e.title.replace(/[^a-z0-9]+/gi,'-').toLowerCase()}.ics`}>Add to calendar</a>{(e as any).agenda_url && <> · <a class="src" href={(e as any).agenda_url} rel="noopener">Agenda</a></>}</div></div>)}</div> : <p class="small">Nothing scheduled right now. {d.facebook ? 'Check the department\'s Facebook page for anything new.' : 'Call the station to ask what\'s coming up.'}</p>}
     </div>
   </section>
 
@@ -24,7 +24,7 @@ const ics = (e: any) => `data:text/calendar;charset=utf8,${encodeURIComponent(['
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">News</p><h2>Recent</h2></div>
       <div class="news">{d.news.map((n) => <div class="item"><time datetime={n.date}>{fmt(n.date)}</time><div>{n.photo && <img class="nimg" src={n.photo} alt={n.alt || ""} loading="lazy" />}<h3>{n.title}</h3><p>{n.text}</p>{n.gallery && <div class="gal">{n.gallery.map((g) => <img src={g.src.replace(".jpg","-800.jpg")} alt={g.alt} loading="lazy" />)}</div>}{n.source && <a class="src" href={n.source} rel="noopener">Source</a>}</div></div>)}</div>
-      <p class="small" style="margin-top:1.5rem;max-width:62ch">Follow the department on <a href={d.facebook} rel="noopener">Facebook</a> for day-to-day updates. News and events are kept in two plain data files the department edits.</p>
+      {d.facebook && <p class="small" style="margin-top:1.5rem;max-width:62ch">Follow the department on <a href={d.facebook} rel="noopener">Facebook</a> for day-to-day updates.</p>}
     </div>
   </section>
 </Base>

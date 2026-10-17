@@ -3,7 +3,14 @@ import '../styles/global.css';
 import '../styles/motion.css';
 import d from '@content/dept.json';
 import { copy } from '../components/copy.js';
+import { youthOn, memorialOn, membersOn, responsesOn } from '../components/sections.js';
+import inc from '@content/incidents.json';
+import { themeVars } from '../components/theme.js';
 const cp = copy(d);
+// 0.12.0: dept.json `theme` {accent, accent_deep?, gold?, cream?} recolors the site from the department's own patch.
+// themeVars checks contrast (WCAG AA) and drops any color that would fail; `theme.css` is the resulting :root block.
+const theme = themeVars((d as any).theme);
+if (theme.notes.length && !(globalThis as any).__sfsThemeNoted) { (globalThis as any).__sfsThemeNoted = true; theme.notes.forEach((n) => console.warn('[responder-engine] ' + n)); }
 import status from '@content/status.json';
 import siteConfig from '@siteconfig';
 import review from '@review';
@@ -31,7 +38,7 @@ const full = path === '/' ? `${d.name} · ${cp.title_suffix}` : `${title} · ${d
 const nav = [
   { href: '/about/', label: 'About' },
   { href: '/apparatus/', label: 'Apparatus' },
-  { href: '/responses/', label: 'Responses' },
+  ...(responsesOn(inc) ? [{ href: '/responses/', label: 'Responses' }] : []),
   { href: '/safety/', label: 'Safety' },
   ...((d as any).weather ? [{ href: '/weather/', label: cp.weather_nav }] : []),
   { href: '/community/', label: 'Community' },
@@ -41,9 +48,9 @@ const nav = [
   { href: '/join/', label: 'Join', cta: true },
 ];
 const more = [
-  { href: '/members/', label: 'Members' },
-  { href: '/youth/', label: 'Junior program' },
-  { href: '/memorial/', label: 'Memorial' },
+  ...(membersOn(d) ? [{ href: '/members/', label: 'Members' }] : []),
+  ...(youthOn(d) ? [{ href: '/youth/', label: 'Junior program' }] : []),
+  ...(memorialOn(d) ? [{ href: '/memorial/', label: 'Memorial' }] : []),
   { href: '/support/', label: 'Support the department' },
   ...((d as any).iso_page && !(d as any).iso_page.nav_main ? [{ href: '/rating/', label: (d as any).iso_page.nav || 'What our rating saves you' }] : []),
   ...((d as any).store && (d as any).store.nav === false ? [{ href: '/shop/', label: cp.shop_nav }] : []),
@@ -78,7 +85,8 @@ const jsonld = {
     <meta property="og:title" content={full} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <meta name="theme-color" content="#b3261e" />
+    <meta name="theme-color" content={theme.accent} />
+    {theme.css && <style is:inline set:html={theme.css}></style>}
     {patch && <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32" />}
     {patch && patch.endsWith(".svg") && <link rel="icon" href={patch} type="image/svg+xml" />}
     {patch && <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />}
@@ -136,7 +144,7 @@ const jsonld = {
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
-    {d.draft_note && <p class="draft">{d.draft_note}{feedback && hasReview && <Fragment> <a class="draft-link" href="#sfs-review" data-sfs-start>Chiefs: review this site &rarr;</a></Fragment>}{!feedback && hasReview && path !== '/review/' && <Fragment> <a class="draft-link" href="/review/">Chiefs: review checklist &rarr;</a></Fragment>}</p>}
+    {d.draft_note && <p class="draft">{d.draft_note}{feedback && hasReview && <Fragment> <a class="draft-link" href="#sfs-review" data-sfs-start>Review this site &rarr;</a></Fragment>}{!feedback && hasReview && path !== '/review/' && <Fragment> <a class="draft-link" href="/review/">Review checklist &rarr;</a></Fragment>}</p>}
     <div class="bar">
       <div class="wrap">
         <span><b class="em">Emergency: 911</b></span>
@@ -175,7 +183,7 @@ const jsonld = {
           <div class="fid">
             {patch && <img class="fpatch" src={patch} alt="" width="64" height="74" loading="lazy" />}
             <h2>{d.name}</h2>
-            <p class="about">{cp.footer_about ?? `${d.company}. ${cp.footer_kind} protecting ${cp.territory}, ${d.district.area_sq_mi > 0 ? `about ${d.district.area_sq_mi} square miles of ` : 'in '}${cp.county}, ${cp.state_name}.`}</p>
+            <p class="about">{cp.footer_about ?? [d.company ? `${d.company}.` : '', cp.territory ? `${cp.footer_kind ? `${cp.footer_kind}, serving` : 'Serving'} ${cp.territory}${[cp.county, cp.state_name].filter(Boolean).length ? `, ${[cp.county, cp.state_name].filter(Boolean).join(', ')}` : ''}.` : ''].filter(Boolean).join(' ')}</p>
           </div>
           <div>
             <h2>Reach us</h2>
@@ -184,7 +192,8 @@ const jsonld = {
               <li>Station: <a href={tel(d.phones.station)}>{d.phones.station}</a></li>
               {d.phones.fax && <li>Fax: <span class="tn">{d.phones.fax}</span></li>}
               <li>{addrLine}</li>
-              <li><a href={d.facebook} rel="noopener">Facebook</a></li>
+              {(d as any).email && <li><a href={`mailto:${(d as any).email}`}>{(d as any).email}</a></li>}
+              {d.facebook && <li><a href={d.facebook} rel="noopener">Facebook</a></li>}
               {feed && feed.url && <li class="feed"><a href={feed.url} rel="noopener">Listen live: {feed.label}</a><br /><span class="fnote">Public scanner feed, run by volunteers. Not an official source.</span></li>}
             </ul>
           </div>
@@ -218,6 +227,6 @@ const jsonld = {
       document.addEventListener('click',function(e){if(d.open&&!d.contains(e.target))d.open=false;});
       d.addEventListener('focusout',function(e){if(d.open&&e.relatedTarget&&!d.contains(e.relatedTarget))d.open=false;});})();
     </script>
-    {feedback && !plain && <Feedback site={feedback.site} endpoint={feedback.endpoint} siteName={feedback.siteName} items={hasReview ? (review as any).items : []} />}
+    {feedback && !plain && <Feedback site={feedback.site} endpoint={feedback.endpoint} siteName={feedback.siteName} items={hasReview ? (review as any).items : []} reviewer={String((review as any).reviewer || 'Chief')} />}
   </body>
 </html>

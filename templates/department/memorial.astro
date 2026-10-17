@@ -11,6 +11,11 @@ const q = d.lodd[0];
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 const roll = d.memorial.slice().sort((a, b) => a.died.localeCompare(b.died));
 const first = roll.length ? yr(roll[0].died) : '', last = roll.length ? yr(roll[roll.length - 1].died) : '';
+// 0.12.0: the NFFF's LAST line is the default (NFFF LAST brochure, 2019: "call LAST first"); the old text promised a
+// 24-hour answer and a named state team, which the NFFF doesn't say for every state. `the` is trimmed so no "the the".
+const lastInfo: any = (d as any).michigan_last || {};
+const lastTel: string = lastInfo.nfff || '866-736-5868';
+const stateMemorial: string = String(lastInfo.memorial || '').replace(/^the\s+/i, '');
 const desc = q ? `In memory of the members of the ${d.name} who have died, and of ${q.name}, who died in the line of duty on ${fmt(q.died)}.` : `In memory of the members of the ${d.name} who have died.`;
 ---
 <Base title="Memorial" description={desc}>
@@ -39,16 +44,16 @@ const desc = q ? `In memory of the members of the ${d.name} who have died, and o
           {roll.map((m) => <li><span class="ms-n"><span class="ms-nm">{m.name}</span><span class="ms-dp">{fmt(m.died)}</span></span></li>)}
         </ol>}
         {roll.length > 0 && <p class="ms-end">{roll.length} names &nbsp;·&nbsp; {first}–{last}</p>}
-        <p class="ms-note">{d.memorial_note}</p>
+        {d.memorial_note && <p class="ms-note">{d.memorial_note}</p>}
       </div>
     </section>
 
     <section class="ms-last">
       <div class="wrap">
         <p class="ms-kicker">For every department</p>
-        <h2>If a {cp.state_name} firefighter dies in the line of duty</h2>
-        <p>{d.lodd.length > 0 && `${cp.place} knows this day. `}No department should face it alone. The National Fallen Firefighters Foundation answers <a href={tel(d.michigan_last.nfff)}>{d.michigan_last.nfff}</a> twenty-four hours a day and notifies {cp.last_team}, trained volunteers who help the department and the family with the first hours, the funeral and honors, and the federal and state benefit claims, at no cost and only when asked.</p>
-        <p class="ms-small">{cp.state_name}'s fallen are honored at the {d.michigan_last.memorial}, and nationally each spring at the National Fallen Firefighters Memorial in Emmitsburg, Maryland.</p>
+        <h2>If a {cp.state_name ? `${cp.state_name} ` : ''}firefighter dies in the line of duty</h2>
+        <p>{d.lodd.length > 0 && cp.place && `${cp.place} knows this day. `}No department should face it alone. The National Fallen Firefighters Foundation's Local Assistance State Team program sends trained volunteers, when the department asks, to help it and the family through the first hours, the funeral and honors, and the federal and state benefit claims. The number to call is <a href={tel(lastTel)}>{lastTel}</a>.</p>
+        {stateMemorial && <p class="ms-small">{cp.state_name ? `${cp.state_name}'s fallen are` : 'Fallen firefighters are'} honored at the {stateMemorial}, and nationally each spring at the National Fallen Firefighters Memorial in Emmitsburg, Maryland.</p>}
       </div>
     </section>
   </div>
