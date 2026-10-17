@@ -22,6 +22,9 @@ station tours, weekly training nights, an issued air pack and pager, an aerial, 
 - Accessibility: the header brand link's name now contains its visible text (axe `label-content-name-mismatch`);
   Thomasville scans clean with axe (WCAG 2.1 AA) on every page at 1366 and 390.
 - The weather page only asks for "a permit" when `weather.fire.permit_required` is true.
+- Rating page: no default year-of-work calendar, inspection-day steps or "Tuesday nights and Saturday mornings"
+  line (they were a guess at Crains Creek's schedule). `iso_page.work.year` / `.inspection` / `.intro` bring them
+  back with the department's own facts.
 - One photo once per page: the about history aside (`photos.history`, else `glow`), the about station band, the join
   steps aside, the contact aside and the responses aside no longer repeat the page's hero photo (the blurred hero
   backdrop is the same photo by design).

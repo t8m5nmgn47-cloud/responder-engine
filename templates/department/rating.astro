@@ -38,26 +38,12 @@ const sections = { 'Fire department': 50, 'Water supply': 40, '911 center': 10 }
 const work: any = ip.work || {};
 const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 // Each item: label, months it lands in (1-12), kind: 'drill' (every month) | 'test' | 'drive' | 'inspect'
-const yearItems: { label: string; months: number[]; kind: string; note?: string }[] = work.year || [
-  { label: 'Training night, every week', months: [1,2,3,4,5,6,7,8,9,10,11,12], kind: 'drill', note: 'Company drill. ISO credits up to 16 hours a month per member; the state requires 36 hours a year just to stay rated.' },
-  { label: 'Pump service test, every engine and tanker', months: [3], kind: 'test', note: 'Run at rated capacity and watched for pressure drop. A pump that fails is a pump that doesn\'t count.' },
-  { label: 'Hose test, every length', months: [5], kind: 'test', note: 'Each section pressurized, tagged and logged.' },
-  { label: 'Ground ladder test', months: [5], kind: 'test' },
-  { label: 'SCBA flow and fit tests, turnout gear inspection', months: [2,8], kind: 'test', note: 'Every member, every air pack, every set of gear.' },
-  { label: 'Dry hydrant flush and flow check', months: [4,9], kind: 'test', note: 'The ponds are the water system. Each rated source is flowed and recorded.' },
-  { label: 'Tanker shuttle drill', months: [6,10], kind: 'test', note: 'Fill, haul, dump, repeat, against the clock. This is the 40 water-supply points.' },
-  { label: 'Officer and driver training', months: [1,7], kind: 'drive' },
-  { label: 'Preschool visits, smoke alarm checks, pre-plans', months: [10], kind: 'drive', note: 'Fire Prevention Week. The bonus points.' },
-  { label: 'Run reports, training logs, certifications filed', months: [12], kind: 'drive', note: 'Everything above exists only if it was written down.' },
-];
+// 0.12.0: no default calendar. The old default (weekly training, test months, "36 hours a year") was a guess at
+// Crains Creek's schedule, not its schedule; a department that gives `work.year` gets the strip, everyone else none.
+const yearItems: { label: string; months: number[]; kind: string; note?: string }[] = work.year || [];
 const hoursMember = Number(ip.hours_member ?? 0);
 const hoursDept = Number(ip.hours_dept ?? 0);
-const inspect: any[] = work.inspection || [
-  { t: 'The records', d: 'The inspector pulls a year of training logs, every certification, every pump and hose test card, every run report. Nothing he can\'t see on paper counts.' },
-  { t: 'The trucks', d: 'Every compartment opened, hose and nozzles and ladders counted against the schedule, pumps run.' },
-  { t: 'The water', d: 'A timed shuttle or draft: sustain the required flow for two hours straight while he holds the stopwatch. Fall short and the class moves for the whole district.' },
-  { t: 'The verdict', d: 'A letter from the State Fire Marshal with the class, and a new date on the calendar. It is re-inspected, so it is kept, never owned.' },
-];
+const inspect: any[] = work.inspection || []; // 0.12.0: inspection steps only from the department or its sources
 // Comparison by department type: iso_page.peers [{class, kind:'municipal'|'rural', label?}]; the department itself is added from `cls`.
 const peers: any[] = ip.peers || [];
 const stateStats: any[] = ip.state_stats || [];
@@ -93,19 +79,19 @@ const spread = (list: any[]) => { const by: Record<string, any[]> = {}; list.for
   <section class="section work" id="what-it-takes">
     <div class="wrap">
       <div class="head" data-reveal><p class="kicker">{work.kicker || 'What it takes'}</p><h2>{work.title || `A year of keeping a ${cls}`}</h2></div>
-      <p class="lede" style="max-width:62ch">{work.intro || `Nobody is paid for the rating. It is earned on Tuesday nights and Saturday mornings by people who have already worked a shift somewhere else, and it has to be earned again every year.`}</p>
-      <figure class="yearstrip" aria-label="A calendar year of the tests, drills and paperwork that keep the rating.">
+      <p class="lede" style="max-width:62ch">{work.intro || `The rating is earned, not bought. Training, tested trucks and equipment, and the water the department can deliver all count toward it, and it is graded again.`}</p>
+      {yearItems.length > 0 && <figure class="yearstrip" aria-label="A calendar year of the tests, drills and paperwork that keep the rating.">
         <div class="ys-head"><span class="ys-label"></span>{months.map((m) => <span class="ys-m">{m}</span>)}</div>
         <ol class="ys-rows">{yearItems.map((it) => <li class={`ys-row ${it.kind}`}><span class="ys-label">{it.label}{it.note && <span class="ys-note">{it.note}</span>}</span>{months.map((m, i) => <span class={`ys-cell${it.months.includes(i + 1) ? ' on' : ''}`} aria-hidden="true"></span>)}</li>)}</ol>
-      </figure>
+      </figure>}
       {(hoursMember > 0 || hoursDept > 0) && <div class="stats fit" data-reveal-group style="margin-top:1.75rem">
         {hoursMember > 0 && <div class="stat"><div class="v" data-count>{hoursMember}</div><div class="k">{work.hours_member_label || 'Hours a year, one active member, before a single call'}</div></div>}
         {hoursDept > 0 && <div class="stat"><div class="v" data-count>{hoursDept.toLocaleString('en-US')}</div><div class="k">{work.hours_dept_label || 'Unpaid hours a year across the department'}</div></div>}
         <div class="stat"><div class="v">{usd(saved(worst))}</div><div class="k">Saved on one {usd(base)} policy, every year</div></div>
       </div>}
-      <div class="head" data-reveal style="margin-top:2.5rem"><p class="kicker">{work.inspect_kicker || 'Inspection day'}</p><h2>{work.inspect_title || 'Then the state comes to check'}</h2></div>
-      <ol class="insp" data-reveal-group>{inspect.map((x, i) => <li><span class="n">{i + 1}</span><h3>{x.t}</h3><p>{x.d}</p></li>)}</ol>
-      <p class="small" style="margin-top:1.25rem;max-width:64ch">{work.note || `The equation is simple and nobody says it out loud: the hours above are what the savings below are made of. Take away the hours and the district is a ${worst || '9'}. Here is what that is worth to your house.`}</p>
+      {inspect.length > 0 && <div class="head" data-reveal style="margin-top:2.5rem"><p class="kicker">{work.inspect_kicker || 'Inspection day'}</p><h2>{work.inspect_title || 'Then the state comes to check'}</h2></div>}
+      {inspect.length > 0 && <ol class="insp" data-reveal-group>{inspect.map((x, i) => <li><span class="n">{i + 1}</span><h3>{x.t}</h3><p>{x.d}</p></li>)}</ol>}
+      {(work.note || yearItems.length > 0 || hoursMember > 0) && <p class="small" style="margin-top:1.25rem;max-width:64ch">{work.note || `The hours above are what the savings below are made of. Take away the hours and the district is a ${worst || '9'}. Here is what that is worth to your house.`}</p>}
     </div>
   </section>
 

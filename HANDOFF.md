@@ -15,7 +15,31 @@ before it finishes. `CHANGELOG.md` is the history; this file is the present.
    at the images. A clean build and a passing structural check say nothing about how the page looks; today's
    two header bugs were both invisible until a screenshot.
 
-## Current state (2026-10-16, written by Kris's Mac session after engine 0.10.5 and the Thomasville build)
+## Current state (2026-10-17, cloud session: engine 0.12.0 "nothing untrue", NOT merged, tagged or pushed)
+
+- Engine 0.12.0 lives on local branch `nothing-untrue` (commits 5e3096a..HEAD on top of main f46ae0d). Not merged
+  to main, not tagged, not pushed: waiting for Kris to see Thomasville. To release: merge to main, `git tag v0.12.0`,
+  push main + tag, then re-pin each department and `npm install`. CHANGELOG top entry and README "Nothing untrue
+  (0.12.0)" describe it. Plan doc: "Making Every Department's Site Its Own" (Claude Docs).
+- How to build a department against the working engine without a tag: `zsh ~/sightline-studio/_incoming/try-engine.sh
+  <slug>` (copies the source to /tmp/eng-test/<slug>, drops the working engine into node_modules, builds to dist).
+  Checks used: `_incoming/shots.mjs <dist> <out>` (1366 + 390, overflow, broken images, console errors),
+  `_incoming/axe.mjs <dist>` (WCAG 2.1 AA), `tools/provenance-audit.mjs` (every line not from the department's
+  data). All in sightline-studio `_incoming/` (git-excluded) except the audit, which is in the engine.
+- Thomasville source (uncommitted in sightline-studio): join/community/signature/theme/home.order content, copy
+  fixes (no "20 minutes", no pager, no invented mission, no placeholders), BRIEF.md with sources, review items
+  `story`, `colors`, `story-questions`. Built on 0.12.0: 14 pages, axe clean, no overflow except the print sheet.
+  A fresh-eyes fact check (separate agent) was run against the public sources. Still pinned `#v0.10.5`; the live
+  draft is the old build. Gmail draft to the chief is still held.
+- Hegins source (uncommitted): Nicholas Morgan's Oct 17 email applied (five units, station history), join from the
+  old Join Today page, signature "Two fire companies. One valley." (Republican & Herald 2016), reviewer
+  "President Morgan". Blocked on photos (photographers' OK pending) and a chosen patch/colors. A reply to Nicholas
+  is a Gmail draft (domain: they already own hvfr.org; address 120/720/1720 and phone 1261/1267 questions).
+- Crains: builds on 0.12.0 but has had no content pass. Its rating page defaults (rating.astro `work.year`,
+  "Tuesday nights and Saturday mornings", test months, "36 hours a year") are unsourced engine text; several
+  copy keys are Paw Paw-derived (join_lede, call_door, members_h1). Needs a brief and the same treatment.
+
+## Previous state (2026-10-16, written by Kris's Mac session after engine 0.10.5 and the Thomasville build)
 
 - Engine: `main` = v0.11.1 (tags v0.10.4, v0.10.5, v0.11.0, v0.11.1 all pushed from Kris's Mac). 0.10.4/0.10.5 make
   `founded`, `address.street`/`zip` and `lodd[].joined` optional and fix the empty `tel:+1` and "0 members" bugs.
