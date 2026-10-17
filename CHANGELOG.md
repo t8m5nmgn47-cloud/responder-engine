@@ -22,6 +22,9 @@ station tours, weekly training nights, an issued air pack and pager, an aerial, 
 - Accessibility: the header brand link's name now contains its visible text (axe `label-content-name-mismatch`);
   Thomasville scans clean with axe (WCAG 2.1 AA) on every page at 1366 and 390.
 - The weather page only asks for "a permit" when `weather.fire.permit_required` is true.
+- One photo once per page: the about history aside (`photos.history`, else `glow`), the about station band, the join
+  steps aside, the contact aside and the responses aside no longer repeat the page's hero photo (the blurred hero
+  backdrop is the same photo by design).
 - Fixed: "within a few minutes of Station Station 13"; "honored at the the Pennsylvania…"; an empty NFFF number
   printed `tel:+1` and a broken sentence on the memorial page; "Chief since" for a president; "career and volunteer"
   on every about page; the safety page's seasonal box showed all year; the footer printed "in , Pennsylvania" without

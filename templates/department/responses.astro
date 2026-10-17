@@ -6,6 +6,9 @@ import { pick, p800 } from '../../components/photos.js';
 const cp = copy(d);
 import inc from '@content/incidents.json';
 const rp = pick(d, 'responses', 'glow') as { src: string; alt: string } | null;
+// 0.12.0: the list's aside never repeats the hero photo
+const rpAlt = pick(d, 'structure', 'squad', 'community') as { src: string; alt: string } | null;
+const rp2 = rpAlt && (!rp || rpAlt.src !== rp.src) ? rpAlt : null;
 const feed = (d as any).dispatch_feed as { label: string; url: string } | undefined;
 const fmt = (s: string) => new Date(s + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
 const years = inc.year_counts.slice().sort((a, b) => a.year - b.year);
@@ -61,7 +64,7 @@ const kinds: { title: string; text: string }[] = rs.kinds || [];
       </ol>
       {cp.responses_list_note && <p class="small" style="margin-top:1.5rem;max-width:62ch">{cp.responses_list_note}</p>}
       {rs.list_link && <p style="margin-top:1.25rem"><a class="btn" href={rs.list_link.href} rel="noopener">{rs.list_link.label}</a></p>}
-      </div><aside class="aside">{rp && <figure class="aside-photo"><img src={p800(rp)} alt={rp.alt} loading="lazy" width="800" height="1000" /></figure>}{rs.report && <div class="aside-card"><p class="kicker">After a call</p><h3>Need an incident report?</h3><p>{cp.incident_reports}</p></div>}</aside></div>
+      </div><aside class="aside">{rp2 && <figure class="aside-photo"><img src={p800(rp2)} alt={rp2.alt} loading="lazy" width="800" height="1000" /></figure>}{rs.report && <div class="aside-card"><p class="kicker">After a call</p><h3>Need an incident report?</h3><p>{cp.incident_reports}</p></div>}</aside></div>
     </div>
   </section>
 

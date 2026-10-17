@@ -7,6 +7,9 @@ const cp = copy(d);
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 const phone = (d.phones && d.phones.station) || '';
 const jph = pick(d, 'members_dog', 'squad');
+// 0.12.0: the steps aside never repeats the hero photo
+const alt2 = pick(d, 'structure', 'community', 'glow') as any;
+const sidePh = alt2 && (!jph || alt2.src !== (jph as any).src) ? alt2 : null;
 // Optional career / paid-position block (0.3.4): `careers {kicker?, title, text, cta?, href?}` renders a #career section.
 const careers = (d as any).careers as { kicker?: string; title: string; text: string; cta?: string; href?: string } | undefined;
 // 0.12.0: everything this page says about the department comes from dept.json `join`; a part that is missing is left
@@ -65,7 +68,7 @@ const desc = `How to join the ${d.name} as a volunteer: ${parts.length > 1 ? par
         {steps.map((s) => <li><h3>{s.title}</h3><p>{s.text}</p></li>)}
       </ol>
       <p class="small" style="margin-top:1.5rem;max-width:62ch">{stepsNote ? stepsNote + ' ' : ''}The National Volunteer Fire Council's <a href="https://makemeafirefighter.org" rel="noopener">Make Me A Firefighter</a> site answers the general questions, and lists departments near you.</p>
-      </div>{jph && <aside class="aside"><figure class="aside-photo"><img src={p800(jph)} alt={jph.alt} loading="lazy" width="800" height="1000" /><figcaption>{jph.alt}</figcaption></figure></aside>}</div>
+      </div>{sidePh && <aside class="aside"><figure class="aside-photo"><img src={p800(sidePh)} alt={sidePh.alt} loading="lazy" width="800" height="1000" /><figcaption>{sidePh.caption || sidePh.alt}</figcaption></figure></aside>}</div>
     </div>
   </section>}
 
@@ -74,8 +77,8 @@ const desc = `How to join the ${d.name} as a volunteer: ${parts.length > 1 ? par
       <div class="head" data-reveal><p class="kicker">{visit.kicker || 'Not sure yet?'}</p><h2>{visit.title}</h2></div>
       <div class="prose" style="max-width:60ch">
         <p>{visit.text}{phone && <> Call the station at <a href={tel(phone)}>{phone}</a>, or send the form below.</>}</p>
-        {visit.href && <p style="margin-top:1.4rem"><a class="btn light" href={visit.href} rel="noopener">{visit.cta || 'Learn more'}</a></p>}
       </div>
+      {visit.href && <p style="margin-top:1.4rem"><a class="btn light" href={visit.href} rel="noopener">{visit.cta || 'Learn more'}</a></p>}
     </div>
   </section>}
 
