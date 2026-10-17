@@ -52,7 +52,7 @@ const desc = q ? `In memory of the members of the ${d.name} who have died, and o
       <div class="wrap">
         <p class="ms-kicker">For every department</p>
         <h2>If a {cp.state_name ? `${cp.state_name} ` : ''}firefighter dies in the line of duty</h2>
-        <p>{d.lodd.length > 0 && cp.place && `${cp.place} knows this day. `}No department should face it alone. The National Fallen Firefighters Foundation's Local Assistance State Team program sends trained volunteers, when the department asks, to help it and the family through the first hours, the funeral and honors, and the federal and state benefit claims. The number to call is <a href={tel(lastTel)}>{lastTel}</a>.</p>
+        <p>{d.lodd.length > 0 && cp.place && `${cp.place} knows this day. `}No department should face it alone. The National Fallen Firefighters Foundation's Local Assistance State Team program sends trained volunteers, when the department asks, to help it and the family through the first hours, the funeral and honors, and the federal and state benefit claims. The NFFF's line for reporting a line-of-duty death is <a href={tel(lastTel)}>{lastTel}</a>.</p>
         {stateMemorial && <p class="ms-small">{cp.state_name ? `${cp.state_name}'s fallen are` : 'Fallen firefighters are'} honored at the {stateMemorial}, and nationally each spring at the National Fallen Firefighters Memorial in Emmitsburg, Maryland.</p>}
       </div>
     </section>
