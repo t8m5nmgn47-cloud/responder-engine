@@ -151,7 +151,7 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
           </div>
         </div>
         {cp.map && <DistrictMap />}
-        {!cp.map && mapEmbed && <div class="dmap-wrap"><iframe class="dmap" title={`Map showing ${cp.station_label}, ${mapEmbed.query}`} src={mapSrc} loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe><p class="small mapnote">{mapEmbed.note || `${cp.station_label}, ${d.address.street}.`} <a href={mapDir} rel="noopener">Directions</a> · Not sure you&rsquo;re in the district? <a href={tel(d.phones.station)}>Call the station</a>.</p></div>}
+        {!cp.map && mapEmbed && <div class="dmap-wrap"><iframe class="dmap" title={`Map showing ${cp.station_label}, ${mapEmbed.query}`} src={mapSrc} loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe><p class="small mapnote">{mapEmbed.note || `${[cp.station_label, d.address.street].filter(Boolean).join(', ')}.`} <a href={mapDir} rel="noopener">Directions</a> · Not sure you&rsquo;re in the district? <a href={tel(d.phones.station)}>Call the station</a>.</p></div>}
       </div>
     </div>
   </section>}

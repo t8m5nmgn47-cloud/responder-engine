@@ -57,7 +57,7 @@ const cph = pick(d, 'community');
       <div class="head" data-reveal><p class="kicker">Common questions</p><h2>Things people ask us</h2></div>
       <div class="split"><div class="faq" style="max-width:62ch">
         {d.faq.map((f) => <details><summary>{f.q}</summary><p>{f.a}</p></details>)}
-      </div><aside class="aside"><div class="aside-card"><p class="kicker">Didn't find it?</p><h3>Ask a person.</h3><p>Station, non-emergency: <a href={tel(d.phones.station)}>{d.phones.station}</a>. Someone picks up or calls you back.</p><p>{d.address.street}, {d.address.city}</p><a class="btn light" href="/contact/">Contact and directions</a></div></aside></div>
+      </div><aside class="aside"><div class="aside-card"><p class="kicker">Didn't find it?</p><h3>Ask a person.</h3><p>Station, non-emergency: <a href={tel(d.phones.station)}>{d.phones.station}</a>. Someone picks up or calls you back.</p><p>{[d.address.street, d.address.city].filter(Boolean).join(', ')}</p><a class="btn light" href="/contact/">Contact and directions</a></div></aside></div>
     </div>
   </section>
 

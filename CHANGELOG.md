@@ -3,6 +3,11 @@
 One entry per tag. Read the newest entry before building a department; read the README section it points to before
 touching the engine. Department repos pin a tag (`github:t8m5nmgn47-cloud/responder-engine#v0.10.2`).
 
+## v0.10.5 — 2026-10-16
+
+- Finishes 0.10.4's optional street: the community page's "Didn't find it?" card, the home map caption (when
+  `map_embed.note` is empty) and the default `copy.district_note` no longer print a leading ", ".
+
 ## v0.10.4 — 2026-10-16
 
 Found by the Thomasville (MO) build: a department with no street address on file, no members count and a

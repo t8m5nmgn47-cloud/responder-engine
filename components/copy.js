@@ -57,7 +57,7 @@ export function copy(d) {
     support_h2b: c.support_h2b ?? 'The rest is us.',
     events_link: c.events_link ?? 'News & events',
     rigs_note: c.rigs_note ?? '',
-    district_note: c.district_note ?? `Mutual aid with ${(d.district.mutual_aid || []).slice(0, 2).join(' and ')} and every department in the county. ${station_label}, ${d.address.street}.`,
+    district_note: c.district_note ?? `Mutual aid with ${(d.district.mutual_aid || []).slice(0, 2).join(' and ')} and every department in the county. ${[station_label, d.address.street].filter(Boolean).join(', ')}.`,
     responses_lede: c.responses_lede ?? 'Every call, in general terms: the kind of incident, the road, which rigs went, how many of your neighbors dropped what they were doing. No names, no house numbers, no medical details.',
     responses_list_kicker: c.responses_list_kicker ?? 'Recent',
     responses_list_title: c.responses_list_title ?? 'Latest responses',
