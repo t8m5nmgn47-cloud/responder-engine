@@ -58,11 +58,12 @@ const lvlLabel: Record<string,string> = { normal: 'Burning: normal conditions', 
 const current = (h: string) => (path.startsWith(h) ? 'page' : undefined);
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 const a = d.address;
+const addrLine = `${[a.street, a.city].filter(Boolean).join(', ')}, ${a.state}${a.zip ? ' ' + a.zip : ''}`; // 0.10.4: street and zip optional
 const jsonld = {
   '@context': 'https://schema.org', '@type': 'FireStation', name: d.name, url: d.url, telephone: `+1-${d.phones.station}`,
-  address: { '@type': 'PostalAddress', streetAddress: a.street, addressLocality: a.city, addressRegion: a.state, postalCode: a.zip },
+  address: { '@type': 'PostalAddress', streetAddress: a.street || undefined, addressLocality: a.city, addressRegion: a.state, postalCode: a.zip },
   areaServed: [...d.district.members, ...d.district.contract].map((n) => ({ '@type': 'AdministrativeArea', name: n })),
-  foundingDate: String(d.founded), sameAs: [d.facebook],
+  ...(d.founded ? { foundingDate: String(d.founded) } : {}), sameAs: [d.facebook],
 };
 ---
 <!doctype html>
@@ -140,7 +141,7 @@ const jsonld = {
       <div class="wrap">
         <span><b class="em">Emergency: 911</b></span>
         <span><b>Station, non-emergency:</b> <a href={tel(d.phones.station)}>{d.phones.station}</a></span>
-        <span class="addr">{a.street}, {a.city}, {a.state} {a.zip}</span>
+        <span class="addr">{addrLine}</span>
         <button class="tsz" type="button" id="tsz" aria-pressed="false" title="Larger text">A<span aria-hidden="true">A</span><span class="sr"> Larger text</span></button>
       </div>
     </div>
@@ -182,7 +183,7 @@ const jsonld = {
               <li>Emergency: 911</li>
               <li>Station: <a href={tel(d.phones.station)}>{d.phones.station}</a></li>
               {d.phones.fax && <li>Fax: <span class="tn">{d.phones.fax}</span></li>}
-              <li>{a.street}, {a.city}, {a.state} {a.zip}</li>
+              <li>{addrLine}</li>
               <li><a href={d.facebook} rel="noopener">Facebook</a></li>
               {feed && feed.url && <li class="feed"><a href={feed.url} rel="noopener">Listen live: {feed.label}</a><br /><span class="fnote">Public scanner feed, run by volunteers. Not an official source.</span></li>}
             </ul>

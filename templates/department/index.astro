@@ -51,6 +51,8 @@ const ipWorst = ipg.split || '9';
 const ipSave = ipg.home && ipF[ipCls] && ipF[ipWorst] ? Math.round((ipBase * ipF[ipWorst][0] / ipF[ipCls][0] - ipBase) / 50) * 50 : 0;
 // 0.8.0: `store.home` (true) shows the featured edition and up to three items on the home page
 const st: any = (d as any).store || {};
+// 0.10.4: `founded` is optional (0 or missing hides "Since" and the years tile); the stat band needs two tiles to show
+const statTiles = [d.stats.members > 0, d.stats.calls_2024 > 0, d.district.area_sq_mi > 0, !(d.stats.calls_2024 > 0), d.founded > 0].filter(Boolean).length;
 const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st.featured.title, photo: (st.featured.photos && st.featured.photos[0] && st.featured.photos[0].src) || st.featured.photo, alt: st.featured.photos && st.featured.photos[0] && st.featured.photos[0].alt }] : []), ...(st.items || [])].slice(0, 3) : [];
 ---
 <Base title="Home" description={cp.home_meta}>
@@ -58,7 +60,7 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
     <div class="wrap">
       <div class={`hx${compact ? " compact" : ""}`}>
         {patch && <img class="hpatch" src={patch} alt={`${d.name} patch`} width="140" height="161" loading="eager" />}
-        <p class="kicker">{d.tagline} · {cp.county} · Since {d.founded}</p>
+        <p class="kicker">{[d.tagline, cp.county, d.founded ? `Since ${d.founded}` : ""].filter(Boolean).join(" · ")}</p>
         <h1>{cp.hero_h1}</h1>
         <p class="lede">{cp.hero_lede}</p>
         <div class="acts">
@@ -85,17 +87,17 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
     </div>
   </section>}
 
-  <section class="statband" aria-label="The department by the numbers">
+  {statTiles >= 2 && <section class="statband" aria-label="The department by the numbers">
     <div class="wrap">
       <div class="stats" data-reveal-group>
         {d.stats.members > 0 && <div class="stat"><div class="v" data-count>{d.stats.members}</div><div class="k">{cp.members_label}</div></div>}
         {d.stats.calls_2024 > 0 && <div class="stat"><div class="v" data-count>{d.stats.calls_2024}</div><div class="k">Calls in 2024</div></div>}
         {d.district.area_sq_mi > 0 && <div class="stat"><div class="v" data-count>{d.district.area_sq_mi}</div><div class="k">Square miles protected</div></div>}
         {!(d.stats.calls_2024 > 0) && <div class="stat"><div class="v">24/7</div><div class="k">{cp.stat_247}</div></div>}
-        <div class="stat"><div class="v" data-count data-since={d.founded}>{new Date().getFullYear() - d.founded}</div><div class="k">Years of service</div></div>
+        {d.founded > 0 && <div class="stat"><div class="v" data-count data-since={d.founded}>{new Date().getFullYear() - d.founded}</div><div class="k">Years of service</div></div>}
       </div>
     </div>
-  </section>
+  </section>}
 
   {!hide.has("groupband") && heroPhoto && <figure class="groupband"><img src={heroPhoto.src} alt={heroPhoto.alt} width="1100" height="400" loading="eager" /><figcaption><div class="wrap">{heroPhoto.caption}</div></figcaption></figure>}
 

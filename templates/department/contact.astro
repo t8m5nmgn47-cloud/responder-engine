@@ -8,6 +8,7 @@ import DistrictMap from '../../components/DistrictMap.astro';
 const tel = (n: string) => `tel:+1${n.replace(/\D/g, '')}`;
 const cph = pick(d, 'dog_window', 'station');
 const a = d.address;
+const addrLine = `${[a.street, a.city].filter(Boolean).join(', ')}, ${a.state}${a.zip ? ' ' + a.zip : ''}`; // 0.10.4: street and zip optional
 ---
 <Base title="Contact" description={`How to reach the ${d.name}: 911 for emergencies; station non-emergency line, fax, address, and the chief's officers.`}>
   <section class={cph ? "phero two" : "phero"} style={cph ? `--pbg:url(${cph.src})` : undefined}><div class="wrap"><div><p class="kicker">Contact</p><h1 style="margin-top:.75rem">For an emergency, call 911.</h1><p class="lede">For everything else, the station line is answered when someone is in the building, and the chief's officers are listed below.</p></div>{cph && <figure class="hphoto side"><img src={p800(cph)} alt={cph.alt} width="800" height="1067" loading="eager" /><figcaption>{cp.contact_caption}</figcaption></figure>}</div></section>
@@ -16,13 +17,13 @@ const a = d.address;
       <div class="row"><dt>Emergency</dt><dd><b>911</b></dd></div>
       <div class="row"><dt>Station</dt><dd><a href={tel(d.phones.station)}>{d.phones.station}</a> (non-emergency)</dd></div>
       {d.phones.fax && <div class="row"><dt>Fax</dt><dd><span class="tn">{d.phones.fax}</span></dd></div>}
-      <div class="row"><dt>Address</dt><dd>{d.name}<br />{a.street}<br />{a.city}, {a.state} {a.zip}</dd></div>
-      {d.chiefs.filter((c) => !c.title.startsWith("Past")).map((c) => <div class="row"><dt>{c.title}</dt><dd>{c.name} · <a href={tel(c.phone)}>{c.phone}</a></dd></div>)}
+      <div class="row"><dt>Address</dt><dd>{d.name}<br />{a.street && <>{a.street}<br /></>}{a.city}, {a.state}{a.zip && ` ${a.zip}`}</dd></div>
+      {d.chiefs.filter((c) => !c.title.startsWith("Past")).map((c) => <div class="row"><dt>{c.title}</dt><dd>{c.name}{c.phone && <> · <a href={tel(c.phone)}>{c.phone}</a></>}</dd></div>)}
       <div class="row"><dt>Station tours</dt><dd><a href={tel(d.phones.tours)}>{d.phones.tours}</a></dd></div>
       <div class="row"><dt>Facebook</dt><dd><a href={d.facebook} rel="noopener">Facebook page</a></dd></div>
     </dl></div>
-    <aside class="aside">{(d as any).district && (d as any).district.map_embed ? <iframe class="aside-map" title={`Map showing ${cp.station_label}, ${a.street}, ${a.city}`} src={`https://www.google.com/maps?q=${encodeURIComponent((d as any).district.map_embed.query)}&z=13&output=embed`} loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe> : (cph ? <figure class="aside-photo wide"><img src={p800(cph)} alt={cph.alt} loading="lazy" width="800" height="600" /></figure> : null)}<div class="aside-card light"><p class="kicker">In an emergency</p><h3>Call 911, not the station.</h3><p>The station phone is for everything else: tours, permits, reports, questions. Nobody is at the desk during a call.</p></div></aside>
+    <aside class="aside">{(d as any).district && (d as any).district.map_embed ? <iframe class="aside-map" title={`Map showing ${[cp.station_label, a.street, a.city].filter(Boolean).join(', ')}`} src={`https://www.google.com/maps?q=${encodeURIComponent((d as any).district.map_embed.query)}&z=13&output=embed`} loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe> : (cph ? <figure class="aside-photo wide"><img src={p800(cph)} alt={cph.alt} loading="lazy" width="800" height="600" /></figure> : null)}<div class="aside-card light"><p class="kicker">In an emergency</p><h3>Call 911, not the station.</h3><p>The station phone is for everything else: tours, permits, reports, questions. Nobody is at the desk during a call.</p></div></aside>
     </div>
-    <div class="cmap" style="margin-top:2.5rem"><div class="head" data-reveal><p class="kicker">Where we are</p><h2>{cp.station_label}</h2><p class="small" style="max-width:62ch">{a.street}, {a.city}, {a.state} {a.zip}{cp.station_where}.{cp.map && " The map shows the district the station covers;"}{cp.map ? " for" : " For"} directions, <a href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(`${a.street}, ${a.city}, ${a.state} ${a.zip}`)}`} rel="noopener">open it in OpenStreetMap</a>.</p></div>{cp.map && <DistrictMap />}</div>
+    <div class="cmap" style="margin-top:2.5rem"><div class="head" data-reveal><p class="kicker">Where we are</p><h2>{cp.station_label}</h2><p class="small" style="max-width:62ch">{addrLine}{cp.station_where}.{cp.map && " The map shows the district the station covers;"}{cp.map ? " for" : " For"} directions, <a href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(addrLine)}`} rel="noopener">open it in OpenStreetMap</a>.</p></div>{cp.map && <DistrictMap />}</div>
   </div></section>
 </Base>

@@ -3,6 +3,24 @@
 One entry per tag. Read the newest entry before building a department; read the README section it points to before
 touching the engine. Department repos pin a tag (`github:t8m5nmgn47-cloud/responder-engine#v0.10.2`).
 
+## v0.10.4 — 2026-10-16
+
+Found by the Thomasville (MO) build: a department with no street address on file, no members count and a
+line-of-duty death whose join date is known only to the year. Verified by building Hegins Valley and Crains Creek
+against 0.10.3 and 0.10.4: Crains is byte-identical (normalized), Hegins changes only in the two bugs below.
+
+- `founded` is optional: 0 or missing drops "Since …" from the home kicker, the "Years of service" tile, the about
+  page's "<founded> to now" heading (now `copy.history_title`, default "Our history") and years figure, the JSON-LD
+  `foundingDate`, and "Est. …" from the default header tagline.
+- The home stat band renders only when it has at least two tiles (no lone "24/7" tile).
+- `address.street` and `address.zip` are optional: the top bar, footer, contact page, map title, directions link and
+  escape-plan footer join what is there instead of printing ", Thomasville".
+- `lodd[].joined` may be a full date, a bare year (`"2019"`) or empty; empty leaves out "Member since".
+- Fixed: a chief or officer with no phone printed an empty `tel:+1` link (contact page and about page). Live on
+  Hegins Valley.
+- Fixed: the about page's "By the numbers" card printed "0 members, career and volunteer" when `stats.members` is 0;
+  the sentence (and the card, when there are no years either) is now left out. Live on Hegins Valley.
+
 ## v0.10.3 — 2026-10-15
 
 Found by the Hegins Valley build (first photo-free, patch-free department).
