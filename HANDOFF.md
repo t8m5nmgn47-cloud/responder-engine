@@ -17,12 +17,16 @@ before it finishes. `CHANGELOG.md` is the history; this file is the present.
 
 ## Current state (2026-10-16, written by Kris's Mac session after engine 0.10.5 and the Thomasville build)
 
-- Engine: `main` = `24861e5`, version 0.10.5, tags `v0.10.4` (= `8d42cb4`) and `v0.10.5` (= `24861e5`) pushed from
-  Kris's Mac (tag pushes work there; `v0.10.2`/`v0.10.3` are on GitHub too now). 0.10.4/0.10.5 make `founded`,
-  `address.street`/`zip` and `lodd[].joined` optional and fix two live Hegins bugs (empty `tel:+1` link after a
-  chief with no phone; "0 members, career and volunteer" on about). Verified: Crains byte-identical (normalized) on
-  0.10.3 vs 0.10.5; Hegins differs only in those two fixes. A root `.gitignore` now keeps `node_modules/` out
-  (a stray root `node_modules` exists on the Mac; `example/` has content but no package.json, so it can't build).
+- Engine: `main` = v0.11.1 (tags v0.10.4, v0.10.5, v0.11.0, v0.11.1 all pushed from Kris's Mac). 0.10.4/0.10.5 make
+  `founded`, `address.street`/`zip` and `lodd[].joined` optional and fix the empty `tel:+1` and "0 members" bugs.
+  0.11.0 adds `tools/patch` (own package.json; `cd tools/patch && npm install` once): `import` (existing art to
+  patch.svg + icons), `options` (drafted round badge / Maltese cross / shield from `<source>/patch.json`, text as
+  outlines) and `build` (the chosen style), plus a noindex `/patch-options/` page when dept.json has
+  `patch_options`. 0.11.1 fixes that page's build. README "Patches" has the commands. Verified: Crains
+  byte-identical (normalized) from 0.10.3 through 0.11.1. Root `.gitignore` keeps `node_modules/` out; `example/`
+  can't build (no package.json), so test engine changes against Crains/Hegins/Thomasville copies.
+- Patch wall: every site is free; Sites for Service asks each department for one patch for its wall. It's in the
+  Thomasville email draft and both review intros; put it in every first email and review.
 - `sightline-studio` main (= `01a2ded`, pushed):
   - `sources/thomasville-fire` + `sites/thomasville-fire`: Thomasville Volunteer Fire Department (Thomasville,
     Oregon County, MO), first draft on 0.10.5 (pinned `#v0.10.5`). Request from Fire Chief
@@ -41,13 +45,14 @@ before it finishes. `CHANGELOG.md` is the history; this file is the present.
     (git-excluded). DEPLOYED 2026-10-16 to https://thomasville-fire.vercel.app
     (own Vercel project `thomasville-fire`, linked in `sites/thomasville-fire/.vercel`; same `npm run sync` caveat
     as Hegins: back up `.vercel`, `.gitignore` and `.env.local` first). Review email to the chief is a Gmail DRAFT
-    in Kris's account, not sent. review.json has 20 questions; widget feedback lands in the admin as site
+    in Kris's account, not sent (now ends with the patch-wall ask). Redeployed with the patch-wall review intro. review.json has 20 questions; widget feedback lands in the admin as site
     `thomasville-fire`. The request in the admin is still marked New.
   - Uncommitted on the Mac, not from this session: `sources/crains-creek-fire/site.config.json` and 20 files in
     `sites/crains-creek-fire` (one-line changes each; likely the "Crains Creek Fire-Rescue" header name). Left alone.
-  - Hegins Valley: still on 0.10.3; a rebuild on 0.10.5 picks up the two fixes above. Its `copy.last_team` is `""`,
-    which prints "notifies , trained volunteers" on the memorial page: delete that key (the default names
-    Pennsylvania's LAST). Still needs the review link to Nicholas Morgan (president@hvfr.org).
+  - Hegins Valley: on 0.11.1 (`#v0.11.1`), rebuilt and synced on main (`e15a58f`) but NOT redeployed: Kris to
+    approve. Changes: the two 0.10.4 fixes, `last_team` blank removed, three drafted patches at `/patch-options/`
+    from `sources/hegins-valley-fire/patch.json` (EST 2015 = the merger; review item 1 asks), patch-wall line in the
+    review intro. 16 pages checked at 1366 and 390. Still needs the review link to Nicholas Morgan.
 - Crains review page: 28 open items for Chief Mackey; shop stays in the footer until Stripe links and photos exist.
 - Station Ops (operation-charity repo, ADR + SO1): the other account's session; nothing in the engine depends on it.
 - Known gaps: Facebook and map embeds render blank in headless screenshots (both load in real browsers). The
