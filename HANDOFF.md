@@ -38,9 +38,11 @@ before it finishes. `CHANGELOG.md` is the history; this file is the present.
     `patch.svg`/favicons from the department's logo with the cream background cut out. Raw downloads and the
     contact sheet are in `_incoming/thomasville-fb/` (git-excluded). The memorial page stays photo-free until the
     chief and Bill's family weigh in (review items 1-2). Screenshots in `_incoming/thomasville-shots/`
-    (git-excluded). NOT DEPLOYED yet and no Vercel project; when Kris approves: `cd sites/thomasville-fire &&
-    npx vercel link --yes --project thomasville-fire && npx vercel deploy --prod --yes`. Then email the chief the
-    review link. review.json has 20 questions.
+    (git-excluded). DEPLOYED 2026-10-16 to https://thomasville-fire.vercel.app
+    (own Vercel project `thomasville-fire`, linked in `sites/thomasville-fire/.vercel`; same `npm run sync` caveat
+    as Hegins: back up `.vercel`, `.gitignore` and `.env.local` first). Review email to the chief is a Gmail DRAFT
+    in Kris's account, not sent. review.json has 20 questions; widget feedback lands in the admin as site
+    `thomasville-fire`. The request in the admin is still marked New.
   - Uncommitted on the Mac, not from this session: `sources/crains-creek-fire/site.config.json` and 20 files in
     `sites/crains-creek-fire` (one-line changes each; likely the "Crains Creek Fire-Rescue" header name). Left alone.
   - Hegins Valley: still on 0.10.3; a rebuild on 0.10.5 picks up the two fixes above. Its `copy.last_team` is `""`,
