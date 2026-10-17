@@ -49,8 +49,8 @@ before it finishes. `CHANGELOG.md` is the history; this file is the present.
     `thomasville-fire`. The request in the admin is still marked New.
   - Uncommitted on the Mac, not from this session: `sources/crains-creek-fire/site.config.json` and 20 files in
     `sites/crains-creek-fire` (one-line changes each; likely the "Crains Creek Fire-Rescue" header name). Left alone.
-  - Hegins Valley: on 0.11.1 (`#v0.11.1`), rebuilt and synced on main (`e15a58f`) but NOT redeployed: Kris to
-    approve. Changes: the two 0.10.4 fixes, `last_team` blank removed, three drafted patches at `/patch-options/`
+  - Hegins Valley: on 0.11.1 (`#v0.11.1`), rebuilt on main (`e15a58f`) and DEPLOYED 2026-10-16 to
+    https://hegins-valley-fire.vercel.app. Changes: the two 0.10.4 fixes, `last_team` blank removed, three drafted patches at `/patch-options/`
     from `sources/hegins-valley-fire/patch.json` (EST 2015 = the merger; review item 1 asks), patch-wall line in the
     review intro. 16 pages checked at 1366 and 390. Still needs the review link to Nicholas Morgan.
 - Crains review page: 28 open items for Chief Mackey; shop stays in the footer until Stripe links and photos exist.
