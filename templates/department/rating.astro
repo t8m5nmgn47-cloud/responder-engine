@@ -166,7 +166,7 @@ const spread = (list: any[]) => { const by: Record<string, any[]> = {}; list.for
           </div>
         </div>
         <figure class="ring" aria-label="Diagram: the station at the center, a ring at five road miles, homes inside rated at the department's class and homes outside rated lower.">
-          <svg viewBox="0 0 400 300" role="img">
+          <svg viewBox="0 0 400 300" aria-hidden="true" focusable="false">
             <defs><pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="currentColor" stroke-width="1.2" opacity=".35"/></pattern></defs>
             <rect x="0" y="0" width="400" height="300" fill="url(#hatch)" />
             <circle cx="200" cy="150" r="118" fill="var(--char)" stroke="var(--brass)" stroke-width="2" />
@@ -326,7 +326,7 @@ const spread = (list: any[]) => { const by: Record<string, any[]> = {}; list.for
     .miles .st.sm{font-size:11px;fill:var(--brass);letter-spacing:.08em;text-transform:uppercase}
     .stack .sbar{display:flex;gap:2px;height:4.5rem;margin:1.5rem 0 1.25rem}
     .stack .seg{display:flex;flex-direction:column;justify-content:center;gap:.2rem;padding:0 .8rem;min-width:0;background:var(--char);color:#fff;border-radius:2px;overflow:hidden}
-    .stack .seg:nth-child(2){background:#4a4a4e}.stack .seg:nth-child(3){background:#8e8a82}
+    .stack .seg:nth-child(2){background:#4a4a4e}.stack .seg:nth-child(3){background:#8e8a82;color:var(--char)}
     .stack .seg.bonus{background:var(--brass);color:var(--char)}
     .stack .seg b{font:700 1.4rem/1 var(--display)}
     .stack .seg i{font:600 .68rem/1.1 var(--sans);letter-spacing:.06em;text-transform:uppercase;font-style:normal}

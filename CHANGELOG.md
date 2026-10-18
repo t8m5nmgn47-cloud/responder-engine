@@ -3,6 +3,13 @@
 One entry per tag. Read the newest entry before building a department; read the README section it points to before
 touching the engine. Department repos pin a tag (`github:t8m5nmgn47-cloud/responder-engine#v0.10.2`).
 
+## v0.12.1 — 2026-10-18 — rating page passes the accessibility scan
+
+Found on Crains Creek, the only department with a rating page, during its 0.12.0 content pass.
+- The score bar's third segment (the 911 center) had white text on light grey, 3.4:1; it now uses the dark ink.
+- The five-mile ring diagram was an `svg role="img"` with no name; the figure around it already carries the
+  description, so the drawing is hidden from screen readers instead of read as an unnamed image.
+
 ## v0.12.0 — 2026-10-17 — nothing untrue
 
 The template stops speaking for departments. Found by reading every line on the Thomasville, Hegins Valley and

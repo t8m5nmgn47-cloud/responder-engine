@@ -1,6 +1,6 @@
 {
   "name": "@sightline/responder-engine",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "description": "Reusable Astro site engine for volunteer fire departments and other first-responder organizations. Content-only department repos consume it as an integration.",
   "type": "module",
   "license": "MIT",
