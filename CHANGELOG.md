@@ -3,12 +3,21 @@
 One entry per tag. Read the newest entry before building a department; read the README section it points to before
 touching the engine. Department repos pin a tag (`github:t8m5nmgn47-cloud/responder-engine#v0.10.2`).
 
-## v0.12.1 — 2026-10-18 — rating page passes the accessibility scan
+## v0.12.1 — 2026-10-18 — rating page: accessible, and the split class said right
 
 Found on Crains Creek, the only department with a rating page, during its 0.12.0 content pass.
 - The score bar's third segment (the 911 center) had white text on light grey, 3.4:1; it now uses the dark ink.
 - The five-mile ring diagram was an `svg role="img"` with no name; the figure around it already carries the
   description, so the drawing is hidden from screen readers instead of read as an unnamed image.
+
+Found by the fresh-eyes fact check on Crains Creek (North Carolina rule 11 NCAC 05A .0902(e); N.C. Rate Bureau P-17-4):
+- A split class like 9E covers properties more than five and up to six road miles from the station, not everything
+  "beyond five". The rating page's split label, ring diagram and five-mile paragraph now say five to six, and past
+  six a 10.
+- The calculator's "% more" under the 9E and 10 tiles showed how much less the department's class pays (30%
+  and 44% for Crains Creek), not how much more the same house pays at 9E or 10 (43% and 79%).
+- The savings line said what "a typical home saves". It's the extra a house paying the example premium at the
+  department's class would pay at the split class; the home band and the support page now say exactly that.
 
 ## v0.12.0 — 2026-10-17 — nothing untrue
 

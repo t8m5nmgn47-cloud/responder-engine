@@ -223,8 +223,8 @@ const shopHome: any[] = st.home ? [...(st.featured ? [{ ...st.featured, name: st
         <div class="isonum" aria-hidden="true"><span class="n">{ipCls}</span><span class="l">ISO class</span></div>
         <div>
           <p class="kicker">{ipg.home_kicker || "What our rating saves you"}</p>
-          <h2>{ipg.home_title || `About $${ipSave.toLocaleString("en-US")} a year on a typical home's insurance.`}</h2>
-          <p class="lede" style="margin-top:.6rem;max-width:52ch">{ipg.home_text || `Insurers price every policy in the district on the department's Class ${ipCls} rating. Without a rated department the same house is a ${ipWorst}. See what it means for yours.`}</p>
+          <h2>{ipg.home_title || `About $${ipSave.toLocaleString("en-US")} a year, on a $${ipBase.toLocaleString("en-US")} policy.`}</h2>
+          <p class="lede" style="margin-top:.6rem;max-width:52ch">{ipg.home_text || `Insurers price every policy in the district on the department's Class ${ipCls} rating. A house paying $${ipBase.toLocaleString("en-US")} a year at Class ${ipCls} would pay about that much more at ${ipWorst}, by the state rate bureau's factors. See what it means for yours.`}</p>
           <p style="margin-top:1.25rem"><a class="btn red" href="/rating/#calculator">{ipg.home_link || "Run the numbers for your house"}</a></p>
         </div>
       </div>

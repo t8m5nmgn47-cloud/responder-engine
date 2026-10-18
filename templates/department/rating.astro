@@ -22,7 +22,7 @@ const f = (c: string, i = 0) => (F[c] || F[c.replace(/\D/g, '')] || [1, 1])[i];
 const ours = f(cls), oursM = f(cls, 1);
 const at = (c: string, m = 0) => Math.round(base * f(c, m) / f(cls, m));
 const saved = (c: string, m = 0) => at(c, m) - base;
-const pct = (c: string, m = 0) => Math.round((1 - f(cls, m) / f(c, m)) * 100);
+const pct = (c: string, m = 0) => Math.round((f(c, m) / f(cls, m) - 1) * 100); // 0.12.1: how much MORE the same house pays at class c (was 1 - ours/theirs, i.e. how much less we pay, under a "more" label)
 const worst = split || '9';
 const ladder = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
 const bars = [cls, '5', '7', '8', worst, '10'].filter((v, i, a) => a.indexOf(v) === i).map((c) => ({ c, v: f(c) }));
@@ -62,7 +62,7 @@ const spread = (list: any[]) => { const by: Record<string, any[]> = {}; list.for
         </div>
         <div class="bigclass" aria-hidden="true"><span class="bc-n">{cls}</span><span class="bc-l">of 10</span></div>
       </div>
-      <figure class="ladder" aria-label={`Fire protection classes 1 to 10. ${d.name} is rated ${cls}${split ? `, ${split} beyond five road miles` : ''}; a community with no recognized protection is a 10.`}>
+      <figure class="ladder" aria-label={`Fire protection classes 1 to 10. ${d.name} is rated ${cls}${split ? `, ${split} from five to six road miles` : ''}; a community with no recognized protection is a 10.`}>
         <ol class="rungs">{ladder.map((c) => <li class={c === cls ? 'us' : (c === worst.replace(/\D/g, '') ? 'far' : '') + (c === '10' ? ' none' : '')}><span class="rn">{c}</span></li>)}</ol>
         <div class="rlabels">
           <p class="rl best">Best protection</p>
@@ -70,7 +70,7 @@ const spread = (list: any[]) => { const by: Record<string, any[]> = {}; list.for
         </div>
         <ul class="pins">
           <li class="pin us" style={`--at:${(ladder.indexOf(cls) + .5) / 10 * 100}%`}><b>{cls}</b> {ip.us_label || `${cp.place}, within 5 road miles of the station`}</li>
-          {split && <li class="pin far" style={`--at:${(ladder.indexOf(worst.replace(/\D/g, '')) + .5) / 10 * 100}%`}><b>{split}</b> {ip.split_label || 'Beyond 5 road miles from the station'}</li>}
+          {split && <li class="pin far" style={`--at:${(ladder.indexOf(worst.replace(/\D/g, '')) + .5) / 10 * 100}%`}><b>{split}</b> {ip.split_label || '5 to 6 road miles from the station'}</li>}
         </ul>
       </figure>
     </div>
@@ -161,7 +161,7 @@ const spread = (list: any[]) => { const by: Record<string, any[]> = {}; list.for
         <div>
           <div class="head" data-reveal><p class="kicker">The five-mile line</p><h2>{ip.miles_title || 'Where the rating reaches'}</h2></div>
           <div class="prose">
-            <p>{ip.miles_text || `Class ${cls} covers every property within five road miles of the station${split ? `. Past that line the state rates the same house a ${split}, no matter how good the department is` : ''}. Road miles, not straight-line, so two neighbors can land on different sides of it.`}</p>
+            <p>{ip.miles_text || `Class ${cls} covers every property within five road miles of the station${split ? `. From five to six road miles out, the state rates the same house a ${split}; past six it is a 10, no matter how good the department is` : ''}. Road miles, not straight-line, so two neighbors can land on different sides of it.`}</p>
             <p style="margin-top:1rem">{ip.miles_cta || 'Not sure which side you are on?'} <a href={tel(d.phones.station)}>Call the station</a>. {ip.miles_help || 'There are sometimes ways to fix it, like a certified water source closer to your property.'}</p>
           </div>
         </div>
@@ -176,7 +176,7 @@ const spread = (list: any[]) => { const by: Record<string, any[]> = {}; list.for
             <text x="200" y="48" text-anchor="middle" class="st big">Class {cls}</text>
             <text x="200" y="64" text-anchor="middle" class="st sm">within 5 road miles</text>
             <text x="356" y="282" text-anchor="end" class="st big">{split ? `Class ${split}` : 'Lower class'}</text>
-            <text x="356" y="296" text-anchor="end" class="st sm">beyond</text>
+            <text x="356" y="296" text-anchor="end" class="st sm">{split ? "5 to 6 miles out" : "beyond"}</text>
             <line x1="200" y1="150" x2="318" y2="150" stroke="var(--brass)" stroke-width="1.5" />
             <text x="259" y="143" text-anchor="middle" class="st sm">5 miles</text>
           </svg>
